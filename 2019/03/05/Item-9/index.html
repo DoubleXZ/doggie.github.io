@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/doggie.github.io/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/doggie.github.io/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/doggie.github.io/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/doggie.github.io/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/doggie.github.io/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/doggie.github.io/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/doggie.github.io/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Effiective Java 3rd,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="Java库中包含许多需要手动调用close方法来关闭的资源。例如，包括InputStream, OutputStream和java.sql.Connection。关闭资源经常被客户端忽略，导致可怕的性能问题。尽管许多资源使用终结器作为安全网，但终结器却并不尽如人意（Item 8）。&amp;emsp;&amp;emsp;从历史上来看，try-finally语句是保证资源被恰当关闭的最佳方式，即使是面对异常和返回值">
+<meta name="keywords" content="Effiective Java 3rd">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Item-9 优先选择try-with-resources而非try-finally">
+<meta property="og:url" content="https://doublexz.github.io/doggie.github.io/2019/03/05/Item-9/index.html">
+<meta property="og:site_name" content="CloudXue&#39;s Blog">
+<meta property="og:description" content="Java库中包含许多需要手动调用close方法来关闭的资源。例如，包括InputStream, OutputStream和java.sql.Connection。关闭资源经常被客户端忽略，导致可怕的性能问题。尽管许多资源使用终结器作为安全网，但终结器却并不尽如人意（Item 8）。&amp;emsp;&amp;emsp;从历史上来看，try-finally语句是保证资源被恰当关闭的最佳方式，即使是面对异常和返回值">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-04-09T03:09:42.020Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Item-9 优先选择try-with-resources而非try-finally">
+<meta name="twitter:description" content="Java库中包含许多需要手动调用close方法来关闭的资源。例如，包括InputStream, OutputStream和java.sql.Connection。关闭资源经常被客户端忽略，导致可怕的性能问题。尽管许多资源使用终结器作为安全网，但终结器却并不尽如人意（Item 8）。&amp;emsp;&amp;emsp;从历史上来看，try-finally语句是保证资源被恰当关闭的最佳方式，即使是面对异常和返回值">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/doggie.github.io/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://doublexz.github.io/doggie.github.io/2019/03/05/Item-9/">
+
+
+
+
+
+  <title>Item-9 优先选择try-with-resources而非try-finally | CloudXue's Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/doggie.github.io/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">CloudXue's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/doggie.github.io/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/doggie.github.io/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://doublexz.github.io/doggie.github.io/doggie.github.io/2019/03/05/Item-9/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Doggie">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/doggie.github.io/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="CloudXue's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Item-9 优先选择try-with-resources而非try-finally</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-03-05T11:05:59+08:00">
+                2019-03-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Java库中包含许多需要手动调用<code>close</code>方法来关闭的资源。例如，包括<code>InputStream</code>, <code>OutputStream</code>和<code>java.sql.Connection</code>。关闭资源经常被客户端忽略，导致可怕的性能问题。尽管许多资源使用终结器作为安全网，<strong>但终结器却并不尽如人意</strong>（Item 8）。<br>&emsp;&emsp;从历史上来看，<code>try-finally</code>语句是保证资源被<strong>恰当</strong>关闭的最佳方式，即使是面对异常和返回值的情况<strong>亦如此</strong>：<br><a id="more"></a><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">//try-finally - No longer the best way to close resources !</span><br><span class="line">static String firstLineOfFile(String path) throws IOException &#123;</span><br><span class="line">    BufferedReader br = new BufferedReader(new FileReader(path));</span><br><span class="line">    try &#123;</span><br><span class="line">        return br.readLine();</span><br><span class="line">    &#125; finally &#123;</span><br><span class="line">        br.close();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这看起来还不错，但是当增加第二个资源的时候就会变得很糟：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">// try-finally is ugly when used with more than one resource !</span><br><span class="line">static void copy(String src, String dst) throws IOException &#123;</span><br><span class="line">    InputStream in = new FileInputStream(src);</span><br><span class="line">    try &#123;</span><br><span class="line">        OutputStream out = new FileOutputStream(dst);</span><br><span class="line">        try &#123;</span><br><span class="line">            byte[] buf = new byte[BUFFER_SIZE];</span><br><span class="line">            int n;</span><br><span class="line">            while ((n = in.read(buf)) &gt; 0)</span><br><span class="line">                out.write(buf, 0, n);</span><br><span class="line">        &#125; finally &#123;</span><br><span class="line">            out.close();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; finally &#123;</span><br><span class="line">        in.close();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>&emsp;&emsp;虽然令人难以相信，但许多优秀程序员在多数情况下<strong>也会编写这样的代码</strong>。对于初学者来说，我在Java Puzzlers一书的第88页发现该问题，<strong>但多年来没人注意到</strong>。事实上，在2007年，<strong>在Java库中对<code>close</code>方法的使用有2/3是错误的</strong>。<br>&emsp;&emsp;即使是在前面介绍的两个代码示例中，使用<code>try-finally</code>语句关闭资源的正确代码也有<strong>些小问题</strong>。在<code>try</code>和<code>finally</code>代码块中的代码都可能抛出异常。例如，在<code>firstLineOfFile</code>方法中，调用<code>readLine</code>方法可能会因底层物理设备失败而抛出异常，调用<code>close</code>方法会因为同样的原因而失败。在这种情况下，第二个异常会<strong>掩盖</strong>第一个。在异常堆栈中将不会打印第一个异常的记录信息，<strong>这会极大增加真实系统的调试难度—-通常来说，第一个异常才是问题诊断的关键所在</strong>。尽管可以通过编写代码来压制第二个异常，从而保留第一个异常信息，但没人这么做，因为这样太麻烦了。<br>&emsp;&emsp;所有问题都随着Java 7引入<code>try-with-resources</code>语句得到了解决【JLS，14.20.3】。为了使用这个结构，资源必须实现<code>AutoCloseable</code>接口，这个接口包含唯一一个<strong>返回<code>void</code>类型</strong>的<code>close</code>方法。Java库和第三方库中的大部分类和接口现在都实现或者继承了<code>AutoCloseable</code>。如果编写一个表示资源的类，那么也需要实现<code>AutoCloseable</code>接口。<br>&emsp;&emsp;如下代码使用try-with-resources改写了上面第一个示例：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">//try-with-resource - the best way to close resources !</span><br><span class="line">static String firstLineOfFile(String path) throws IOException &#123;</span><br><span class="line">    try(BufferedReader br = new BufferedReader(new FileReader(path))) &#123;</span><br><span class="line">        return br.readLine();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>如下代码使用try-with-resources改写了上面第二个示例：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">//try-with-resources on multiple resources - short and sweet</span><br><span class="line">static void copy(String src, String dst) throws IOException &#123;</span><br><span class="line">    try (InputStream in = new FileInputStream(src);</span><br><span class="line">        OutputStream out = new FileOutputStream(dst)) &#123;</span><br><span class="line">        byte[] buf = new byte[BUFFER_SIZE];</span><br><span class="line">        int n;</span><br><span class="line">        while ((n = in.read(buf)) &gt; 0)</span><br><span class="line">            out.write(buf, 0, n);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p><code>try-with-resources</code>版本不仅比原始版本更简短、更易读，而且提供了更好的诊断能力。思考下<code>firstLineOfFile</code>方法。如果调用<code>readLine</code>方法和（不可见的）<code>close</code>方法都抛出了异常，==那么后者抛出的异常就会被前者压制住==。事实上，==多个异常将被压制住，从而保留你实际想看到的那个异常==。这些被压制的异常不是被丢弃，==它们会在堆栈中打印出来，并且有相应的符号表示它们被压制了==。你也可以通过编程的方式通过调用<code>getSuppressed</code>方法来==访问这些异常==，该方法在Java 7 中被添加到<code>Throwable</code>中。<br>&emsp;&emsp;你可以把<code>catch</code>从句放在<code>try-with-resources</code>语句上，==就像常规的<code>try-finally</code>语句一样。这样就可以在处理异常的同时又不会在另一个嵌套层次上搞乱代码了==。举个例子，下面这个版本的<code>firstLineOfFile</code>方法不会抛出异常，但是，在它不能打开文件或者不能读取文件时，会接受一个默认值来返回：  </p>
+<pre><code>// try-with-resources with a catch clause
+static String firstLineOfFile(String path, String defaultVal){
+    try (BufferedReader br = new BufferedReader(new FileReader(path))) {
+        return br.readLine();
+    } catch (IOException e) {
+        return defaultVal;
+    }
+}
+</code></pre><p>&emsp;&emsp;结论很明显：当处理必须关闭的资源时，优先使用<code>try-with-resources</code>而不是<code>try-finally</code>。结果代码简短清晰，它所产生的异常更有用。<code>try-with-resources</code>语句==使得编写使用了必须要关闭的资源的代码更加轻松==，而使用<code>try-finally</code>是不可能做到的。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/doggie.github.io/tags/Effiective-Java-3rd/" rel="tag"># Effiective Java 3rd</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/doggie.github.io/2019/03/04/Item-8/" rel="next" title="Item-8 避免使用终结器和清理器">
+                <i class="fa fa-chevron-left"></i> Item-8 避免使用终结器和清理器
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/doggie.github.io/2019/03/18/Item-10/" rel="prev" title="Item-10 重写equals方法时请遵循通用规范">
+                Item-10 重写equals方法时请遵循通用规范 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Doggie</p>
+              <p class="site-description motion-element" itemprop="description">CloudXue</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/doggie.github.io/archives/">
+              
+                  <span class="site-state-item-count">14</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">1</span>
+                  <span class="site-state-item-name">标签</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Doggie</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/doggie.github.io/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/doggie.github.io/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/doggie.github.io/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/doggie.github.io/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/doggie.github.io/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/doggie.github.io/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/doggie.github.io/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/doggie.github.io/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/doggie.github.io/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/doggie.github.io/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/doggie.github.io/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/doggie.github.io/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/doggie.github.io/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/doggie.github.io/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/doggie.github.io/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/doggie.github.io/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/doggie.github.io/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/doggie.github.io/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/doggie.github.io/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/doggie.github.io/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Effiective Java 3rd,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="Cloneable接口路旨在作为一个mixin接口，用于声明类允许克隆。不幸的是，它不能满足这个目标。它的主要缺陷是缺少clone方法，且Object的clone方法是protected的。如果不通过反射，就不能仅仅因为实现了Cloneable接口就在对象上调用clone方法。即使是反射调用也会失败，因为不能保证该对象有一个可访问的clone方法。尽管存在这个缺陷和其他许多问题，但该功能（faci">
+<meta name="keywords" content="Effiective Java 3rd">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Item-13 重写clone方法要谨慎">
+<meta property="og:url" content="https://doublexz.github.io/doggie.github.io/2019/03/30/Item-13/index.html">
+<meta property="og:site_name" content="CloudXue&#39;s Blog">
+<meta property="og:description" content="Cloneable接口路旨在作为一个mixin接口，用于声明类允许克隆。不幸的是，它不能满足这个目标。它的主要缺陷是缺少clone方法，且Object的clone方法是protected的。如果不通过反射，就不能仅仅因为实现了Cloneable接口就在对象上调用clone方法。即使是反射调用也会失败，因为不能保证该对象有一个可访问的clone方法。尽管存在这个缺陷和其他许多问题，但该功能（faci">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-04-09T03:17:39.746Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Item-13 重写clone方法要谨慎">
+<meta name="twitter:description" content="Cloneable接口路旨在作为一个mixin接口，用于声明类允许克隆。不幸的是，它不能满足这个目标。它的主要缺陷是缺少clone方法，且Object的clone方法是protected的。如果不通过反射，就不能仅仅因为实现了Cloneable接口就在对象上调用clone方法。即使是反射调用也会失败，因为不能保证该对象有一个可访问的clone方法。尽管存在这个缺陷和其他许多问题，但该功能（faci">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/doggie.github.io/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://doublexz.github.io/doggie.github.io/2019/03/30/Item-13/">
+
+
+
+
+
+  <title>Item-13 重写clone方法要谨慎 | CloudXue's Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/doggie.github.io/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">CloudXue's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/doggie.github.io/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/doggie.github.io/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://doublexz.github.io/doggie.github.io/doggie.github.io/2019/03/30/Item-13/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Doggie">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/doggie.github.io/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="CloudXue's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Item-13 重写clone方法要谨慎</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-03-30T11:14:04+08:00">
+                2019-03-30
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><code>Cloneable</code>接口路旨在作为一个mixin接口，用于声明类允许克隆。不幸的是，它不能满足这个目标。它的主要缺陷是缺少clone方法，且Object的<code>clone</code>方法是protected的。如果不通过反射，就不能仅仅因为实现了<code>Cloneable</code>接口就在对象上调用<code>clone</code>方法。即使是反射调用也会失败，因为不能保证该对象有一个可访问的<code>clone</code>方法。尽管存在这个缺陷和其他许多问题，但该功能（facility）应用广泛，因此值得去理解它。本条款告诉你如何实现一个行为良好的clone方法，讨论何时适合这样做，并给出替代方法。<br><a id="more"></a>&emsp;&emsp;那么<code>Cloneable</code>接口不包含任何方法，到底做了什么？它决定了Object类中受保护的<code>clone</code>方法实现的行为：如果一个类实现了<code>Cloneable</code>接口，Object的clone方法返回对象的逐字拷贝（副本），否则它会抛出<code>CloneNotSupportedException</code>。这是一种明显的非典型的接口使用，而不是一种模拟。通常，实现一个接口会表明一个类可以为它的客户端做什么。在本例中，它改变了在父类中的受保护方法的行为。<br>&emsp;&emsp;虽然规范没有明确说明，但实际上，实现Cloneable接口的类应该提供一个正常功能的共有的clone方法。为实现这个要求，该类和其所有父类必须遵循一个复杂的、无法强制执行的、精简的协议。由此生成的机制是脆弱的，危险的且超语言的：可以不调用构造方法来创建对象。<br>&emsp;&emsp;clone方法的通用规范很少。这里是从Object规范中复制的：<br>&emsp;&emsp;创建和返回一个对象的拷贝。这里“拷贝”的精确含义取决于对象的类。通常，希望对于任何对象x，表达式<code>x.clone() != x</code>值为true,且表达式<code>x.clone().getClass() == x.getClass()</code>值为ture，但这些不是绝对要求。典型例子是<code>x.clone().equals(x)</code>值为true,这也不是绝对要求。按照惯例，该方法返回的对象应该通过调用super.clone方法获得。如果该类及其所有父类（Object除外）遵循这个管理，它将是以下实例：<code>x.clone().getClass() == x.getClass()</code>。按照管理，返回的对象应该独立于被克隆的对象。为实现该独立性，需要在super.clone返回对象前改变一个或多个字段。<br>&emsp;&emsp;这种机制依稀与构造函数连相似，只是它没有强制执行：如果类的clone方法返回的实例不是通过调用super.clone而是通过构造方法获得的，编译器不会警示（抱怨），但该类的一个子类调用super.clone,结果对象具有错误的类，阻止来自克隆方法的子类的正常工作。如果重写了clone方法的类是终态的（final）,该约定可以安全的被忽略，因为没有子类可以担心。但如果一个终态类含有未调用super.clone的clone方法，该类没有理由实现Cloneable，因为它不依赖Object的clone实现的行为。<br>&emsp;&emsp;假设你想在类中实现Cloneable接口，其父类提供了行为良好的clone方法。首先调用super.clone。你获得的对象是原始的功能完善的副本。在你的类中声明的任何字段其值将于原始类中的一致。如果每个字段包含一个原生值或者是不可变对象的引用，那么返回的对象确实是你需要的，此种情况不需要任何其他处理。例如，条款11中的PhoneNumber类就是如此，但是主要，不可变类应该永远不要提供一个clone方法，因为它只会鼓励无意义的拷贝。对于以上警告，这里是PhoneNumber类的clone方法应该的样子：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">    //Clone method for class with no references to mutable state</span><br><span class="line">    @Override public PhoneNumber clone()&#123;</span><br><span class="line">        try&#123;</span><br><span class="line">            return (PhoneNumber) super.clone();</span><br><span class="line">        &#125;catch(CloneNotSupportedException e)&#123;</span><br><span class="line">            throw new AssertionError(); //Can&apos;t happen</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">```  </span><br><span class="line">&amp;emsp;&amp;emsp;为了使该方法工作，PhoneNumber类的声明必须被改变来表明它实现了Cloneable接口。虽然Object类的clone方法返回Object对象，但该方法返回PhoneNumber对象。这么做是合法且令人满意的，因为Java支持协变返回类型。换句话说，重写方法的返回类型可以是子类重写方法的返回类型。这消除了在客户端进行类型转换的需要。我们必须在super.clone方法返回结果以前，将其从Object类型转换为PhoneNumber类型，但这个转换要保证是成功的。  </span><br><span class="line">&amp;emsp;&amp;emsp;对super.clone方法的调用可以包含在try-catch代码块中。这是因为，Object类声明其clone方法抛出CloneNotSupportedException，该异常是检查性异常。因为PhoneNumber类实现了Cloneable接口，所以我们知道调用super.clone方法是成功的。对此样板文件的需要表明CastNotSupportedException异常未被检查（Item 71）。  </span><br><span class="line">&amp;emsp;&amp;emsp;如果一个对象包含可变对象引用字段，前面展示的简单clone实现将是灾难性的。例如，思考下条款7中的Stack类：</span><br></pre></td></tr></table></figure></p>
+<pre><code>public class Stack {
+    private Object[] elements;
+    private int size = 0;
+    private static final int DEFAULT_INITIAL_CAPACITY =  16;
+    public Stack() {
+        this.elements = new Object[DEFAULT_INITIAL_CAPACITY];
+    }
+    public void push(Object e) {
+        ensureCapacity();
+        elements[size++] = e;
+    }
+    public Object pop() {
+        if (size == 0)
+            throw new EmptyStackException();
+        Object result = elements[--size];
+        elements[size] = null; // Eliminate obsolete reference
+        return result;
+    }
+    // Ensure space for at least one more element.
+    private void ensureCapacity() {
+        if (elements.length == size)
+            elements = Arrays.copyOf(elements, 2 * size + 1);
+    } 
+
+}
+</code></pre><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&amp;emsp;&amp;emsp;假设你想使该类可复制。如果clone方法仅返回super.clone()，结果是Stack实例的size字段将有正确的值，但是其elements字段将涉及相同的数组作为原始Stack实例。修改原始实例将破坏clone方法中的不变量，反之亦然。你将很快发现你的程序会生成一个无意义的结果或者抛出空指针异常。  </span><br><span class="line">&amp;emsp;&amp;emsp;由于调用Stack类的唯一构造函数，这种情况将永远不会发生。**实际上，clone方法用作构造方法时，你必须确保它不会对原始对象造成伤害，并且在克隆对象上正确地创建不变量**。为使Stack上的clone方法正常工作，最简单的方式是在elements数组上递归调用clone方法。</span><br></pre></td></tr></table></figure>
+<pre><code>//Clone method for class with references to mutable class
+@Override public Stack clone() {
+    try {
+        Stack result = (Stack) super.clone();
+        result.elements = elements.clone();
+        return result;
+    } catch (CloneNotSupportedException e) {
+        throw new AssertionError();
+    }
+}
+</code></pre><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&amp;emsp;&amp;emsp;注意，我们不必将elements.clone的结果转换为Object[]。调用数组的clone方法返回一个数组，该数组在运行和编译时其类型与被克隆的数组一致。这是复制数组的惯用方法。实际上，数组是克隆能力唯一吸引人的用途。</span><br><span class="line">&amp;emsp;&amp;emsp;同时注意，如果elements字段是终态的，之前的解决方法将不生效，因为clone方法将被禁止为字段设置新值。这是一个根本问题：像序列化。**Cloneable结构与引用可变对象终态字段的正常使用是不兼容的**，除非在对象与其克隆对象之间安全地共享可变对象。为使类可复制，有必要将final修饰符从某些字段上移除。  </span><br><span class="line">&amp;emsp;&amp;emsp;仅递归调用clone方法并不够的。例如，假设你要为哈希表写clone方法，该哈希表内部包含一个桶数组，数组中的每个元素引用键值对列表中的第一个条目。为了提高性能，该类实现了自己的轻量级单链表，代替在内部使用java.util.LinkedList：</span><br></pre></td></tr></table></figure>
+<pre><code>public class HashTable implements Cloneable {
+    private Entry[] buckets = ...;    
+    private static class Entry {
+        final Object key;
+        Object value;
+        Entry next;
+        Entry(Object key, Object value, Entry next) {
+            this.key = key;
+            this.value = value;
+            this.next = next; 
+        }
+    }
+... // Remainder omitted
+}
+</code></pre><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&amp;emsp;&amp;emsp;假设你仅要递归得克隆bucket数组，应该对Stack做如下修改：</span><br></pre></td></tr></table></figure>
+<pre><code>// Broken clone method - results in shared mutable state!
+@Override public HashTable clone() {
+    try {
+        HashTable result = (HashTable) super.clone();
+        result.buckets = buckets.clone();
+        return result;
+    } catch (CloneNotSupportedException e) {
+        throw new AssertionError();
+    }
+}
+</code></pre><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&amp;emsp;&amp;emsp;即使克隆对象有自己的桶数组，这个数组引用了与原始对象一样的链表，这很容易在克隆对象和原始对象中引起不确定性行为。未解决该问题，你将不得不复制包含每个桶元素的链表。这是通用实现：</span><br></pre></td></tr></table></figure>
+<pre><code>// Recursive clone method for class with complex mutable state
+public class HashTable implements Cloneable {
+    private Entry[] buckets = ...;
+    private static class Entry {
+        final Object key;
+        Object value;
+        Entry  next;
+        Entry(Object key, Object value, Entry next) {
+            this.key   = key;
+            this.value = value;
+            this.next  = next;
+    }
+
+    // Recursively copy the linked list headed by this Entry
+        Entry deepCopy() {
+            return new Entry(key, value,
+               next == null ? null : next.deepCopy());
+        } 
+
+    }
+    @Override public HashTable clone() {
+        try {
+            HashTable result = (HashTable) super.clone();
+            result.buckets = new Entry[buckets.length];
+            for (int i = 0; i &lt; buckets.length; i++)
+                if (buckets[i] != null)
+                    result.buckets[i] = buckets[i].deepCopy();
+            return result;
+        } catch (CloneNotSupportedException e) {
+           throw new AssertionError();
+        }
+    }
+   ... // Remainder omitted
+</code></pre><p>   }<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&amp;emsp;&amp;emsp;私有类`HashTable.Entry`已被扩充来支持“深拷贝”方法。HashTable的clone方法分配一个大小合适的新的桶数组，并且遍历原始通数组，深度拷贝非空桶元素。Entry上的deepCopy方法递归地调用自身，来复制以该条目为头的整个链表。尽管在桶元素不是很长的时候，该技巧是完美且有效的，但它不是一个克隆链表的好方式，因为它为表中每一个元素消耗一个堆栈帧。如果链表很长，很容易引起堆栈溢出。为阻止该情况发生，可以使用迭代替换deepCopy中的递归：</span><br></pre></td></tr></table></figure></p>
+<pre><code>// Iteratively copy the linked list headed by this Entry
+    Entry deepCopy() {
+        Entry result = new Entry(key, value, next);
+        for (Entry p = result; p.next != null; p = p.next)
+        p.next = new Entry(p.next.key, p.next.value, p.next.next); return result;
+}
+</code></pre><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&amp;emsp;&amp;emsp;复制复杂可变对象的终极方式是调用super.clone，在结果对象中设置所有字段为其初始状态，然后调用更高级别的方法重新生成原始对象的状态。在我们的HashTable示例中，bukets字段将被初始化成一个新的bucket数组，并且put(key, value)方法（未展示）在哈希表被克隆时将被每一个键值映射调用。这种方式通常会产生一种简单的、相当优雅的clone方法，其运行速度不如直接操作克隆（对象）内部的clone方法。尽管这种方式很简洁，但它与整个Cloneable架构师对立的，因为它会盲目得逐个字段地重写对象拷贝，这些对象拷贝构成了架构基础。  </span><br><span class="line">&amp;emsp;&amp;emsp;与构造方法一样，clone方法必须永远不会在构造中的克隆上调用重写的方法（Item 19）。如果clone调用一个在子类中重写的方法，该方法将在子类有机会修改其状态之前执行，这很可能导致克隆对象和原始对象的损坏。因此，之前段落中讨论的put(key, value)方法或者是final的或者是private的（如果是private的，它可能是非最终公共方法的“辅助方法”）。  </span><br><span class="line">&amp;emsp;&amp;emsp;Object的clone方法声明了抛出CloneNotSupportedException异常，但不需要重写clone方法。**公共的clone方法应该省略throws字句**，因为不需要抛出检查异常的方法更容易使用（Item71）。  </span><br><span class="line">&amp;emsp;&amp;emsp;在设计继承类时你有两个选择（Item 19），但是无论选哪一个，该类都不应该实现Cloneable接口。你会选择通过实现一个正常运行的受保护的clone方法来模拟Object类的行为，该方法声明了抛出CloneNotSupportedException异常。这让子类可以自由选择是否实现Cloneable接口，或者直接从Object类继承。或者，你可以选择不实现工作中的clone方法，并通过提供下面简化的clone实现来阻止子类实现它：</span><br></pre></td></tr></table></figure>
+<pre><code>// clone method for extendable class not supporting Cloneable
+@Override
+    protected final Object clone() throws CloneNotSupportedException {
+    throw new CloneNotSupportedException();
+</code></pre><p>   }<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&amp;emsp;&amp;emsp;还有一个细节需要注意。如果你写了一个线程安全的类实现了Cloneable接口，记住，它的clone方法必须正确的同步，就像其他任何方法一样（Item 78）。Object类的clone方法不是同步的，所以即使其实现令人满意，你不得不写一个同步的clone方法来返回super.clone。  </span><br><span class="line">&amp;emsp;&amp;emsp;重述一下，所有实现Cloneable接口的类应该使用一个共有的，返回类型是其自身的方法来重写clone方法。该方法应该首先调用super.clone()，然后修复任何需要修复的字段。通常，这意味着克隆可变对象时要包括内部的深层结构，并且使用对副本的引用替换这些对象克隆的引用。尽管这些内部克隆通常可以通过递归地调用clone方法，这通常不是最好的方式。如果类只包含私有的字段或者不可变对象的引用，这很可能是没有字段需要修复的情况。对于该规则是有问题的。例如，一个代表一系列数字或者其他唯一ID的字段，即使是原生的或者不可变的，也需要被修复。  </span><br><span class="line">&amp;emsp;&amp;emsp;所有这些复杂性真是必要的吗？很少的！如果你继承了一个已经实现了Cloneable接口的类，你不得不实现一个行为良好的clone方法。否则，你通常最好提供另一种对象复制方法。**对象克隆的一个更好方式是提供一个克隆构建器或者克隆工厂**。克隆构造函数是一个简单的，持有单个参数且参数类型是包含构造函数的类，例如：</span><br></pre></td></tr></table></figure></p>
+<pre><code>//Copy Constructor
+public Yum (Yum yum) {...};
+</code></pre><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">克隆工厂是一个模拟克隆构造函数的静态工厂（Item 1）：</span><br></pre></td></tr></table></figure>
+<pre><code>//Copy Factory
+public static Yum newInstance(Yum yum) {...};
+</code></pre><p><code>`</code><br>&emsp;&emsp;克隆构造方法和它的静态工厂变体有许多Cloneable接口和clone方法没有的优势：==他们不依赖于易于冒险的语外对象创建机制==；它们并不要求无法执行的遵守精简文件的管理；它们与终态字段的正确使用不冲突；它们不会抛出不必要的检查异常；并且它们不需要类型转换。<br>&emsp;&emsp;此外，克隆构造函数或者工厂可以使用其类型是由类实现的接口的参数。按照惯例，所有通用集合的实现都提供一个构造函数，其参数类型是Map或者Collection。基于接口的克隆构造函数和工厂，更恰当的称为转换函数和转换工厂，允许客户端选择克隆的实现类型，而不是强制客户端接受原始类的实现类型。例如，你有一个HashSet：s,并且你想复制它作为TreeSet，clone方法没有提供这个功能，但是使用转换构造函数就很简单：new TreeSet&lt;&gt;(s)。  </p>
+<h2 id="emsp-emsp-鉴于所有与Cloneable接口有关的问题，新接口不应该继承它，新的继承类不应该实现它。尽管对于终态类来说实现Cloneable接口的危害较小，但这应该看做是性能优化保留用于合理的极少数情况（Item-67）。通常，克隆功能最好由构造方法或者工厂提供。此规则的一个显著例外是数组，最好使用clone方法进行克隆。"><a href="#emsp-emsp-鉴于所有与Cloneable接口有关的问题，新接口不应该继承它，新的继承类不应该实现它。尽管对于终态类来说实现Cloneable接口的危害较小，但这应该看做是性能优化保留用于合理的极少数情况（Item-67）。通常，克隆功能最好由构造方法或者工厂提供。此规则的一个显著例外是数组，最好使用clone方法进行克隆。" class="headerlink" title="&emsp;&emsp;鉴于所有与Cloneable接口有关的问题，新接口不应该继承它，新的继承类不应该实现它。尽管对于终态类来说实现Cloneable接口的危害较小，但这应该看做是性能优化保留用于合理的极少数情况（Item 67）。通常，克隆功能最好由构造方法或者工厂提供。此规则的一个显著例外是数组，最好使用clone方法进行克隆。  "></a>&emsp;&emsp;鉴于所有与Cloneable接口有关的问题，新接口不应该继承它，新的继承类不应该实现它。尽管对于终态类来说实现Cloneable接口的危害较小，但这应该看做是性能优化保留用于合理的极少数情况（Item 67）。通常，克隆功能最好由构造方法或者工厂提供。此规则的一个显著例外是数组，最好使用clone方法进行克隆。  </h2><p>Finished at 2019年03月30日13:33:05</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/doggie.github.io/tags/Effiective-Java-3rd/" rel="tag"># Effiective Java 3rd</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/doggie.github.io/2019/03/23/Item-12/" rel="next" title="Item-12 始终重写toString方法">
+                <i class="fa fa-chevron-left"></i> Item-12 始终重写toString方法
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/doggie.github.io/2019/04/04/Item-14/" rel="prev" title="Item-14 考虑实现Comparable接口">
+                Item-14 考虑实现Comparable接口 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Doggie</p>
+              <p class="site-description motion-element" itemprop="description">CloudXue</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/doggie.github.io/archives/">
+              
+                  <span class="site-state-item-count">14</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">1</span>
+                  <span class="site-state-item-name">标签</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#emsp-emsp-鉴于所有与Cloneable接口有关的问题，新接口不应该继承它，新的继承类不应该实现它。尽管对于终态类来说实现Cloneable接口的危害较小，但这应该看做是性能优化保留用于合理的极少数情况（Item-67）。通常，克隆功能最好由构造方法或者工厂提供。此规则的一个显著例外是数组，最好使用clone方法进行克隆。"><span class="nav-number">1.</span> <span class="nav-text">  鉴于所有与Cloneable接口有关的问题，新接口不应该继承它，新的继承类不应该实现它。尽管对于终态类来说实现Cloneable接口的危害较小，但这应该看做是性能优化保留用于合理的极少数情况（Item 67）。通常，克隆功能最好由构造方法或者工厂提供。此规则的一个显著例外是数组，最好使用clone方法进行克隆。  </span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Doggie</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/doggie.github.io/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/doggie.github.io/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/doggie.github.io/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/doggie.github.io/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/doggie.github.io/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/doggie.github.io/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/doggie.github.io/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/doggie.github.io/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/doggie.github.io/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/doggie.github.io/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/doggie.github.io/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/doggie.github.io/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/doggie.github.io/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
