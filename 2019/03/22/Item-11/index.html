@@ -87,7 +87,7 @@
 <meta property="og:site_name" content="CloudXue&#39;s Blog">
 <meta property="og:description" content="你必须在每个类中重写equals时重写hashCode方法。如果你没有这么做，你的类将违反hashCode的通用规范，这将妨碍它在HashMap和HashSet集合中的正常功能。这里是根据Object规则改编的规范：    在应用程序运行期间，hashCode方法在对象上被重复调用时，如果==没有==修改equals比较中使用的信息，则必须始终返回相同的值。该值从一个应用程序的执行到另一个应用程序">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-04-09T03:16:14.289Z">
+<meta property="og:updated_time" content="2019-04-09T05:00:57.570Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Item-11 重写equals方法时也要重写hashCode方法">
 <meta name="twitter:description" content="你必须在每个类中重写equals时重写hashCode方法。如果你没有这么做，你的类将违反hashCode的通用规范，这将妨碍它在HashMap和HashSet集合中的正常功能。这里是根据Object规则改编的规范：    在应用程序运行期间，hashCode方法在对象上被重复调用时，如果==没有==修改equals比较中使用的信息，则必须始终返回相同的值。该值从一个应用程序的执行到另一个应用程序">
@@ -305,37 +305,55 @@
 <li>在应用程序运行期间，<code>hashCode</code>方法在对象上被重复调用时，如果==没有==修改<code>equals</code>比较中使用的信息，则必须始终返回相同的值。该值从一个应用程序的执行到另一个应用程序的执行不需要一致。</li>
 <li>如果两个对象根据<code>equals</code>方法比较是相等的，那么在这两个对象上调用<code>hashCode</code>方法必须产生相同的整数值。</li>
 <li><p>如果两个对象根据<code>equals</code>方法比较是不相等的，则不需要在每个对象上调用<code>hashCode</code>方法必须产生不同的结果。然而，程序员应该意识到为不相等的对象生成不同的结果可以提高哈希表（散列表）的性能。  </p>
-<a id="more"></a>&emsp;&emsp;<strong>当你未重写hashCode而违反的第二个关键条款是：相等的对象必须有相等的哈希码</strong>。两个不同的实例根据类的<code>equals</code>方法应该逻辑上相等，但是对于<code>Object</code>类的<code>hashCode</code>方法，它们仅仅是两个没有多少共同点的对象。因此，<code>Object</code>类的<code>hashCode</code>方法返回两个看起来随机的数字，而不是按照约定要求的两个相等的数字。<br>&emsp;&emsp;例如，假设你试图使用来自条款10中的<code>PhoneNumber</code>类的实例作为<code>HashMap</code>的键：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">    Map&lt;PhoneNumber, String&gt; m = new HashMap&lt;&gt;();</span><br><span class="line">    m.put(new PhoneNumber(707, 867, 5309), &quot;Jenny&quot;);</span><br><span class="line">```  </span><br><span class="line">&amp;emsp;&amp;emsp;此刻，你会期望`m.get(new PhoneNumber(707, 867, 5309))`返回`&quot;Jenny&quot;`，但是，它返回`null`。注意，是两个`PhoneNumber`实例被调用了：一个用于插入`HashMap`，另一个==作为判断==相等的实例被用于（尝试）检索。`PhoneNumber`类没有重写`hashCode`方法导致两个相等的实例有两个不同的哈希码，违反了`hashCode`规范。因此，`get`方法可能从`put`方法存储的那个哈希桶开始在不同的哈希桶中寻找PhoneNumber实例。即使两个实例散列到相同的哈希桶中，`get`方法几乎完全返回`null`，因为`HashMap`有一个优化，它会缓存与每一个实体相关的哈希码，并且两个哈希码如果不匹配，也不会检查两个对象的相等性。  </span><br><span class="line">&amp;emsp;&amp;emsp;解决此问题很简单，只需为`PhoneNumber`重写一个合适的`hashCode`方法。那么`hashCode`方法看起来应该是怎样的呢？编写一个糟糕的方法是简单的。例如，下面这个虽然总是合法的，但永远不应该使用：</span><br></pre></td></tr></table></figure>
-<p>  //The worst possible legal hashCode implementation -never use!<br>  @Override public int hashCode(){</p>
-<pre><code>return 42;
-</code></pre><p>  }</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">&amp;emsp;它合法是因为它确保相等的对象拥有相同的哈希码。这很糟糕，因为它确保每一个对象都有相同的哈希码。所以，每个对象散列在同一个哈希桶中，哈希表退化为链表。应该在线性时间运行的程序，运行时间改为二次方级别。对大型哈希表来说，==会影响到是否正常工作==。  </span><br><span class="line">&amp;emsp;&amp;emsp;一个良好的哈希函数趋向于为不等的实例生成不等的哈希码。这是`hashCode`规范第三条明确声明的。理想情况下，一个哈希函数应该公平地将所有整数值分配给集合中任何合理的不等实例。要实现这个理想是艰难的。幸运的是，不难实现一个公平的近似。下面是一个简单的步骤（配方recipe）：  </span><br><span class="line">1. 声明一个名为result的int变量，==并将其初始化为对象中第一个重要属性`c`的哈希码==，用于在第2.a中计算（回顾下条款10：重要字段是可以影响`equals`比较的字段）。</span><br><span class="line">2. 对于对象中剩余的重要字段`f`，执行以下操作：  </span><br><span class="line">    a. 为字段计算一个整型哈希码`c`：  </span><br><span class="line">        &amp;emsp;&amp;emsp;i.&amp;emsp;如果该字段是一个原生类型，使用`Type.hashCode(f)`计算，这个`Type`是与`f`的类型对应的包装类。  </span><br><span class="line">        &amp;emsp;&amp;emsp;ii.&amp;emsp;如果该字段是一个对象引用，且这个类的`equals`方法通过递归调用`equals`方法来比较这个字段，就要在该字段上递归调用`hashCode`方法。如果需要一个更复杂的比较，则计算次字段的范式（canonical representation），且在==范式==上调用`hashCode`方法。如果字段值是`null`，则使用0(或者其他常量，但通常用0)。  </span><br><span class="line">        &amp;emsp;&amp;emsp;iii.&amp;emsp;如果该字段是一个数组，则将其视为每个重要元素都是单独的字段。也就是说通过递归地应用这些规则来计算每个重要元素的哈希码，并组合每个步骤2.b中的值。如果该数组没有重要元素，则使用一个常量，最好不要用0。如果所有元素都是重要的，使用`Arrays.hashCode`方法。  </span><br><span class="line">    b. 按如下所示组合在步骤2.a中所计算的哈希码c到result结果中：</span><br></pre></td></tr></table></figure>
-<p>  result = 31 * result + c;</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">3. 返回result。  </span><br><span class="line"></span><br><span class="line">&amp;emsp;&amp;emsp;当你完成编写`hashCode`方法，自问一下是否相等的实例拥有相等的哈希码。编写单元测试来验证你的直觉（除非你使用AutoValue框架来生成你的`equals`和`hashCode`方法，此种情况可以忽略测试）。如果相等实例拥有不相等的哈希码，找出原因并解决该问题。  </span><br><span class="line">&amp;emsp;&amp;emsp;你应该从哈希计算中排除派生字段。换句话说，==如果一个字段的值可以根据参与计算的其他字段值计算出来，那么可以忽略这样的字段==。你必须排除任何未在`equals`比较中使用的字段，否则你将面临违反`hashCode`规范第二条的风险。  </span><br><span class="line">&amp;emsp;&amp;emsp;步骤2.b中的乘法的结果取决于字段的顺序，如果该类有多个相似的字段则会生成一个更好的哈希函数。如果从`String`哈希函数中省略了乘法，那么所有的变位词（字符）都将具有相同的哈希码。选择值31是因为它是一个奇素数。如果它是偶数并且乘法溢出，则将丢失信息，因为乘以2等于移位。使用素数的优势不明显，但习惯上都这么做。31的一个很好特性是乘法可以用移位和减法代替，以便在某些体系结构中获得更好的性能：`31*i==(i&lt;&lt;5)-i`。现在的虚拟机会自动做这类优化。  </span><br><span class="line">&amp;emsp;&amp;emsp;让我们在`PhoneNumber`类上应用之前的技巧(配方recipe):</span><br></pre></td></tr></table></figure>
-<p>  //Typical hashCode method<br>  @Override public int hashCode() {</p>
-<pre><code>int result = Short.hashCode(areaCode);
-result = 31*result + Short.hashCode(prefix);
-result = 31*result + Short.hashCode(lineNum);
-return result;
-</code></pre><p>  }</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&amp;emsp;&amp;emsp;因为这个方法返回一个简单而确定的计算结果，该计算的唯一输入只是`PhoneNumber`实例的三个重要字段，很明显，相等的`PhoneNumber`实例具有相等的哈希码。==实际上，该方法是`PhoneNumber`的一个非常好的`hashCode`实现，与Java平台库中的实现一样==。它很简单，速度很快，且可以合理地将不等的电话号码分配到不同哈希桶中。  </span><br><span class="line">&amp;emsp;&amp;emsp;尽管此案例中的技巧(配方recipe)产生了相当好的哈希函数，但这不是最好的。他们在质量上同在Java平台库的值类型中发现的哈希函数相当，且适合于大多数用途。如果你对哈希函数的真正需求不太可能产生冲突，可以看下`Guava`的`com.google.common.hash.Hashing`[Guava]。  </span><br><span class="line">&amp;emsp;&amp;emsp;Object类有一个静态方法，它==接受==任意数量的对象，且为它们返回一个哈希码。该方法名为`hash`，让你编写单行hashCode方法，该方法质量与根据本案例中的技巧（recipe）编写的hashCode方法一样。不幸的是，它运行的更慢，因为它们需要创建数组来传递可变数量的参数，如果任何参数是原生类型，还需要装箱与拆箱操作。此风格的哈希函数建议只在性能不是很紧要的情况下使用。这是使用该技巧为PhoneNumber写的哈希函数：</span><br></pre></td></tr></table></figure>
-<p>  //One-line hashCode method - mediocre performance<br>  @Override public int hashCode () {</p>
-<pre><code>return Object.hash(lineNum, prefix, areaCode);
-</code></pre><p>  }</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&amp;emsp;&amp;emsp;如果一个类是不可变的且计算哈希码的花销很大，你应该考虑在对象中缓存哈希码而不是每次请求时重新计算。如果你==认为==此类型的大多数对象将被用作哈希键，那么应该在实例创建的时候计算哈希码。否则，应该选择在首次调用hashCode的时候懒加载哈希码。注意需要确保类在延迟加载字段的情况下仍是线程安全的（Item 83）。我们的PhoneNumber类不值得这种待遇，但这里仅为你展示它是如何完成的，就是下面这样。注意hashCode字段的初始值（该例中是0）不应该是普通创建实例的哈希码：</span><br></pre></td></tr></table></figure>
-<p>  //hashCode method with lazily initialized cached hash code<br>  private int hashCode; // Automatically initialized 0</p>
-<p>  @Override public int hashCode() {</p>
-<pre><code>int result = hashCode;
-if (result == 0){
-    result = Short.hashCode(areaCode);
-    result = 31 * result + Short.hashCode(prefix);
-    result = 31 * result + Short.hashCode(lineNum);
-    hashCode = result;
-}
-return result;
-</code></pre><p>  }<br><code>`</code><br>&emsp;&emsp;<strong>不要试图从哈希码计算中排除重要字段来提高性能</strong>。尽管结果是哈希函数会运行得更快，但是其低质量可能会使哈希表的性能降低到无法使用的地步。特别的，哈希函数会面对一个很大的实例集合，==这些实例主要在你忽略的区域中有所不同==。如果这种情况发生了，哈希函数将映射所有的实例到一部分哈希码上，且在线性时间运行的程序将会运行平方级的时间。<br>&emsp;&emsp;这不仅仅是一个理论问题。在Java 2 之前，==<code>String</code>哈希函数使用最多16个字符，从第一个字符开始，在整个字符串中均匀地分布==。对于大型的具有分层名称集合，如URL，该功能完美地展示了前面描述的病态行为。<br>&emsp;&emsp;<strong>不要为<code>hashCode</code>返回值提供详细规范，以至于客户端不能合理地依赖它；你可以灵活地更改它</strong>。Java库中的许多类，像<code>String</code>和<code>Integer</code>，指定了它们<code>hashCode</code>方法返回的确切值来作为实例值的函数。这不是一个好主意但却是我们不得不忍受的一个错误：它阻碍了在未来版本中优化哈希函数的能力。==如果未指定细节并在哈希函数中发现缺陷，或者发现了更好的哈希函数，则可以在后续版本中对其进行更改。==<br>&emsp;&emsp;总之，每当你重写<code>equals</code>方法时必须重写<code>hashCode</code>方法，否则你的程序将运行不正常。你的<code>hashCode</code>方法必须遵循<code>Object</code>类中规定的通用规范，并且做合理的措施来分配不同的哈希码给不同的实例。如果按规则（单调乏味），使用51页的配方（recipe）,这很容易做到。条款10中提到过，AutoValue框架提供了良好的方案来替代手动编写<code>equals</code>和<code>hashCode</code>方法，IDE也可以提供同样的功能。  </p>
-</li>
+<a id="more"></a>
+<p>&emsp;&emsp;<strong>当你未重写hashCode而违反的第二个关键条款是：相等的对象必须有相等的哈希码</strong>。两个不同的实例根据类的<code>equals</code>方法应该逻辑上相等，但是对于<code>Object</code>类的<code>hashCode</code>方法，它们仅仅是两个没有多少共同点的对象。因此，<code>Object</code>类的<code>hashCode</code>方法返回两个看起来随机的数字，而不是按照约定要求的两个相等的数字。<br>&emsp;&emsp;例如，假设你试图使用来自条款10中的<code>PhoneNumber</code>类的实例作为<code>HashMap</code>的键：  </p>
+<pre><code>Map&lt;PhoneNumber, String&gt; m = new HashMap&lt;&gt;();
+m.put(new PhoneNumber(707, 867, 5309), &quot;Jenny&quot;);
+</code></pre></li>
 </ul>
+<p>&emsp;&emsp;此刻，你会期望<code>m.get(new PhoneNumber(707, 867, 5309))</code>返回<code>&quot;Jenny&quot;</code>，但是，它返回<code>null</code>。注意，是两个<code>PhoneNumber</code>实例被调用了：一个用于插入<code>HashMap</code>，另一个==作为判断==相等的实例被用于（尝试）检索。<code>PhoneNumber</code>类没有重写<code>hashCode</code>方法导致两个相等的实例有两个不同的哈希码，违反了<code>hashCode</code>规范。因此，<code>get</code>方法可能从<code>put</code>方法存储的那个哈希桶开始在不同的哈希桶中寻找PhoneNumber实例。即使两个实例散列到相同的哈希桶中，<code>get</code>方法几乎完全返回<code>null</code>，因为<code>HashMap</code>有一个优化，它会缓存与每一个实体相关的哈希码，并且两个哈希码如果不匹配，也不会检查两个对象的相等性。<br>&emsp;&emsp;解决此问题很简单，只需为<code>PhoneNumber</code>重写一个合适的<code>hashCode</code>方法。那么<code>hashCode</code>方法看起来应该是怎样的呢？编写一个糟糕的方法是简单的。例如，下面这个虽然总是合法的，但永远不应该使用：  </p>
+<pre><code>//The worst possible legal hashCode implementation -never use!
+@Override 
+public int hashCode(){
+    return 42;
+}
+</code></pre><p>&emsp;它合法是因为它确保相等的对象拥有相同的哈希码。这很糟糕，因为它确保每一个对象都有相同的哈希码。所以，每个对象散列在同一个哈希桶中，哈希表退化为链表。应该在线性时间运行的程序，运行时间改为二次方级别。对大型哈希表来说，会影响到是否正常工作。<br>&emsp;&emsp;一个良好的哈希函数趋向于为不等的实例生成不等的哈希码。这是<code>hashCode</code>规范第三条明确声明的。理想情况下，一个哈希函数应该公平地将所有整数值分配给集合中任何合理的不等实例。要实现这个理想是艰难的。幸运的是，不难实现一个公平的近似。下面是一个简单的步骤（配方recipe）：  </p>
+<ol>
+<li>声明一个名为result的int变量，并将其初始化为对象中第一个重要属性<code>c</code>的哈希码，用于在第2.a中计算（回顾下条款10：重要字段是可以影响<code>equals</code>比较的字段）。</li>
+<li>对于对象中剩余的重要字段f，执行以下操作：<br> a. 为字段计算一个整型哈希码 c：<br>  1) 如果该字段是一个原生类型，使用<code>Type.hashCode(f)</code>计算，这个<code>Type</code>是与<code>f</code>的类型对应的包装类。<br>  2) 如果该字段是一个对象引用，且这个类的<code>equals</code>方法通过递归调用<code>equals</code>方法来比较这个字段，就要在该字段上递归调用<code>hashCode</code>方法。如果需要一个更复杂的比较，则计算次字段的范式（canonical representation），且在范式上调用<code>hashCode</code>方法。如果字段值是<code>null</code>，则使用0(或者其他常量，但通常用0)。<br>  3) 如果该字段是一个数组，则将其视为每个重要元素都是单独的字段。也就是说通过递归地应用这些规则来计算每个重要元素的哈希码，并组合每个步骤2.b中的值。如果该数组没有重要元素，则使用一个常量，最好不要用0。如果所有元素都是重要的，使用<code>Arrays.hashCode</code>方法。<br> b. 按如下所示组合在步骤2.a中所计算的哈希码c到result结果中：<br> <code>result = 31 * result + c;</code>  </li>
+<li>返回result。  </li>
+</ol>
+<p>&emsp;&emsp;当你完成编写<code>hashCode</code>方法，自问一下是否相等的实例拥有相等的哈希码。编写单元测试来验证你的直觉（除非你使用AutoValue框架来生成你的<code>equals</code>和<code>hashCode</code>方法，此种情况可以忽略测试）。如果相等实例拥有不相等的哈希码，找出原因并解决该问题。<br>&emsp;&emsp;你应该从哈希计算中排除派生字段。换句话说，如果一个字段的值可以根据参与计算的其他字段值计算出来，那么可以忽略这样的字段。你必须排除任何未在<code>equals</code>比较中使用的字段，否则你将面临违反<code>hashCode</code>规范第二条的风险。<br>&emsp;&emsp;步骤2.b中的乘法的结果取决于字段的顺序，如果该类有多个相似的字段则会生成一个更好的哈希函数。如果从<code>String</code>哈希函数中省略了乘法，那么所有的变位词（字符）都将具有相同的哈希码。选择值31是因为它是一个奇素数。如果它是偶数并且乘法溢出，则将丢失信息，因为乘以2等于移位。使用素数的优势不明显，但习惯上都这么做。31的一个很好特性是乘法可以用移位和减法代替，以便在某些体系结构中获得更好的性能：<code>31*i==(i&lt;&lt;5)-i</code>。现在的虚拟机会自动做这类优化。<br>&emsp;&emsp;让我们在<code>PhoneNumber</code>类上应用之前的技巧(配方recipe):  </p>
+<pre><code>//Typical hashCode method
+@Override 
+public int hashCode() {
+    int result = Short.hashCode(areaCode);
+    result = 31*result + Short.hashCode(prefix);
+    result = 31*result + Short.hashCode(lineNum);
+    return result;
+}
+</code></pre><p>&emsp;&emsp;因为这个方法返回一个简单而确定的计算结果，该计算的唯一输入只是<code>PhoneNumber</code>实例的三个重要字段，很明显，相等的<code>PhoneNumber</code>实例具有相等的哈希码。实际上，该方法是<code>PhoneNumber</code>的一个非常好的<code>hashCode</code>实现，与Java平台库中的实现一样。它很简单，速度很快，且可以合理地将不等的电话号码分配到不同哈希桶中。<br>&emsp;&emsp;尽管此案例中的技巧(配方recipe)产生了相当好的哈希函数，但这不是最好的。他们在质量上同在Java平台库的值类型中发现的哈希函数相当，且适合于大多数用途。如果你对哈希函数的真正需求不太可能产生冲突，可以看下<code>Guava</code>的<code>com.google.common.hash.Hashing</code>[Guava]。<br>&emsp;&emsp;Object类有一个静态方法，它接受任意数量的对象，且为它们返回一个哈希码。该方法名为<code>hash</code>，让你编写单行hashCode方法，该方法质量与根据本案例中的技巧（recipe）编写的hashCode方法一样。不幸的是，它运行的更慢，因为它们需要创建数组来传递可变数量的参数，如果任何参数是原生类型，还需要装箱与拆箱操作。此风格的哈希函数建议只在性能不是很紧要的情况下使用。这是使用该技巧为PhoneNumber写的哈希函数：  </p>
+<pre><code>//One-line hashCode method - mediocre performance
+@Override 
+public int hashCode () {
+    return Object.hash(lineNum, prefix, areaCode);
+}
+</code></pre><p>&emsp;&emsp;如果一个类是不可变的且计算哈希码的花销很大，你应该考虑在对象中缓存哈希码而不是每次请求时重新计算。如果你认为此类型的大多数对象将被用作哈希键，那么应该在实例创建的时候计算哈希码。否则，应该选择在首次调用hashCode的时候懒加载哈希码。注意需要确保类在延迟加载字段的情况下仍是线程安全的（Item 83）。我们的PhoneNumber类不值得这种待遇，但这里仅为你展示它是如何完成的，就是下面这样。注意hashCode字段的初始值（该例中是0）不应该是普通创建实例的哈希码：  </p>
+<pre><code>//hashCode method with lazily initialized cached hash code
+private int hashCode; // Automatically initialized 0
+
+@Override 
+public int hashCode() {
+    int result = hashCode;
+    if (result == 0){
+        result = Short.hashCode(areaCode);
+        result = 31 * result + Short.hashCode(prefix);
+        result = 31 * result + Short.hashCode(lineNum);
+        hashCode = result;
+    }
+    return result;
+}
+</code></pre><p>&emsp;&emsp;<strong>不要试图从哈希码计算中排除重要字段来提高性能</strong>。尽管结果是哈希函数会运行得更快，但是其低质量可能会使哈希表的性能降低到无法使用的地步。特别的，哈希函数会面对一个很大的实例集合，这些实例主要在你忽略的区域中有所不同。如果这种情况发生了，哈希函数将映射所有的实例到一部分哈希码上，且在线性时间运行的程序将会运行平方级的时间。<br>&emsp;&emsp;这不仅仅是一个理论问题。在Java 2 之前，<code>String</code>哈希函数使用最多16个字符，从第一个字符开始，在整个字符串中均匀地分布。对于大型的具有分层名称集合，如URL，该功能完美地展示了前面描述的病态行为。<br>&emsp;&emsp;<strong>不要为<code>hashCode</code>返回值提供详细规范，以至于客户端不能合理地依赖它；你可以灵活地更改它</strong>。Java库中的许多类，像<code>String</code>和<code>Integer</code>，指定了它们<code>hashCode</code>方法返回的确切值来作为实例值的函数。这不是一个好主意但却是我们不得不忍受的一个错误：它阻碍了在未来版本中优化哈希函数的能力。如果未指定细节并在哈希函数中发现缺陷，或者发现了更好的哈希函数，则可以在后续版本中对其进行更改。<br>&emsp;&emsp;总之，每当你重写<code>equals</code>方法时必须重写<code>hashCode</code>方法，否则你的程序将运行不正常。你的<code>hashCode</code>方法必须遵循<code>Object</code>类中规定的通用规范，并且做合理的措施来分配不同的哈希码给不同的实例。如果按规则（单调乏味），使用51页的配方（recipe）,这很容易做到。条款10中提到过，AutoValue框架提供了良好的方案来替代手动编写<code>equals</code>和<code>hashCode</code>方法，IDE也可以提供同样的功能。  </p>
 
       
     </div>

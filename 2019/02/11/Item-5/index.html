@@ -79,18 +79,18 @@
 
 
 
-<meta name="description" content="许多类依赖一个或多个底层资源。例如，拼写检查依赖于字典。我们常常会看到这种类被实现为静态辅助类（Item 4）：123456789//Inappropriate use of static utility - inflexiable &amp;amp; untestable!public class SpellChecker&amp;#123;    private static final Lexicon di">
+<meta name="description" content="许多类依赖一个或多个底层资源。例如，拼写检查依赖于字典。我们常常会看到这种类被实现为静态辅助类（Item 4）：   //Inappropriate use of static utility - inflexiable &amp;amp; untestable! public class SpellChecker{     private static final Lexicon dictionary">
 <meta name="keywords" content="Effiective Java 3rd">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Item-5 优先选择依赖注入而非硬编码资源的关联关系">
 <meta property="og:url" content="https://doublexz.github.io/doggie.github.io/2019/02/11/Item-5/index.html">
 <meta property="og:site_name" content="CloudXue&#39;s Blog">
-<meta property="og:description" content="许多类依赖一个或多个底层资源。例如，拼写检查依赖于字典。我们常常会看到这种类被实现为静态辅助类（Item 4）：123456789//Inappropriate use of static utility - inflexiable &amp;amp; untestable!public class SpellChecker&amp;#123;    private static final Lexicon di">
+<meta property="og:description" content="许多类依赖一个或多个底层资源。例如，拼写检查依赖于字典。我们常常会看到这种类被实现为静态辅助类（Item 4）：   //Inappropriate use of static utility - inflexiable &amp;amp; untestable! public class SpellChecker{     private static final Lexicon dictionary">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-04-08T09:51:09.243Z">
+<meta property="og:updated_time" content="2019-04-09T05:19:03.940Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Item-5 优先选择依赖注入而非硬编码资源的关联关系">
-<meta name="twitter:description" content="许多类依赖一个或多个底层资源。例如，拼写检查依赖于字典。我们常常会看到这种类被实现为静态辅助类（Item 4）：123456789//Inappropriate use of static utility - inflexiable &amp;amp; untestable!public class SpellChecker&amp;#123;    private static final Lexicon di">
+<meta name="twitter:description" content="许多类依赖一个或多个底层资源。例如，拼写检查依赖于字典。我们常常会看到这种类被实现为静态辅助类（Item 4）：   //Inappropriate use of static utility - inflexiable &amp;amp; untestable! public class SpellChecker{     private static final Lexicon dictionary">
 
 
 
@@ -300,18 +300,43 @@
       
 
       
-        <p>许多类依赖一个或多个底层资源。例如，拼写检查依赖于字典。<strong>我们常常会看到这种类被实现为静态辅助类</strong>（Item 4）：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">//Inappropriate use of static utility - inflexiable &amp; untestable!</span><br><span class="line">public class SpellChecker&#123;</span><br><span class="line">    private static final Lexicon dictionary = ...;</span><br><span class="line">   </span><br><span class="line">    private SpellChecker()&#123;&#125; //Noninstantiable</span><br><span class="line">    </span><br><span class="line">    public static boolean isValid(String word) &#123;...&#125;</span><br><span class="line">    public static List&lt;String&gt; suggestions(String typo) &#123;...&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<a id="more"></a>
-<p><strong>与之类似，我们有时也会看到这些类被实现为单例</strong>（Item 3）：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">    //Inappropriate use of singleton - inflexible &amp; untestable !</span><br><span class="line">    public class SpellChecker&#123;</span><br><span class="line">        private final Lexicon dictionary = ...;</span><br><span class="line">        </span><br><span class="line">        private SpellChecker(...) &#123;&#125;</span><br><span class="line">        public static INSTANCE = new SpellChecker(...);</span><br><span class="line">        </span><br><span class="line">        public boolean isValid(String word) &#123;...&#125;</span><br><span class="line">        public List&lt;String&gt; suggestions(String typo) &#123;...&#125;</span><br><span class="line">    &#125;</span><br><span class="line">```  </span><br><span class="line">&amp;emsp;&amp;emsp;以上两种方式没有一种是令人满意的，因为他们都假设只有一个字典**可供使用**。在实际中每一门语言都有它自己的字典，并且特殊字典用于特殊词汇。此外，我们还需要一个特殊字典进行测试。 **认为一个字典能够满足所有情况只不过是一种美好的愿望罢了**。  </span><br><span class="line">&amp;emsp;&amp;emsp;你可以尝试将dictionary字段定义为非final的，并且添加一个方法改变在已存在的拼写检查实例中修改字典来让`SpellChecker`类支持多种字典，**不过这么做有些笨拙、易出错，并且在并发设置下无法正常工作**。****  </span><br><span class="line">&amp;emsp;&amp;emsp;**我们所需要的是支持类的多个实例的能力（在该示例中就是SpellCheck）,每个实例都会使用客户端所需要的资源（在该示例中就是字典）**。满足这个需要的一个简单模式是**在创建一个新实例的时候将资源传递给构造方法**。这是依赖注入的一种形式：字典是拼写检查器的依赖并且在创建拼写检查实例的时候将字典注入进去。</span><br></pre></td></tr></table></figure></p>
-<p>//Dependency injection provides flexibility and testability<br>public class SpellChecker {<br>    private final Lexicon dictionary;</p>
-<pre><code>public SpellChecker(Lexicon dictionary) {
-    this.dictionary = Objects.requireNonNull(dictionary);
-}
+        <p>许多类依赖一个或多个底层资源。例如，拼写检查依赖于字典。<strong>我们常常会看到这种类被实现为静态辅助类</strong>（Item 4）：  </p>
+<pre><code>//Inappropriate use of static utility - inflexiable &amp; untestable!
+public class SpellChecker{
+    private static final Lexicon dictionary = ...;
 
-public boolean isValid(String word) {...}
-public List&lt;String&gt; suggestions (String typo) {...}
-</code></pre><p>}<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&amp;emsp;&amp;emsp;依赖注入模式太简单了以至于许多程序员使用它多年，只不过尚不知道它还有这个名字而已。尽管我们的拼写检查器示例只有单个资源（字典），不过依赖注入**可用于**任意数量的资源和任意依赖图表。它能够保证不变性（Item 17），这样多客户端可以共享依赖对象（假设这些客户端需要相同的底层资源）。依赖注入适合于构造方法、静态工厂（Item 1）和构建器（Item 2）。  </span><br><span class="line">&amp;emsp;&amp;emsp;**该模式的一个很有用的变种是将资源工厂传递给构造方法**。工厂是一个可以被重复调用连创建不同实例的对象。**这种工厂是工厂方法模式的一种具化形式**[Gamma95].Java 8中介绍的`Supplier&lt;T&gt;`接口非常适合于表示工厂。那些包含`Supplier&lt;T&gt;`入参的方法通过绑定的通配符类型来限制工厂的类型参数，**从而可以让客户端传递的工厂能够创建所指定类型的任何子类型**。例如，下面这个方法使用客户端提供的用于生成每个瓷砖的工厂来创建一个马赛克：</span><br></pre></td></tr></table></figure></p>
-<p>Mosaic create(Supplier&lt;? extends Tile&gt; tileFactory) {…}<br><code>`</code><br>&emsp;&emsp;尽管依赖注入极大地提高了灵活性和可测性，但是它会让严格约束成千上万依赖的大项目变得混乱。<strong>这种混乱可以通过依赖注入框架来消除，比如说Dagger、Guice、或者Spring</strong>。这些框架的使用超出了本书的范围，但是请注意： 那些专为手动依赖注入而设计的API通常适用于这些框架。<br>&emsp;&emsp;总结一下，如果一个类依赖于一个或多个底层资源，而这些底层资源的行为会影响这个类的行为，那么请不要使用单例或者静态辅助类来实现 ，也不要让类直接创建这些资源。相反，传递一个资源或者工厂到构造方法（或者静态工厂和构建器）来创建它们。这种实践被称为依赖注入，将极大的增强类的灵活性、重用性和可测试性。</p>
+    private SpellChecker(){} //Noninstantiable
+
+    public static boolean isValid(String word) {...}
+    public static List&lt;String&gt; suggestions(String typo) {...}
+}
+</code></pre><a id="more"></a>
+<p><strong>与之类似，我们有时也会看到这些类被实现为单例</strong>（Item 3）：</p>
+<pre><code>//Inappropriate use of singleton - inflexible &amp; untestable !
+public class SpellChecker{
+    private final Lexicon dictionary = ...;
+
+    private SpellChecker(...) {}
+    public static INSTANCE = new SpellChecker(...);
+
+    public boolean isValid(String word) {...}
+    public List&lt;String&gt; suggestions(String typo) {...}
+}
+</code></pre><p>&emsp;&emsp;以上两种方式没有一种是令人满意的，因为他们都假设只有一个字典<strong>可供使用</strong>。在实际中每一门语言都有它自己的字典，并且特殊字典用于特殊词汇。此外，我们还需要一个特殊字典进行测试。 <strong>认为一个字典能够满足所有情况只不过是一种美好的愿望罢了</strong>。<br>&emsp;&emsp;你可以尝试将dictionary字段定义为非final的，并且添加一个方法改变在已存在的拼写检查实例中修改字典来让<code>SpellChecker</code>类支持多种字典，<strong>不过这么做有些笨拙、易出错，并且在并发设置下无法正常工作</strong>。<strong>**<br>&emsp;&emsp;</strong>我们所需要的是支持类的多个实例的能力（在该示例中就是SpellCheck）,每个实例都会使用客户端所需要的资源（在该示例中就是字典）<strong>。满足这个需要的一个简单模式是</strong>在创建一个新实例的时候将资源传递给构造方法**。这是依赖注入的一种形式：字典是拼写检查器的依赖并且在创建拼写检查实例的时候将字典注入进去。  </p>
+<pre><code>//Dependency injection provides flexibility and testability
+public class SpellChecker {
+    private final Lexicon dictionary;
+
+    public SpellChecker(Lexicon dictionary) {
+        this.dictionary = Objects.requireNonNull(dictionary);
+    }
+
+    public boolean isValid(String word) {...}
+    public List&lt;String&gt; suggestions (String typo) {...}
+}
+</code></pre><p>&emsp;&emsp;依赖注入模式太简单了以至于许多程序员使用它多年，只不过尚不知道它还有这个名字而已。尽管我们的拼写检查器示例只有单个资源（字典），不过依赖注入<strong>可用于</strong>任意数量的资源和任意依赖图表。它能够保证不变性（Item 17），这样多客户端可以共享依赖对象（假设这些客户端需要相同的底层资源）。依赖注入适合于构造方法、静态工厂（Item 1）和构建器（Item 2）。<br>&emsp;&emsp;<strong>该模式的一个很有用的变种是将资源工厂传递给构造方法</strong>。工厂是一个可以被重复调用连创建不同实例的对象。<strong>这种工厂是工厂方法模式的一种具化形式</strong>[Gamma95].Java 8中介绍的<code>Supplier&lt;T&gt;</code>接口非常适合于表示工厂。那些包含<code>Supplier&lt;T&gt;</code>入参的方法通过绑定的通配符类型来限制工厂的类型参数，<strong>从而可以让客户端传递的工厂能够创建所指定类型的任何子类型</strong>。例如，下面这个方法使用客户端提供的用于生成每个瓷砖的工厂来创建一个马赛克：  </p>
+<pre><code>Mosaic create(Supplier&lt;? extends Tile&gt; tileFactory) {...}
+</code></pre><p>&emsp;&emsp;尽管依赖注入极大地提高了灵活性和可测性，但是它会让严格约束成千上万依赖的大项目变得混乱。<strong>这种混乱可以通过依赖注入框架来消除，比如说Dagger、Guice、或者Spring</strong>。这些框架的使用超出了本书的范围，但是请注意： 那些专为手动依赖注入而设计的API通常适用于这些框架。<br>&emsp;&emsp;总结一下，如果一个类依赖于一个或多个底层资源，而这些底层资源的行为会影响这个类的行为，那么请不要使用单例或者静态辅助类来实现 ，也不要让类直接创建这些资源。相反，传递一个资源或者工厂到构造方法（或者静态工厂和构建器）来创建它们。这种实践被称为依赖注入，将极大的增强类的灵活性、重用性和可测试性。</p>
 
       
     </div>

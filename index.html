@@ -302,69 +302,14 @@
 
       
         
-          
-            <p>不像在本章节中讨论的其他方法，compareTo方法未在Object中声明，而是Comparable接口中的唯一方法。它的特征与Object的equals方法类似，除了允许简单的相等性比较还允许顺序比较，且它是通用的。为了实现Comparable接口，类应该声明其实例有一个自然顺序。为实现了Comparable接口的对象数组排序就像下面这样简单：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">    Arrays.sort(a);</span><br><span class="line">```  </span><br><span class="line">&lt;!--more--&gt;</span><br><span class="line">&amp;emsp;&amp;emsp;它同样易于搜索，计算极值，并且维护自动排序的Compara对象集合。例如，下面的程序，依赖于String类实现了Comparable接口的事实，会打印按字母顺序排列的集合，该集合包含去重的命令行参数：</span><br></pre></td></tr></table></figure></p>
-<pre><code>public class WordList {
-    public static void main (String[] args){
-        Set&lt;String&gt; s = new TreeSet&lt;&gt;();
-        Collections.addAll(s, args);
-        System.out.println(s);
-    }
-}
-</code></pre><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&amp;emsp;&amp;emsp;为实现Comparable接口，你必须使你的类与所有通用算法和基于该接口的稽核实现进行交互。只需少量努力就可获得巨大的能力（力量power）。事实上，所有在Java平台库中的值类，像枚举类型（Item 34），都实现了Comparable接口。如果你正在编写一个具有明显自然顺序的值类，如字母顺序，数字顺序，年份顺序，就应该实现Comparable接口：</span><br></pre></td></tr></table></figure>
-<pre><code>public interface Comparable&lt;T&gt; {
-    int compareTo(T, t);
-}
-</code></pre><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">compareTo方法的通用规范与equals方法一样：  </span><br><span class="line">将此对象与指定对象进行比较以获得顺序。返回一个负整数，零，正整数，当此对象比指定对象小，相等，或者大的时候。如果指定对象的类型阻止其与该对象进行比较，则抛出ClassCastException。在以下的描述中，符号sgn(expression)指明数学符号函数，根据表达式的值是否是正数，零，或者负数，被定义成返回-1，0，1。  </span><br><span class="line">- 实现者必须确保对于所有的x和y,sgn(x.compareTo(y)) == -sgn(y.compareTo(x))。这意味着当且仅当y.conpareTo(x)抛出异常的时候x.compateTo(y)必须抛出异常。</span><br><span class="line">- 实现者也必须确保关系是可传递的：(x.compareTo(y) &gt; 0 &amp;&amp; y.compareTo(z) &gt; 0)意味着x.compareTo(z) &gt; 0。</span><br><span class="line">- 最后，实现者必须确保对于所有的z,x.compareTo(y)==0意味着sgn(x.compareTo(z)) == sgn(y.compareTo(z))。</span><br><span class="line">- 特别强调，但不是必须的，(x.compareTo(y) == 0) == (x.equals(y))。通常来讲，任何实现了Comparable接口且校验该条件的类应该清晰的声明该事实。推荐语言是“注意：此类具有与equals方法不一致的自然顺序”。  </span><br><span class="line"></span><br><span class="line">&amp;emsp;&amp;emsp;不要被该规范的数学本质所拖延。像equals规范一样(Item 10),该规范看起来也不复杂。不像equals方法，在所有对象上强加全局等价关系，compareTo方法不必跨越不同类型的对象工作：当遇到不同类型的对象时，允许compareTo方法抛出ClassCastException异常。通常，它确实是这么做的。规范确实允许交互式比较，这些比较通常在被比较对象实现的接口中定义。  </span><br><span class="line">&amp;emsp;&amp;emsp;就像校验hashCode规范的类会破坏其他依赖散列的类一样，校验compareTo规范的类会破坏依赖于比较的类。依赖于比较的类包括有序集合TreeSet和TreeMap以及包含搜索和排序算法的实用程序类集合和数组。  </span><br><span class="line">&amp;emsp;&amp;emsp;让我们复习下compareTo规范的规定。第一条规定说如果你颠倒两个对象引用之间的比较方向，那么预期的事情就会发生：如果第一个对象小于第二个，那么第二个对象必须比第一个大；如果第一个对象等于第二个，那么第二个对象必须等于第一个；且如果第一个对象大于第二个，那么第二个对象必须小于第一个。第二条规定说如果一个对象大于第二个，第二个对象大于第三个，那么第一个对象必须大于第三个。最后一条规定说，所有相等的对象相互比较时必须生成同样的结果。  </span><br><span class="line">&amp;emsp;&amp;emsp;这三个条款的一个结果是compareTo方法强加的相等测试必须遵守equals规范强加的限制：自反性、对称性和传递性。因此，同样的警告适应如下：除非你愿意放弃面向对象抽象的好处，否则不可能在遵守（保留）compareTog规范的同时使用一个新的值组件扩展可实例化类（Item 10）。同样的解决方法也适用。如果你想给实现了Comparable接口的类添加值组件，那就不要扩展它；而是要写一个包含第一个类实例的不相关的类。然后提供一个“试图”方法返回包含的实例。这可以让你在包含的类上自由地实现任何你喜欢的compareTo方法，同事允许其客户端在需要时查看包含类的实例作为包含类的实例。  </span><br><span class="line">&amp;emsp;&amp;emsp;compateTo规范的最后一段是强烈建议而非必须的，简单地说，compareTo方法强加的相等性测试通常应该返回与equals方法相同的结果。如果遵循了该条款，则compareTo方法强加的顺序与equaks一致。如果违反了，则说明顺序与equals不一致。compareTo方法强执行与equals不一致的顺序的类仍然有效，但包含该类元素的有序集合可能不遵守相应集合接口（Collection，Set和Map）的通用规范。这是因为这些接口的通用规范定义在equals方法中，但是有序集合使用compareTo方法加强的相等测试来代替equals。如果发生这种情况，这不是灾难，但要注意。  </span><br><span class="line">&amp;emsp;&amp;emsp;例如，考虑下BigDecimal类，其compareTo方法与equals不一致。如果你创建一个空的HashSet实例并添加new BigDecimal(&quot;1.0&quot;)和new BigDecimal(&quot;1.00&quot;)，该集合将包含两个元素，因为这两个添加到集合中的BigDecimal实例在使用equals方法比较时是不相等的。然而，如果你使用TreeSet代替HashSet执行相同的程序，该集合中将只包含一个元素，因为这两个BigDecimal实例在使用compareTo方法比较时是相等的。（查看BigDecimal文档了解详情）  </span><br><span class="line">&amp;emsp;&amp;emsp;编写一个compareTo方法与编写一个equals方法一样，但有几个关键的不同之处。因为Comparable接口是参数化的，compareTo方法是静态类型的，因此你不需要类型检查或者转换其参数。如果参数为空，调用将抛出空指针异常，并且只要方法尝试访问其成员，就会抛出空指针异常。  </span><br><span class="line">&amp;emsp;&amp;emsp;在compareTo方法内，变量比较的是顺序而不是相等性。为比较对象引用变量，请递归调用compareTo方法。如果变量没有实现Comparable接口或者你需要一个非标准的排序，使用Comparator代替。你可以为条款10中的CaseInsensitiveString的compareTo方法编写自己的比较器或者使用已存在的：</span><br></pre></td></tr></table></figure>
-<pre><code>// Single-field Comparable with object reference field
-public final class CaseInsensitiveString implements Comparable&lt;CaseInsensitiveString&gt; {
-    public int compareTo(CaseInsensitiveString cis) {
-        return String.CASE_INSENSITIVE_ORDER.compare(s, cis.s);
-    }
-   ... // Remainder omitted
-</code></pre><p>   }<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&amp;emsp;&amp;emsp;注意，`CaseInsensitiveString`实现了`Comparable&lt;CaseInsensitiveString&gt;`接口。这意味着CaseInsensitiveString实例只能与另一个CaseInsensitiveString实例进行比较。这是声明一个类实现Comparable接口时遵循的正常模式。  </span><br><span class="line">&amp;emsp;&amp;emsp;本书的早先版本建议compareTo方法使用关系运算符&lt;and &gt;整数原生字段，使用静态方法Double.compare和Float.compare比较浮点原生字段。在Java 7中，静态的compare方法被添加到了所有的Java包装原生类中。**在compareTo方法中使用关系运算符&lt;and&gt;是冗余且容易出错的，不再推荐使用**。  </span><br><span class="line">&amp;emsp;&amp;emsp;如果一个类有多种重要字段，那么比较他们的顺序是至关重要的。从最重要的字段开始并逐步完成。如果比较结果是零意外的任何结果（零表示相等），那么你就完成了，只返回结果。如果最重要的字段是相等的，再比较次重要的字段，并依次比较下去，直到你发现一个不相等的字段或者比较到最不重要的字段。这里是条款11中PhoneNumber类的compareTo方法使用该技术的开始实例：</span><br></pre></td></tr></table></figure></p>
-<pre><code>// Multiple-field Comparable with primitive fields
-public int compareTo(PhoneNumber pn) {
-    int result = Short.compare(areaCode, pn.areaCode);
-    if (result == 0)  {
-        result = Short.compare(prefix, pn.prefix);
-        if (result == 0)
-            result = Short.compare(lineNum, pn.lineNum);
-    }
-    return result;
-}
-</code></pre><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&amp;emsp;&amp;emsp;在Java 8中Comparator接口配备了一系列比较器构造函数，可以流利地构建比较器。这些比较器可用于实现compareTo方法，这是Comparable接口所需要的。许多程序员更喜欢这种方式的简洁性，尽管它的性能成本适中：在我的机器上对PhoneNumber实例数组排序大约慢10%。在使用该方式时，请考虑使用Java的静态导入功能，以便可以通过简单的名称引用静态比较器构造方法，以简化和简洁（程序）。下面是PhoneNumber类的compareTo方法使用该方式的实现：</span><br></pre></td></tr></table></figure>
-<pre><code>// Comparable with comparator construction methods
-private static final Comparator&lt;PhoneNumber&gt; COMPARATOR =
-       comparingInt((PhoneNumber pn) -&gt; pn.areaCode)
-         .thenComparingInt(pn -&gt; pn.prefix)
-         .thenComparingInt(pn -&gt; pn.lineNum);
-public int compareTo(PhoneNumber pn) {
-   return COMPARATOR.compare(this, pn);
-}
-</code></pre><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&amp;emsp;&amp;emsp;该实现使用两个比较器构造方法在类初始化的时候构建了一个比较器。第一个是`comparingInt`。它是一个比较器，接收一个键提取函数（key extractor function），将对象引用映射到int类型的键，并返回一个根据该键对实例排序的比较器。在之前的示例中，comparingInt接收一个lambda(),从PhoneNumber中提取地区码，并且返回根据地区码对电话号码进行排序的比较器Comparator&lt;PhoneNumber pn&gt;。注意，lambda显示指定输入参数的类型（PhoneNumber pn）。事实证明，在这种情况下，Java的类型推断不足以为自己计算类型，所以我们被迫帮助它来使程序通过编译。  </span><br><span class="line">&amp;emsp;&amp;emsp;如果两个电话号码有相同的地区码，我们就需要进一步细化比较，这正是第二个比较器构造方法thenComparingInt做的。它是Comparator上的一个实例方法，接收一个int类型的键提取函数，并返回一个比较器，该比较器首先应用原是比较器，然后使用提取键来断开关系。你可以根据需要尽可能多的对thenComparingInt叠加调用，从而产生字典顺序。在上面的示例中，我们叠加了两个队thenComparingInt的调用，结果是按照第二个字段是前缀（prefix），且第三个字段是线性码（line number）的顺序调用。注意，我们不必指定传递给thenComparingInt的任一调用的键提取函数的参数类型：Java的类型推断足够聪明，可以为自己解决该问题。  </span><br><span class="line">&amp;emsp;&amp;emsp;Comparator类具有完整的构造方法。对原生类型long和double有类似comparingInt和thenComparingInt的比较器。int版本也可以用于范围更小的整数类型，如short，以及我们的PhoneNumber示例。double版本也可以用于float。其提供的比较器覆盖Java的所有数字原生类型。  </span><br><span class="line">&amp;emsp;&amp;emsp;对于对象引用类型也有比较器构造函数。名为comparing的静态方法，有两个重写实现。一个接收关键字提取并使用关键字的自然顺序。第二个接收关键字提取和用于提取的关键字的比较器。实例方法还有第三种重写实现，名为thenComparing。其中一个重载只接收一个比较器，并使用该比较器提供第二种顺序。第二个重载只接收一个关键字提取器并且使用关键字的自然顺序作为第二种顺序。最后一种重载接收一个关键字提取器和使用提取的关键字的比较器。  </span><br><span class="line">&amp;emsp;&amp;emsp;偶尔的，你可以看下compareTo方法和基于以下事实的方法：如果第一个值小于第二个值，则两个值之间的差值为负，如果两个值相等，则差值为零，如果第一个值较大则为正直。这里是实例：</span><br></pre></td></tr></table></figure>
-<pre><code>// BROKEN difference-based comparator - violates transitivity!
-static Comparator&lt;Object&gt; hashCodeOrder = new Comparator&lt;&gt;() {
-    public int compare(Object o1, Object o2) {
-       return o1.hashCode() - o2.hashCode();
-    }
-};
-</code></pre><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">不要使用该技巧。它充满了整数溢出和IEEE 754浮点运算伪像的危险【JLS 15.20.1, 15.21.1】。此为，所得到的方法不可能比使用本条款中描述的技术编写的方法更快。或者使用静态比较方法：</span><br></pre></td></tr></table></figure>
-<pre><code>// Comparator based on static compare method
-static Comparator&lt;Object&gt; hashCodeOrder = new Comparator&lt;&gt;() {
-    public int compare(Object o1, Object o2) {
-        return Integer.compare(o1.hashCode(), o2.hashCode());
-    }
-};
-</code></pre><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">或者使用比较器构造方法：</span><br></pre></td></tr></table></figure>
-<pre><code>// Comparator based on Comparator construction method
-static Comparator&lt;Object&gt; hashCodeOrder =
-       Comparator.comparingInt(o -&gt; o.hashCode());
-</code></pre><p><code>`</code><br>&emsp;&emsp;总之，无论何时实现具有合理排序的值类，都应该使实现Comparable接口，以至于使其实例可以容易的排序、查询和在基于相等的集合中使用。当比较在compareTo方法中实现的字段值时，应该避免使用<and>运算符。作为替换，在包装原生类中使用静态比较方法或者在Comparator接口中使用比较器构造方法。  </and></p>
-<hr>
-<p>Finished at 2019年04月04日12:51:19</p>
-
-          
+          <p>不像在本章节中讨论的其他方法，compareTo方法未在Object中声明，而是Comparable接口中的唯一方法。它的特征与Object的equals方法类似，除了允许简单的相等性比较还允许顺序比较，且它是通用的。为了实现Comparable接口，类应该声明其实例有一个自然顺序。为实现了Comparable接口的对象数组排序就像下面这样简单：  </p>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/doggie.github.io/2019/04/04/Item-14/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -481,7 +426,7 @@ static Comparator&lt;Object&gt; hashCodeOrder =
 
       
         
-          <p><code>Cloneable</code>接口路旨在作为一个mixin接口，用于声明类允许克隆。不幸的是，它不能满足这个目标。它的主要缺陷是缺少clone方法，且Object的<code>clone</code>方法是protected的。如果不通过反射，就不能仅仅因为实现了<code>Cloneable</code>接口就在对象上调用<code>clone</code>方法。即使是反射调用也会失败，因为不能保证该对象有一个可访问的<code>clone</code>方法。尽管存在这个缺陷和其他许多问题，但该功能（facility）应用广泛，因此值得去理解它。本条款告诉你如何实现一个行为良好的clone方法，讨论何时适合这样做，并给出替代方法。<br>
+          <p><code>Cloneable</code>接口路旨在作为一个mixin接口，用于声明类允许克隆。不幸的是，它不能满足这个目标。它的主要缺陷是缺少clone方法，且Object的<code>clone</code>方法是protected的。如果不通过反射，就不能仅仅因为实现了<code>Cloneable</code>接口就在对象上调用<code>clone</code>方法。即使是反射调用也会失败，因为不能保证该对象有一个可访问的<code>clone</code>方法。尽管存在这个缺陷和其他许多问题，但该功能（facility）应用广泛，因此值得去理解它。本条款告诉你如何实现一个行为良好的clone方法，讨论何时适合这样做，并给出替代方法。  </p>
           <!--noindex-->
           <div class="post-button text-center">
             <a class="btn" href="/doggie.github.io/2019/03/30/Item-13/#more" rel="contents">
@@ -491,7 +436,7 @@ static Comparator&lt;Object&gt; hashCodeOrder =
           <!--/noindex-->
         
       
-    </p></div>
+    </div>
     
     
     
@@ -605,7 +550,7 @@ static Comparator&lt;Object&gt; hashCodeOrder =
 
       
         
-          <p>尽管Object类提供了一个toString方法的实现，但其返回的字符创通常不是类的使用者想要看到的。该字符串由类的名字后面紧跟@符号和哈希码的无符号十六进制表示组成，例如：PhoneNumber@163b91。toSting的通用规范是这么说的：返回的字符串应该是“一个简洁但信息丰富的表示，以便人们阅读”。尽管可以认为PhoneNumber@163b91是简洁易读的，但与707-867-5309相比，其信息量不大。toString规范还说“建议所有的子类重写该方法”。这确实是一个好的建议。<br>
+          <p>尽管Object类提供了一个toString方法的实现，但其返回的字符创通常不是类的使用者想要看到的。该字符串由类的名字后面紧跟@符号和哈希码的无符号十六进制表示组成，例如：PhoneNumber@163b91。toSting的通用规范是这么说的：返回的字符串应该是“一个简洁但信息丰富的表示，以便人们阅读”。尽管可以认为PhoneNumber@163b91是简洁易读的，但与707-867-5309相比，其信息量不大。toString规范还说“建议所有的子类重写该方法”。这确实是一个好的建议。<br>&emsp;&emsp;尽管遵循toString规范没有遵循equals和hashCode规范要紧(Item 10 和 11)，<strong>提供良好的toString实现会使你的类使用起来更愉快，并且使使用该类的系统更易于调试</strong>。把对象传递给print、printf，字符串连接运算，或断言，或者调试器打印时，会自动调用toString方法。即使你永远不会在某个对象上调用toString方法，其他对象也会。例如，一个含有你自定义对象引用的组件会在日志错误信息中包含该对象的字符串实现。如果你没有重写toString方法，日志信息虽然很全但是没有用处。<br>
           <!--noindex-->
           <div class="post-button text-center">
             <a class="btn" href="/doggie.github.io/2019/03/23/Item-12/#more" rel="contents">
@@ -862,7 +807,7 @@ static Comparator&lt;Object&gt; hashCodeOrder =
 <li><strong>每个类的实例本质上都是唯一的</strong>。这对表示活动实体而非值的类（例如Thread类）来说是正确的。<code>Object</code>类提供的<code>equals</code>实现对这些类来说具有非常正确的行为。  </li>
 <li><strong>类不需要提供“逻辑相等”测试</strong>。例如，<code>java.util.regax.Pattern</code>可以重写equals方法来检查两个<code>Pattern</code>实例是否表示相同的正则表达式，但是设计者不认为客户端需要或者想要这个功能。在这种情况下，从<code>Object</code>类中继承equals实现是理想的选择。</li>
 <li><strong>父类已经重写了equals方法，则父类的行为适合这些子类</strong>。例如，大部分<code>Set</code>实现从<code>AbstractSet</code>继承equals方法实现，<code>List</code>实现从<code>AbstractList</code>继承，<code>Map</code>从<code>AbstractMap</code>继承。  </li>
-<li><strong>==类是私有的或包级私有的==，可以确定它的equals方法永远不会被调用</strong>。如果你非常厌恶风险，可以重写equals方法来确保它不会被意外地调用：
+<li><strong>类是私有的或包级私有的，可以确定它的equals方法永远不会被调用</strong>。如果你非常厌恶风险，可以重写equals方法来确保它不会被意外地调用：
           <!--noindex-->
           <div class="post-button text-center">
             <a class="btn" href="/doggie.github.io/2019/03/18/Item-10/#more" rel="contents">
@@ -1358,7 +1303,9 @@ static Comparator&lt;Object&gt; hashCodeOrder =
 
       
         
-          <p>在需要<strong>一个对象</strong>时，总是重复使用单个对象来代替创建一个具备等价功能的新对象。重用既快速又时尚。如果对象是不可变的，那么它总是可以被重用（Item 17）。<br>&emsp;&emsp;作为禁止的极端案例，思考以下情景：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">String s = new String(&quot;bikini&quot;); //DON&apos;T DO THIS</span><br></pre></td></tr></table></figure></p>
+          <p>在需要<strong>一个对象</strong>时，总是重复使用单个对象来代替创建一个具备等价功能的新对象。重用既快速又时尚。如果对象是不可变的，那么它总是可以被重用（Item 17）。<br>&emsp;&emsp;作为禁止的极端案例，思考以下情景：  </p>
+<pre><code>String s = new String(&quot;bikini&quot;); //DON&apos;T DO THIS
+</code></pre>
           <!--noindex-->
           <div class="post-button text-center">
             <a class="btn" href="/doggie.github.io/2019/02/25/Item-6/#more" rel="contents">
@@ -1482,7 +1429,17 @@ static Comparator&lt;Object&gt; hashCodeOrder =
 
       
         
-          <p>许多类依赖一个或多个底层资源。例如，拼写检查依赖于字典。<strong>我们常常会看到这种类被实现为静态辅助类</strong>（Item 4）：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">//Inappropriate use of static utility - inflexiable &amp; untestable!</span><br><span class="line">public class SpellChecker&#123;</span><br><span class="line">    private static final Lexicon dictionary = ...;</span><br><span class="line">   </span><br><span class="line">    private SpellChecker()&#123;&#125; //Noninstantiable</span><br><span class="line">    </span><br><span class="line">    public static boolean isValid(String word) &#123;...&#125;</span><br><span class="line">    public static List&lt;String&gt; suggestions(String typo) &#123;...&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+          <p>许多类依赖一个或多个底层资源。例如，拼写检查依赖于字典。<strong>我们常常会看到这种类被实现为静态辅助类</strong>（Item 4）：  </p>
+<pre><code>//Inappropriate use of static utility - inflexiable &amp; untestable!
+public class SpellChecker{
+    private static final Lexicon dictionary = ...;
+
+    private SpellChecker(){} //Noninstantiable
+
+    public static boolean isValid(String word) {...}
+    public static List&lt;String&gt; suggestions(String typo) {...}
+}
+</code></pre>
           <!--noindex-->
           <div class="post-button text-center">
             <a class="btn" href="/doggie.github.io/2019/02/11/Item-5/#more" rel="contents">
