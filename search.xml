@@ -1,6 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title><![CDATA[Item-15 最大限度地减少类和成员的可访问性]]></title>
+    <url>%2Fdoggie.github.io%2F2019%2F04%2F10%2FItem-15%2F</url>
+    <content type="text"><![CDATA[区分设计良好和设计糟糕组件的唯一重要因素是组件隐藏其内部数据的程度以及其他组件的其他实现详情。设计良好的组件会隐藏所有其实现细节，从其实现中清晰划分API。组件之间只通过API交互，并且明显在各组件内部起作用。这个称作信息隐藏或者封装的概念是软件设计中的一个重要信条【Parnas72】。&emsp;&emsp;出于多种原因，信息隐藏（封装）很重要，其中大多数基于它解耦组成系统的各个组件这一事实，允许他们被独立的开发、测试、优化、使用、理解和修改。这可以加快系统开发，因为组件可以并行开发。它减轻了维护的负担，因为组件可以被更快的理解并进行调试和替换，而不必担心损害其他组件。尽管信息隐藏本身不会导致良好的性能，但它可以实现有效的性能调整：一旦系统完成并分析确认哪些组件引起性能问题（Item 67），这些组件可以在不影响其他组件正确性的情况下被优化。信息隐藏会增强软件复用，因为非紧密耦合的组件在其他上下文中经常被证明是有用的，除了为它们开发的那些。最后，信息隐藏降低了构建大型系统的风险，因为即使系统没有，单个组件也可能成功。&emsp;&emsp;Java有许多工具来协助信息隐藏。访问控制机制指定【JSL,6.6】指定类、接口和成员的可访问性。一个实体的可访问性取决于其声明的位置和访问修饰符（private、protected、public）在生声明中的位置（如果有的话）。正确使用这些修饰符对信息隐藏至关重要。&emsp;&emsp;经验法则很简单：尽可能地使每一个类和成员不可访问。换句话说，使用符合你正在编写的软件正常运行条件的最低可能的访问级别。&emsp;&emsp;对于顶层的类和接口（费嵌套），只有两种可访问级别：包私有的和公共的（package-private and public）。如果使用public修饰符声明顶级的类或接口，那么这个它将是公共的；否则，它将是包私有的。如果一个类或接口可以被定义成包私有的，那就应该这么做。把它定义成包私有的，就可以将其视作实现的一部分而不是导出的接口，并且在随后发布的版本中，可以修改它、替换它或者消除它，而不必担心损害现有客户端。如果把它定义成公共的，你有责任永久支持它以保持兼容性。&emsp;&emsp;如果包私有的顶级类或者接口只被一个类使用，那么考虑将这个顶级类定义成一个在唯一使用它的类中的私有静态内部类（Item 24）。这会从包中的所有类到使用它的一个类降低对它的可访问性。但是，降低对不必要的公共类的可访问性远比包私有的顶级类的可访问性重要的多：公共类是包的API中的一部分，而包私有顶级类已经是其实现的一部分。&emsp;&emsp;对于成员（字段、方法、内部类、内部接口）来说，有四种可访问级别，按照可访问性递增的顺序列在这： private ——该成员只能被声明它的顶级类访问。 package-private——该成员可以被与声明它的类在相同包下的所有类访问。通常称其为默认权限，如果没有指定访问修饰符，这将是你获得的访问级别（接口成员除外，默认情况下是公共的）。 protected——该成员可以被声明它的类的子类（受到一些限制【JLS，6.6.2】）和与声明它的类在相同包下的所有类访问。 public——该成员可以在任何地方访问。 &emsp;&emsp;在认真设计完类的公共API以后，你的反应应该是将其他成员定义成私有的。只有在相同包中的另一个类确实需要访问某个成员时，才应该删除private修饰符，时该成员成为包私有的。如果你发现自己经常这么做，你应该重新审视下你的系统设计来明确是否另一个分解可能产生更好地彼此解耦的类。也就是说，私有成员和包私有成员是类的实现的一部分，并且通常不会影响其导出的API。然而，如果类实现了Serializable接口，这些字段可能会“泄漏”到导出的API中（Item 86和87）。&emsp;&emsp;对于公共类的成员，当访问级别从package-private变为protected时，其访问性会发生一个巨大增长。受保护成员是类的导出API的一部分，并且必须永远支持。此外，导出类的受保护成员表示对实现细节的公开承诺（Item 19）。对受保护成员的需求相对较少。&emsp;&emsp;有一个关键规则限制了你减少方法可访问性的能力。如果一个方法重写了父类的方法，它不能在子类中具有比在父类中更严格的访问方法【JLS,8.4.8.3】。这对于确保子类实例在父类实例是有用的任何地方有用是必要的。如果你违反了这个规则，在你试图编译这个子类的时候，编译器会生成一个错误信息。该规则的一个特殊案例是，如果一个类实现了某个接口，那么所有在接口中的类方法必须在类中声明成public的。&emsp;&emsp;为了便于测试你的代码，你也许会试图使类、接口或者成员比其他方式更易于访问。这一点很好。为了检测，将公共类中的私有成员定义成包私有的，这是可接受的，但是提高可访问性是不被接受的。换句话说，将一个类、接口或者成员定义成包的导出API的一部分来便于测试是不被接受的。幸运的是，这两者都不是必须的，因为测试可以作为被测试包的一部分运行，从而获得对其包私有元素的访问（权限）。&emsp;&emsp;公共类的实例字段应该很少公开（Item 16）。如果实例字段是非终态的或者可变对象的引用，那么将其定义为public的，就放弃了限制在字段中存储值的能力。这意味着放弃了强制执行涉及该字段不变量的能力。此外，你还放弃了在修改字段时执行任何操作的能力，因此拥有公共可变字段的类通常不是线程安全的。即使一个字段是中台的并且引用了一个不可变对象，通过将其定义成公共的，就放弃了在字段不存在时切换到新内部数据表示的灵活性。&emsp;&emsp;相同的建议适应于静态字段，但有一个除外。你可以通过公共静态final的字段来暴露常量，假设常量形成了类提供的抽象的组成部分。按照惯例，这些字段的名字由大写字母组成，单词由下划线划分（Item 68）。这些字段（是否）包含原生值或者包含对不可变对象的引用是至关重要的（Item 17）。一个包含可变对象引用的字段具备非终态字段的所有缺点。既然引用不能不修改，但引用对象可以被修改，这就会导致严重的后果。&emsp;&emsp;注意，一个非零长度的数组经常是可变的，因此类如果包含一个共有静态且终态的数组字段或者返回这样一个字段的访问器，都是错误的。如果类包含这样一个字段或者访问器，客户端就可以修改数组的内容。这是安全漏洞的常见来源： //Potential security hold! public static final Thing[] VALUES = {...}; 请注意，某些IDE生成的访问器会会返回对私有数组字段的引用，从而导致此问题。有两种方式来解决该问题。你可以加个公共数组定义成私有的并添加一个公共的不可变集合： private static final Thing[] PRIVATE_VALUES = {...}; public static final List&lt;Thing&gt; VALUES = Collections.unmodifiableList(Arrays.asList(PRIVATE_VALUES)); &emsp;&emsp;另一种可替换方式是：将数组定义成私有的并且添加一个返回私有数组拷贝的公共方法： private static final Thing[] PRIVATE_VALUES = {...}; public static final Thing[] values() { return PRIVATE_VALUES.clone(); } 在这些备选方案之间选择时，请考虑客户端可能会对结果做什么处理。哪一种返回类型会更方便？哪一种性能更好？&emsp;&emsp;从Java 9开始，引入了两个额外的隐式访问级别作为模块系统的一部分。模块是一组包，就像包是一组类一样。模块可以通过其模块声明中的导出声明显式地导出一些包（按照惯例，模块声明包含在名为moudle-info.java的源文件中）。模块中未导出包的公共和受保护的成员在模块外部是不可访问的；在模块内部，可访问性不受导出声明的影响。使用模块系统允许你在模块内部包中共享类，而不需要让类对全世界可见。未导出包中公共类的公共成员和受保护成员生成两个隐式访问级别，这是正常公共级别和受保护级别的模块内类似物。这种共享的需求相对较少，通常可以通过重新安排包中的类来消除。&emsp;&emsp;与四个主要访问级别不同，这两个基于模块的级别主要是建议性的。如果将模块的JAV文件放在应用程序的类路上而非模块路径上，模块中的包将恢复为非模块化行为：包中公共类的所有公共成员和受保护成员具备正常的可访问性，无论包是否由模块导出【Reinhold，1.2】。对新引入的访问级别严格执行的地方是JDK本身：Java库中的非导出包确实不能再在模块以外访问。&emsp;&emsp;对于典型的Java程序员而言，有限的实用程序模块不仅提供访问保护，而且主要是咨询性的；为了利用它，你必须将软件包分组到模块中，在模块声明中明确其所有依赖项，重新排列源代码树，并采取特殊措施来适应来自模块内任何费模块化软件包的访问【Reinhold, 3】。现在说模块是否会在JDK自身以外被广泛应用还为时尚早。与此同时，除非你有迫切需要，否则最好避免使用它们。&emsp;&emsp;总之，你应该尽可能的地减少程序元素的可访问性（在合理范围内）。在认真设计了最小的公共API以后，你应该阻止任何散杂的类、接口或者成员成为API的一部分。除了作为常量的公共静态终态字段以外，公共类不应该有公共字段。确保public static final 的字段引用的对象是不可变的。]]></content>
+      <categories>
+        <category>Java</category>
+      </categories>
+      <tags>
+        <tag>Effective Java 3rd</tag>
+      </tags>
+  </entry>
+  <entry>
     <title><![CDATA[Item-14 考虑实现Comparable接口]]></title>
     <url>%2Fdoggie.github.io%2F2019%2F04%2F04%2FItem-14%2F</url>
     <content type="text"><![CDATA[不像在本章节中讨论的其他方法，compareTo方法未在Object中声明，而是Comparable接口中的唯一方法。它的特征与Object的equals方法类似，除了允许简单的相等性比较还允许顺序比较，且它是通用的。为了实现Comparable接口，类应该声明其实例有一个自然顺序。为实现了Comparable接口的对象数组排序就像下面这样简单： Arrays.sort(a); &emsp;&emsp;它同样易于搜索，计算极值，并且维护自动排序的Compara对象集合。例如，下面的程序，依赖于String类实现了Comparable接口的事实，会打印按字母顺序排列的集合，该集合包含去重的命令行参数： public class WordList { public static void main (String[] args){ Set&lt;String&gt; s = new TreeSet&lt;&gt;(); Collections.addAll(s, args); System.out.println(s); } } &emsp;&emsp;为实现Comparable接口，你必须使你的类与所有通用算法和基于该接口的稽核实现进行交互。只需少量努力就可获得巨大的能力（力量power）。事实上，所有在Java平台库中的值类，像枚举类型（Item 34），都实现了Comparable接口。如果你正在编写一个具有明显自然顺序的值类，如字母顺序，数字顺序，年份顺序，就应该实现Comparable接口： public interface Comparable&lt;T&gt; { int compareTo(T, t); } compareTo方法的通用规范与equals方法一样：将此对象与指定对象进行比较以获得顺序。返回一个负整数，零，正整数，当此对象比指定对象小，相等，或者大的时候。如果指定对象的类型阻止其与该对象进行比较，则抛出ClassCastException。在以下的描述中，符号sgn(expression)指明数学符号函数，根据表达式的值是否是正数，零，或者负数，被定义成返回-1，0，1。 实现者必须确保对于所有的x和y,sgn(x.compareTo(y)) == -sgn(y.compareTo(x))。这意味着当且仅当y.conpareTo(x)抛出异常的时候x.compateTo(y)必须抛出异常。 实现者也必须确保关系是可传递的：(x.compareTo(y) &gt; 0 &amp;&amp; y.compareTo(z) &gt; 0)意味着x.compareTo(z) &gt; 0。 最后，实现者必须确保对于所有的z,x.compareTo(y)==0意味着sgn(x.compareTo(z)) == sgn(y.compareTo(z))。 特别强调，但不是必须的，(x.compareTo(y) == 0) == (x.equals(y))。通常来讲，任何实现了Comparable接口且校验该条件的类应该清晰的声明该事实。推荐语言是“注意：此类具有与equals方法不一致的自然顺序”。 &emsp;&emsp;不要被该规范的数学本质所拖延。像equals规范一样(Item 10),该规范看起来也不复杂。不像equals方法，在所有对象上强加全局等价关系，compareTo方法不必跨越不同类型的对象工作：当遇到不同类型的对象时，允许compareTo方法抛出ClassCastException异常。通常，它确实是这么做的。规范确实允许交互式比较，这些比较通常在被比较对象实现的接口中定义。&emsp;&emsp;就像校验hashCode规范的类会破坏其他依赖散列的类一样，校验compareTo规范的类会破坏依赖于比较的类。依赖于比较的类包括有序集合TreeSet和TreeMap以及包含搜索和排序算法的实用程序类集合和数组。&emsp;&emsp;让我们复习下compareTo规范的规定。第一条规定说如果你颠倒两个对象引用之间的比较方向，那么预期的事情就会发生：如果第一个对象小于第二个，那么第二个对象必须比第一个大；如果第一个对象等于第二个，那么第二个对象必须等于第一个；且如果第一个对象大于第二个，那么第二个对象必须小于第一个。第二条规定说如果一个对象大于第二个，第二个对象大于第三个，那么第一个对象必须大于第三个。最后一条规定说，所有相等的对象相互比较时必须生成同样的结果。&emsp;&emsp;这三个条款的一个结果是compareTo方法强加的相等测试必须遵守equals规范强加的限制：自反性、对称性和传递性。因此，同样的警告适应如下：除非你愿意放弃面向对象抽象的好处，否则不可能在遵守（保留）compareTog规范的同时使用一个新的值组件扩展可实例化类（Item 10）。同样的解决方法也适用。如果你想给实现了Comparable接口的类添加值组件，那就不要扩展它；而是要写一个包含第一个类实例的不相关的类。然后提供一个“试图”方法返回包含的实例。这可以让你在包含的类上自由地实现任何你喜欢的compareTo方法，同事允许其客户端在需要时查看包含类的实例作为包含类的实例。&emsp;&emsp;compateTo规范的最后一段是强烈建议而非必须的，简单地说，compareTo方法强加的相等性测试通常应该返回与equals方法相同的结果。如果遵循了该条款，则compareTo方法强加的顺序与equaks一致。如果违反了，则说明顺序与equals不一致。compareTo方法强执行与equals不一致的顺序的类仍然有效，但包含该类元素的有序集合可能不遵守相应集合接口（Collection，Set和Map）的通用规范。这是因为这些接口的通用规范定义在equals方法中，但是有序集合使用compareTo方法加强的相等测试来代替equals。如果发生这种情况，这不是灾难，但要注意。&emsp;&emsp;例如，考虑下BigDecimal类，其compareTo方法与equals不一致。如果你创建一个空的HashSet实例并添加new BigDecimal(“1.0”)和new BigDecimal(“1.00”)，该集合将包含两个元素，因为这两个添加到集合中的BigDecimal实例在使用equals方法比较时是不相等的。然而，如果你使用TreeSet代替HashSet执行相同的程序，该集合中将只包含一个元素，因为这两个BigDecimal实例在使用compareTo方法比较时是相等的。（查看BigDecimal文档了解详情）&emsp;&emsp;编写一个compareTo方法与编写一个equals方法一样，但有几个关键的不同之处。因为Comparable接口是参数化的，compareTo方法是静态类型的，因此你不需要类型检查或者转换其参数。如果参数为空，调用将抛出空指针异常，并且只要方法尝试访问其成员，就会抛出空指针异常。&emsp;&emsp;在compareTo方法内，变量比较的是顺序而不是相等性。为比较对象引用变量，请递归调用compareTo方法。如果变量没有实现Comparable接口或者你需要一个非标准的排序，使用Comparator代替。你可以为条款10中的CaseInsensitiveString的compareTo方法编写自己的比较器或者使用已存在的： // Single-field Comparable with object reference field public final class CaseInsensitiveString implements Comparable&lt;CaseInsensitiveString&gt; { public int compareTo(CaseInsensitiveString cis) { return String.CASE_INSENSITIVE_ORDER.compare(s, cis.s); } ... // Remainder omitted } &emsp;&emsp;注意，CaseInsensitiveString实现了Comparable&lt;CaseInsensitiveString&gt;接口。这意味着CaseInsensitiveString实例只能与另一个CaseInsensitiveString实例进行比较。这是声明一个类实现Comparable接口时遵循的正常模式。&emsp;&emsp;本书的早先版本建议compareTo方法使用关系运算符整数原生字段，使用静态方法Double.compare和Float.compare比较浮点原生字段。在Java 7中，静态的compare方法被添加到了所有的Java包装原生类中。在compareTo方法中使用关系运算符是冗余且容易出错的，不再推荐使用。&emsp;&emsp;如果一个类有多种重要字段，那么比较他们的顺序是至关重要的。从最重要的字段开始并逐步完成。如果比较结果是零意外的任何结果（零表示相等），那么你就完成了，只返回结果。如果最重要的字段是相等的，再比较次重要的字段，并依次比较下去，直到你发现一个不相等的字段或者比较到最不重要的字段。这里是条款11中PhoneNumber类的compareTo方法使用该技术的开始实例： // Multiple-field Comparable with primitive fields public int compareTo(PhoneNumber pn) { int result = Short.compare(areaCode, pn.areaCode); if (result == 0) { result = Short.compare(prefix, pn.prefix); if (result == 0) result = Short.compare(lineNum, pn.lineNum); } return result; } &emsp;&emsp;在Java 8中Comparator接口配备了一系列比较器构造函数，可以流利地构建比较器。这些比较器可用于实现compareTo方法，这是Comparable接口所需要的。许多程序员更喜欢这种方式的简洁性，尽管它的性能成本适中：在我的机器上对PhoneNumber实例数组排序大约慢10%。在使用该方式时，请考虑使用Java的静态导入功能，以便可以通过简单的名称引用静态比较器构造方法，以简化和简洁（程序）。下面是PhoneNumber类的compareTo方法使用该方式的实现： // Comparable with comparator construction methods private static final Comparator&lt;PhoneNumber&gt; COMPARATOR = comparingInt((PhoneNumber pn) -&gt; pn.areaCode) .thenComparingInt(pn -&gt; pn.prefix) .thenComparingInt(pn -&gt; pn.lineNum); public int compareTo(PhoneNumber pn) { return COMPARATOR.compare(this, pn); } &emsp;&emsp;该实现使用两个比较器构造方法在类初始化的时候构建了一个比较器。第一个是comparingInt。它是一个比较器，接收一个键提取函数（key extractor function），将对象引用映射到int类型的键，并返回一个根据该键对实例排序的比较器。在之前的示例中，comparingInt接收一个lambda(),从PhoneNumber中提取地区码，并且返回根据地区码对电话号码进行排序的比较器Comparator。注意，lambda显示指定输入参数的类型（PhoneNumber pn）。事实证明，在这种情况下，Java的类型推断不足以为自己计算类型，所以我们被迫帮助它来使程序通过编译。&emsp;&emsp;如果两个电话号码有相同的地区码，我们就需要进一步细化比较，这正是第二个比较器构造方法thenComparingInt做的。它是Comparator上的一个实例方法，接收一个int类型的键提取函数，并返回一个比较器，该比较器首先应用原是比较器，然后使用提取键来断开关系。你可以根据需要尽可能多的对thenComparingInt叠加调用，从而产生字典顺序。在上面的示例中，我们叠加了两个队thenComparingInt的调用，结果是按照第二个字段是前缀（prefix），且第三个字段是线性码（line number）的顺序调用。注意，我们不必指定传递给thenComparingInt的任一调用的键提取函数的参数类型：Java的类型推断足够聪明，可以为自己解决该问题。&emsp;&emsp;Comparator类具有完整的构造方法。对原生类型long和double有类似comparingInt和thenComparingInt的比较器。int版本也可以用于范围更小的整数类型，如short，以及我们的PhoneNumber示例。double版本也可以用于float。其提供的比较器覆盖Java的所有数字原生类型。&emsp;&emsp;对于对象引用类型也有比较器构造函数。名为comparing的静态方法，有两个重写实现。一个接收关键字提取并使用关键字的自然顺序。第二个接收关键字提取和用于提取的关键字的比较器。实例方法还有第三种重写实现，名为thenComparing。其中一个重载只接收一个比较器，并使用该比较器提供第二种顺序。第二个重载只接收一个关键字提取器并且使用关键字的自然顺序作为第二种顺序。最后一种重载接收一个关键字提取器和使用提取的关键字的比较器。&emsp;&emsp;偶尔的，你可以看下compareTo方法和基于以下事实的方法：如果第一个值小于第二个值，则两个值之间的差值为负，如果两个值相等，则差值为零，如果第一个值较大则为正直。这里是实例： // BROKEN difference-based comparator - violates transitivity! static Comparator&lt;Object&gt; hashCodeOrder = new Comparator&lt;&gt;() { public int compare(Object o1, Object o2) { return o1.hashCode() - o2.hashCode(); } }; 不要使用该技巧。它充满了整数溢出和IEEE 754浮点运算伪像的危险【JLS 15.20.1, 15.21.1】。此为，所得到的方法不可能比使用本条款中描述的技术编写的方法更快。或者使用静态比较方法： // Comparator based on static compare method static Comparator&lt;Object&gt; hashCodeOrder = new Comparator&lt;&gt;() { public int compare(Object o1, Object o2) { return Integer.compare(o1.hashCode(), o2.hashCode()); } }; 或者使用比较器构造方法： // Comparator based on Comparator construction method static Comparator&lt;Object&gt; hashCodeOrder = Comparator.comparingInt(o -&gt; o.hashCode()); &emsp;&emsp;总之，无论何时实现具有合理排序的值类，都应该使实现Comparable接口，以至于使其实例可以容易的排序、查询和在基于相等的集合中使用。当比较在compareTo方法中实现的字段值时，应该避免使用运算符。作为替换，在包装原生类中使用静态比较方法或者在Comparator接口中使用比较器构造方法。]]></content>
@@ -8,7 +19,7 @@
         <category>Java</category>
       </categories>
       <tags>
-        <tag>Effiective Java 3rd</tag>
+        <tag>Effective Java 3rd</tag>
       </tags>
   </entry>
   <entry>
@@ -19,7 +30,7 @@
         <category>Java</category>
       </categories>
       <tags>
-        <tag>Effiective Java 3rd</tag>
+        <tag>Effective Java 3rd</tag>
       </tags>
   </entry>
   <entry>
@@ -30,7 +41,7 @@
         <category>Java</category>
       </categories>
       <tags>
-        <tag>Effiective Java 3rd</tag>
+        <tag>Effective Java 3rd</tag>
       </tags>
   </entry>
   <entry>
@@ -41,7 +52,7 @@
         <category>Java</category>
       </categories>
       <tags>
-        <tag>Effiective Java 3rd</tag>
+        <tag>Effective Java 3rd</tag>
       </tags>
   </entry>
   <entry>
@@ -52,7 +63,7 @@
         <category>Java</category>
       </categories>
       <tags>
-        <tag>Effiective Java 3rd</tag>
+        <tag>Effective Java 3rd</tag>
       </tags>
   </entry>
   <entry>
@@ -63,7 +74,7 @@
         <category>Java</category>
       </categories>
       <tags>
-        <tag>Effiective Java 3rd</tag>
+        <tag>Effective Java 3rd</tag>
       </tags>
   </entry>
   <entry>
@@ -74,7 +85,7 @@
         <category>Java</category>
       </categories>
       <tags>
-        <tag>Effiective Java 3rd</tag>
+        <tag>Effective Java 3rd</tag>
       </tags>
   </entry>
   <entry>
@@ -85,7 +96,7 @@
         <category>Java</category>
       </categories>
       <tags>
-        <tag>Effiective Java 3rd</tag>
+        <tag>Effective Java 3rd</tag>
       </tags>
   </entry>
   <entry>
@@ -96,18 +107,18 @@
         <category>Java</category>
       </categories>
       <tags>
-        <tag>Effiective Java 3rd</tag>
+        <tag>Effective Java 3rd</tag>
       </tags>
   </entry>
   <entry>
     <title><![CDATA[Item-5 优先选择依赖注入而非硬编码资源的关联关系]]></title>
     <url>%2Fdoggie.github.io%2F2019%2F02%2F11%2FItem-5%2F</url>
-    <content type="text"><![CDATA[许多类依赖一个或多个底层资源。例如，拼写检查依赖于字典。我们常常会看到这种类被实现为静态辅助类（Item 4）： //Inappropriate use of static utility - inflexiable &amp; untestable! public class SpellChecker{ private static final Lexicon dictionary = ...; private SpellChecker(){} //Noninstantiable public static boolean isValid(String word) {...} public static List&lt;String&gt; suggestions(String typo) {...} } 与之类似，我们有时也会看到这些类被实现为单例（Item 3）： //Inappropriate use of singleton - inflexible &amp; untestable ! public class SpellChecker{ private final Lexicon dictionary = ...; private SpellChecker(...) {} public static INSTANCE = new SpellChecker(...); public boolean isValid(String word) {...} public List&lt;String&gt; suggestions(String typo) {...} } &emsp;&emsp;以上两种方式没有一种是令人满意的，因为他们都假设只有一个字典可供使用。在实际中每一门语言都有它自己的字典，并且特殊字典用于特殊词汇。此外，我们还需要一个特殊字典进行测试。 认为一个字典能够满足所有情况只不过是一种美好的愿望罢了。&emsp;&emsp;你可以尝试将dictionary字段定义为非final的，并且添加一个方法改变在已存在的拼写检查实例中修改字典来让SpellChecker类支持多种字典，不过这么做有些笨拙、易出错，并且在并发设置下无法正常工作。**&emsp;&emsp;我们所需要的是支持类的多个实例的能力（在该示例中就是SpellCheck）,每个实例都会使用客户端所需要的资源（在该示例中就是字典）。满足这个需要的一个简单模式是在创建一个新实例的时候将资源传递给构造方法**。这是依赖注入的一种形式：字典是拼写检查器的依赖并且在创建拼写检查实例的时候将字典注入进去。 //Dependency injection provides flexibility and testability public class SpellChecker { private final Lexicon dictionary; public SpellChecker(Lexicon dictionary) { this.dictionary = Objects.requireNonNull(dictionary); } public boolean isValid(String word) {...} public List&lt;String&gt; suggestions (String typo) {...} } &emsp;&emsp;依赖注入模式太简单了以至于许多程序员使用它多年，只不过尚不知道它还有这个名字而已。尽管我们的拼写检查器示例只有单个资源（字典），不过依赖注入可用于任意数量的资源和任意依赖图表。它能够保证不变性（Item 17），这样多客户端可以共享依赖对象（假设这些客户端需要相同的底层资源）。依赖注入适合于构造方法、静态工厂（Item 1）和构建器（Item 2）。&emsp;&emsp;该模式的一个很有用的变种是将资源工厂传递给构造方法。工厂是一个可以被重复调用连创建不同实例的对象。这种工厂是工厂方法模式的一种具化形式[Gamma95].Java 8中介绍的Supplier&lt;T&gt;接口非常适合于表示工厂。那些包含Supplier&lt;T&gt;入参的方法通过绑定的通配符类型来限制工厂的类型参数，从而可以让客户端传递的工厂能够创建所指定类型的任何子类型。例如，下面这个方法使用客户端提供的用于生成每个瓷砖的工厂来创建一个马赛克： Mosaic create(Supplier&lt;? extends Tile&gt; tileFactory) {...} &emsp;&emsp;尽管依赖注入极大地提高了灵活性和可测性，但是它会让严格约束成千上万依赖的大项目变得混乱。这种混乱可以通过依赖注入框架来消除，比如说Dagger、Guice、或者Spring。这些框架的使用超出了本书的范围，但是请注意： 那些专为手动依赖注入而设计的API通常适用于这些框架。&emsp;&emsp;总结一下，如果一个类依赖于一个或多个底层资源，而这些底层资源的行为会影响这个类的行为，那么请不要使用单例或者静态辅助类来实现 ，也不要让类直接创建这些资源。相反，传递一个资源或者工厂到构造方法（或者静态工厂和构建器）来创建它们。这种实践被称为依赖注入，将极大的增强类的灵活性、重用性和可测试性。]]></content>
+    <content type="text"><![CDATA[许多类依赖一个或多个底层资源。例如，拼写检查依赖于字典。我们常常会看到这种类被实现为静态辅助类（Item 4）： //Inappropriate use of static utility - inflexiable &amp; untestable! public class SpellChecker{ private static final Lexicon dictionary = ...; private SpellChecker(){} //Noninstantiable public static boolean isValid(String word) {...} public static List&lt;String&gt; suggestions(String typo) {...} } 与之类似，我们有时也会看到这些类被实现为单例（Item 3）： //Inappropriate use of singleton - inflexible &amp; untestable ! public class SpellChecker{ private final Lexicon dictionary = ...; private SpellChecker(...) {} public static INSTANCE = new SpellChecker(...); public boolean isValid(String word) {...} public List&lt;String&gt; suggestions(String typo) {...} } &emsp;&emsp;以上两种方式没有一种是令人满意的，因为他们都假设只有一个字典可供使用。在实际中每一门语言都有它自己的字典，并且特殊字典用于特殊词汇。此外，我们还需要一个特殊字典进行测试。 认为一个字典能够满足所有情况只不过是一种美好的愿望罢了。&emsp;&emsp;你可以尝试将dictionary字段定义为非final的，并且添加一个方法改变在已存在的拼写检查实例中修改字典来让SpellChecker类支持多种字典，不过这么做有些笨拙、易出错，并且在并发设置下无法正常工作。&emsp;&emsp;我们所需要的是支持类的多个实例的能力（在该示例中就是SpellCheck）,每个实例都会使用客户端所需要的资源（在该示例中就是字典）。满足这个需要的一个简单模式是在创建一个新实例的时候将资源传递给构造方法。这是依赖注入的一种形式：字典是拼写检查器的依赖并且在创建拼写检查实例的时候将字典注入进去。 //Dependency injection provides flexibility and testability public class SpellChecker { private final Lexicon dictionary; public SpellChecker(Lexicon dictionary) { this.dictionary = Objects.requireNonNull(dictionary); } public boolean isValid(String word) {...} public List&lt;String&gt; suggestions (String typo) {...} } &emsp;&emsp;依赖注入模式太简单了以至于许多程序员使用它多年，只不过尚不知道它还有这个名字而已。尽管我们的拼写检查器示例只有单个资源（字典），不过依赖注入可用于任意数量的资源和任意依赖图表。它能够保证不变性（Item 17），这样多客户端可以共享依赖对象（假设这些客户端需要相同的底层资源）。依赖注入适合于构造方法、静态工厂（Item 1）和构建器（Item 2）。&emsp;&emsp;该模式的一个很有用的变种是将资源工厂传递给构造方法。工厂是一个可以被重复调用连创建不同实例的对象。这种工厂是工厂方法模式的一种具化形式[Gamma95].Java 8中介绍的Supplier&lt;T&gt;接口非常适合于表示工厂。那些包含Supplier&lt;T&gt;入参的方法通过绑定的通配符类型来限制工厂的类型参数，从而可以让客户端传递的工厂能够创建所指定类型的任何子类型。例如，下面这个方法使用客户端提供的用于生成每个瓷砖的工厂来创建一个马赛克： Mosaic create(Supplier&lt;? extends Tile&gt; tileFactory) {...} &emsp;&emsp;尽管依赖注入极大地提高了灵活性和可测性，但是它会让严格约束成千上万依赖的大项目变得混乱。这种混乱可以通过依赖注入框架来消除，比如说Dagger、Guice、或者Spring。这些框架的使用超出了本书的范围，但是请注意： 那些专为手动依赖注入而设计的API通常适用于这些框架。&emsp;&emsp;总结一下，如果一个类依赖于一个或多个底层资源，而这些底层资源的行为会影响这个类的行为，那么请不要使用单例或者静态辅助类来实现 ，也不要让类直接创建这些资源。相反，传递一个资源或者工厂到构造方法（或者静态工厂和构建器）来创建它们。这种实践被称为依赖注入，将极大的增强类的灵活性、重用性和可测试性。]]></content>
       <categories>
         <category>Java</category>
       </categories>
       <tags>
-        <tag>Effiective Java 3rd</tag>
+        <tag>Effective Java 3rd</tag>
       </tags>
   </entry>
   <entry>
@@ -118,7 +129,7 @@
         <category>Java</category>
       </categories>
       <tags>
-        <tag>Effiective Java 3rd</tag>
+        <tag>Effective Java 3rd</tag>
       </tags>
   </entry>
   <entry>
@@ -129,7 +140,7 @@
         <category>Java</category>
       </categories>
       <tags>
-        <tag>Effiective Java 3rd</tag>
+        <tag>Effective Java 3rd</tag>
       </tags>
   </entry>
   <entry>
@@ -140,7 +151,7 @@
         <category>Java</category>
       </categories>
       <tags>
-        <tag>Effiective Java 3rd</tag>
+        <tag>Effective Java 3rd</tag>
       </tags>
   </entry>
   <entry>
@@ -151,7 +162,7 @@
         <category>Java</category>
       </categories>
       <tags>
-        <tag>Effiective Java 3rd</tag>
+        <tag>Effective Java 3rd</tag>
       </tags>
   </entry>
 </search>

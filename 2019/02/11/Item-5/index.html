@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="Effiective Java 3rd,">
+  <meta name="keywords" content="Effective Java 3rd,">
 
 
 
@@ -82,14 +82,14 @@
 
 
 <meta name="description" content="许多类依赖一个或多个底层资源。例如，拼写检查依赖于字典。我们常常会看到这种类被实现为静态辅助类（Item 4）：   //Inappropriate use of static utility - inflexiable &amp;amp; untestable! public class SpellChecker{     private static final Lexicon dictionary">
-<meta name="keywords" content="Effiective Java 3rd">
+<meta name="keywords" content="Effective Java 3rd">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Item-5 优先选择依赖注入而非硬编码资源的关联关系">
 <meta property="og:url" content="https://doublexz.github.io/doggie.github.io/2019/02/11/Item-5/index.html">
 <meta property="og:site_name" content="CloudXue&#39;s Blog">
 <meta property="og:description" content="许多类依赖一个或多个底层资源。例如，拼写检查依赖于字典。我们常常会看到这种类被实现为静态辅助类（Item 4）：   //Inappropriate use of static utility - inflexiable &amp;amp; untestable! public class SpellChecker{     private static final Lexicon dictionary">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-04-09T07:35:41.941Z">
+<meta property="og:updated_time" content="2019-04-10T06:35:14.080Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Item-5 优先选择依赖注入而非硬编码资源的关联关系">
 <meta name="twitter:description" content="许多类依赖一个或多个底层资源。例如，拼写检查依赖于字典。我们常常会看到这种类被实现为静态辅助类（Item 4）：   //Inappropriate use of static utility - inflexiable &amp;amp; untestable! public class SpellChecker{     private static final Lexicon dictionary">
@@ -424,7 +424,7 @@ public class SpellChecker{
     public boolean isValid(String word) {...}
     public List&lt;String&gt; suggestions(String typo) {...}
 }
-</code></pre><p>&emsp;&emsp;以上两种方式没有一种是令人满意的，因为他们都假设只有一个字典<strong>可供使用</strong>。在实际中每一门语言都有它自己的字典，并且特殊字典用于特殊词汇。此外，我们还需要一个特殊字典进行测试。 <strong>认为一个字典能够满足所有情况只不过是一种美好的愿望罢了</strong>。<br>&emsp;&emsp;你可以尝试将dictionary字段定义为非final的，并且添加一个方法改变在已存在的拼写检查实例中修改字典来让<code>SpellChecker</code>类支持多种字典，<strong>不过这么做有些笨拙、易出错，并且在并发设置下无法正常工作</strong>。<strong>**<br>&emsp;&emsp;</strong>我们所需要的是支持类的多个实例的能力（在该示例中就是SpellCheck）,每个实例都会使用客户端所需要的资源（在该示例中就是字典）<strong>。满足这个需要的一个简单模式是</strong>在创建一个新实例的时候将资源传递给构造方法**。这是依赖注入的一种形式：字典是拼写检查器的依赖并且在创建拼写检查实例的时候将字典注入进去。  </p>
+</code></pre><p>&emsp;&emsp;以上两种方式没有一种是令人满意的，因为他们都假设只有一个字典<strong>可供使用</strong>。在实际中每一门语言都有它自己的字典，并且特殊字典用于特殊词汇。此外，我们还需要一个特殊字典进行测试。 <strong>认为一个字典能够满足所有情况只不过是一种美好的愿望罢了</strong>。<br>&emsp;&emsp;你可以尝试将dictionary字段定义为非final的，并且添加一个方法改变在已存在的拼写检查实例中修改字典来让<code>SpellChecker</code>类支持多种字典，<strong>不过这么做有些笨拙、易出错，并且在并发设置下无法正常工作</strong>。<br>&emsp;&emsp;<strong>我们所需要的是支持类的多个实例的能力（在该示例中就是SpellCheck）,每个实例都会使用客户端所需要的资源（在该示例中就是字典）</strong>。满足这个需要的一个简单模式是<strong>在创建一个新实例的时候将资源传递给构造方法</strong>。这是依赖注入的一种形式：字典是拼写检查器的依赖并且在创建拼写检查实例的时候将字典注入进去。  </p>
 <pre><code>//Dependency injection provides flexibility and testability
 public class SpellChecker {
     private final Lexicon dictionary;
@@ -456,7 +456,7 @@ public class SpellChecker {
       
         <div class="post-tags">
           
-            <a href="/doggie.github.io/tags/Effiective-Java-3rd/" rel="tag"># Effiective Java 3rd</a>
+            <a href="/doggie.github.io/tags/Effective-Java-3rd/" rel="tag"># Effective Java 3rd</a>
           
         </div>
       
@@ -551,7 +551,7 @@ public class SpellChecker {
               
                 <a href="/doggie.github.io/archives/">
               
-                  <span class="site-state-item-count">14</span>
+                  <span class="site-state-item-count">15</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
