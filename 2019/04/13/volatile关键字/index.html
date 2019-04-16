@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="Hexo, NexT">
+  <meta name="keywords" content="Java多线程编程,Netty,">
 
 
 
@@ -81,16 +81,18 @@
 
 
 
-<meta name="description" content="CloudXue">
-<meta property="og:type" content="website">
-<meta property="og:title" content="CloudXue&#39;s Blog">
-<meta property="og:url" content="https://doublexz.github.io/doggie.github.io/archives/index.html">
+<meta name="description" content="对volatile关键字的理解 volatile只能修饰变量，不能修饰方法和代码块，是一个变量修饰符。 volatile修饰变量后可以保证多个线程对该变量操作的内存可见性。即一个线程修改变量的值后，其他线程可以立即得到修改值。 禁止处理器对指令重排序，保证程序执行的有序性，即保证程序按照代码的先后顺序执行。 volatile不保证程序执行的原子性。">
+<meta name="keywords" content="Java多线程编程,Netty">
+<meta property="og:type" content="article">
+<meta property="og:title" content="volatile关键字">
+<meta property="og:url" content="https://doublexz.github.io/doggie.github.io/2019/04/13/volatile关键字/index.html">
 <meta property="og:site_name" content="CloudXue&#39;s Blog">
-<meta property="og:description" content="CloudXue">
+<meta property="og:description" content="对volatile关键字的理解 volatile只能修饰变量，不能修饰方法和代码块，是一个变量修饰符。 volatile修饰变量后可以保证多个线程对该变量操作的内存可见性。即一个线程修改变量的值后，其他线程可以立即得到修改值。 禁止处理器对指令重排序，保证程序执行的有序性，即保证程序按照代码的先后顺序执行。 volatile不保证程序执行的原子性。">
 <meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-04-16T13:32:42.438Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="CloudXue&#39;s Blog">
-<meta name="twitter:description" content="CloudXue">
+<meta name="twitter:title" content="volatile关键字">
+<meta name="twitter:description" content="对volatile关键字的理解 volatile只能修饰变量，不能修饰方法和代码块，是一个变量修饰符。 volatile修饰变量后可以保证多个线程对该变量操作的内存可见性。即一个线程修改变量的值后，其他线程可以立即得到修改值。 禁止处理器对指令重排序，保证程序执行的有序性，即保证程序按照代码的先后顺序执行。 volatile不保证程序执行的原子性。">
 
 
 
@@ -120,13 +122,13 @@
 
 
 
-  <link rel="canonical" href="https://doublexz.github.io/doggie.github.io/archives/">
+  <link rel="canonical" href="https://doublexz.github.io/doggie.github.io/2019/04/13/volatile关键字/">
 
 
 
 
 
-  <title>归档 | CloudXue's Blog</title>
+  <title>volatile关键字 | CloudXue's Blog</title>
   
 
 
@@ -145,7 +147,7 @@
     
   
 
-  <div class="container sidebar-position-left page-archive">
+  <div class="container sidebar-position-left page-post-detail">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -281,391 +283,236 @@
           <div id="content" class="content">
             
 
-  
-  
-  
-  <div class="post-block archive">
-    <div id="posts" class="posts-collapse">
-      <span class="archive-move-on"></span>
+  <div id="posts" class="posts-expand">
+    
 
-      <span class="archive-page-counter">
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://doublexz.github.io/doggie.github.io/doggie.github.io/2019/04/13/volatile关键字/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Doggie">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/doggie.github.io/images/love.jpeg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="CloudXue's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
         
         
+          <h1 class="post-title" itemprop="name headline">volatile关键字</h1>
         
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-04-13T21:24:06+08:00">
+                2019-04-13
+              </time>
+            
+
+            
+
+            
+          </span>
+
           
-        
-        嗯..! 目前共计 16 篇日志。 继续努力。
-      </span>
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/doggie.github.io/categories/Java多线程编程/" itemprop="url" rel="index">
+                    <span itemprop="name">Java多线程编程</span>
+                  </a>
+                </span>
 
-      
-
-        
-        
-        
-
-        
+                
+                
+              
+            </span>
           
-          <div class="collection-title">
-            <h1 class="archive-year" id="archive-year-2019">2019</h1>
-          </div>
-        
-        
 
-        
+          
+            
+          
 
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
+          
+          
+             <span id="/doggie.github.io/2019/04/13/volatile关键字/" class="leancloud_visitors" data-flag-title="volatile关键字">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
 
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/doggie.github.io/2019/04/13/volatile关键字/" itemprop="url">
-              
-                <span itemprop="name">volatile关键字</span>
-              
-            </a>
-        
-      </h2>
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o">本文总阅读量</i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>次
+            </span>
+          
 
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated" datetime="2019-04-13T21:24:06+08:00" content="2019-04-13">
-          04-13
-        </time>
-      </div>
+          
 
-    </header>
-  </article>
+          
 
+        </div>
+      </header>
+    
 
-
-      
-
-        
-        
-        
-
-        
-        
-
-        
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/doggie.github.io/2019/04/10/Item-15/" itemprop="url">
-              
-                <span itemprop="name">Item-15 最大限度地减少类和成员的可访问性</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated" datetime="2019-04-10T08:56:15+08:00" content="2019-04-10">
-          04-10
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
 
       
-
-        
-        
-        
-
-        
-        
-
-        
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/doggie.github.io/2019/04/04/Item-14/" itemprop="url">
-              
-                <span itemprop="name">Item-14 考虑实现Comparable接口</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated" datetime="2019-04-04T11:14:08+08:00" content="2019-04-04">
-          04-04
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-
       
 
-        
-        
-        
+      
+        <h3 id="对volatile关键字的理解"><a href="#对volatile关键字的理解" class="headerlink" title="对volatile关键字的理解"></a>对volatile关键字的理解</h3><ol>
+<li>volatile只能修饰变量，不能修饰方法和代码块，是一个变量修饰符。</li>
+<li>volatile修饰变量后可以保证多个线程对该变量操作的内存可见性。即一个线程修改变量的值后，其他线程可以立即得到修改值。</li>
+<li>禁止处理器对指令重排序，保证程序执行的有序性，即保证程序按照代码的先后顺序执行。</li>
+<li>volatile不保证程序执行的原子性。</li>
+</ol>
+<a id="more"></a>
+<h3 id="volatile关键字实现原理（实现机制）"><a href="#volatile关键字实现原理（实现机制）" class="headerlink" title="volatile关键字实现原理（实现机制）"></a>volatile关键字实现原理（实现机制）</h3><ol>
+<li>加入volatile关键字后，对其修饰的变量进行写操作时，JVM会向处理器发送一条lock前缀指令，lock前缀指令相当于一个内存屏障，确保指令再进行重排序时不会把后面的指令排到内存屏障以前，也不会把前面的指令排到内存屏障以后，在执行到内存屏障这条指令时，其前面的指令已经执行完毕；</li>
+<li>lock前缀指令会强制将对缓存的修改回写到系统主存；</li>
+<li>多处理器下的缓存一致协议：每个处理器会嗅探总线上传播的数据来检查自己缓存的值是不是过期了，当处理器发现自己缓存行对应的内存地址被修改，就会将当前处理器的缓存行设置成无效状态，在处理器要对这个数据进行修改操作的时候，会强制重新从系统主存中读取最新数据到处理器缓存。</li>
+</ol>
+<h3 id="volatile关键字使用场景"><a href="#volatile关键字使用场景" class="headerlink" title="volatile关键字使用场景"></a>volatile关键字使用场景</h3><ol>
+<li><p>状态标记量  </p>
+<pre><code>int a = 0;
+volatile boolean flag = false;
 
-        
-        
+public void write() {
+    a = 2;
+    flag = true;
+}
 
-        
+public void add() {
+    if(flag){
+        int result = a + a;
+    }
+}
+</code></pre></li>
+<li><p>使用双重检查锁定的单例模式实现  </p>
+<pre><code>public class Singleton {
+    private volatile static Singleton instance = null;
 
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
+    private Singleton() {
 
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/doggie.github.io/2019/03/30/Item-13/" itemprop="url">
-              
-                <span itemprop="name">Item-13 重写clone方法要谨慎</span>
-              
-            </a>
-        
-      </h2>
+    }
 
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated" datetime="2019-03-30T11:14:04+08:00" content="2019-03-30">
-          03-30
-        </time>
-      </div>
+    public static Singleton getInstance() {
+        if(null == instance){
+            synchronized (Singleton.class){
+                if(null == instance){
+                    instance = new Singleton();
+                }
+            }
+        }
+        return instance;
+    }
 
-    </header>
-  </article>
-
-
+}
+</code></pre></li>
+</ol>
 
       
-
-        
-        
-        
-
-        
-        
-
-        
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/doggie.github.io/2019/03/23/Item-12/" itemprop="url">
-              
-                <span itemprop="name">Item-12 始终重写toString方法</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated" datetime="2019-03-23T11:14:00+08:00" content="2019-03-23">
-          03-23
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-
-      
-
-        
-        
-        
-
-        
-        
-
-        
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/doggie.github.io/2019/03/22/Item-11/" itemprop="url">
-              
-                <span itemprop="name">Item-11 重写equals方法时也要重写hashCode方法</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated" datetime="2019-03-22T11:12:34+08:00" content="2019-03-22">
-          03-22
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-
-      
-
-        
-        
-        
-
-        
-        
-
-        
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/doggie.github.io/2019/03/18/Item-10/" itemprop="url">
-              
-                <span itemprop="name">Item-10 重写equals方法时请遵循通用规范</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated" datetime="2019-03-18T11:09:59+08:00" content="2019-03-18">
-          03-18
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-
-      
-
-        
-        
-        
-
-        
-        
-
-        
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/doggie.github.io/2019/03/05/Item-9/" itemprop="url">
-              
-                <span itemprop="name">Item-9 优先选择try-with-resources而非try-finally</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated" datetime="2019-03-05T11:05:59+08:00" content="2019-03-05">
-          03-05
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-
-      
-
-        
-        
-        
-
-        
-        
-
-        
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/doggie.github.io/2019/03/04/Item-8/" itemprop="url">
-              
-                <span itemprop="name">Item-8 避免使用终结器和清理器</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated" datetime="2019-03-04T10:58:28+08:00" content="2019-03-04">
-          03-04
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-
-      
-
-        
-        
-        
-
-        
-        
-
-        
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/doggie.github.io/2019/02/27/Item-7/" itemprop="url">
-              
-                <span itemprop="name">Item-7 消除废弃的对象引用</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated" datetime="2019-02-27T17:56:11+08:00" content="2019-02-27">
-          02-27
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-
-      
-
     </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/doggie.github.io/tags/Java多线程编程/" rel="tag"># Java多线程编程</a>
+          
+            <a href="/doggie.github.io/tags/Netty/" rel="tag"># Netty</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/doggie.github.io/2019/04/10/Item-15/" rel="next" title="Item-15 最大限度地减少类和成员的可访问性">
+                <i class="fa fa-chevron-left"></i> Item-15 最大限度地减少类和成员的可访问性
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
   </div>
   
   
   
-
-  
-  <nav class="pagination">
-    <span class="page-number current">1</span><a class="page-number" href="/doggie.github.io/archives/page/2/">2</a><a class="extend next" rel="next" href="/doggie.github.io/archives/page/2/"><i class="fa fa-angle-right"></i></a>
-  </nav>
+  </article>
 
 
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
 
 
           </div>
@@ -673,6 +520,10 @@
 
 
           
+
+  
+
+
 
         </div>
         
@@ -693,8 +544,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -779,6 +639,22 @@
         </div>
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#对volatile关键字的理解"><span class="nav-number">1.</span> <span class="nav-text">对volatile关键字的理解</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#volatile关键字实现原理（实现机制）"><span class="nav-number">2.</span> <span class="nav-text">volatile关键字实现原理（实现机制）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#volatile关键字使用场景"><span class="nav-number">3.</span> <span class="nav-text">volatile关键字使用场景</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
@@ -942,6 +818,10 @@
 
 
   
+  <script type="text/javascript" src="/doggie.github.io/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/doggie.github.io/js/src/post-details.js?v=5.1.4"></script>
+
+
 
   
 

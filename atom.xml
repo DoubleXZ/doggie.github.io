@@ -6,7 +6,7 @@
   <link href="/doggie.github.io/atom.xml" rel="self"/>
   
   <link href="https://doublexz.github.io/doggie.github.io/"/>
-  <updated>2019-04-11T04:40:46.578Z</updated>
+  <updated>2019-04-16T13:32:42.438Z</updated>
   <id>https://doublexz.github.io/doggie.github.io/</id>
   
   <author>
@@ -15,6 +15,35 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>volatile关键字</title>
+    <link href="https://doublexz.github.io/doggie.github.io/2019/04/13/volatile%E5%85%B3%E9%94%AE%E5%AD%97/"/>
+    <id>https://doublexz.github.io/doggie.github.io/2019/04/13/volatile关键字/</id>
+    <published>2019-04-13T13:24:06.000Z</published>
+    <updated>2019-04-16T13:32:42.438Z</updated>
+    
+    <content type="html"><![CDATA[<h3 id="对volatile关键字的理解"><a href="#对volatile关键字的理解" class="headerlink" title="对volatile关键字的理解"></a>对volatile关键字的理解</h3><ol><li>volatile只能修饰变量，不能修饰方法和代码块，是一个变量修饰符。</li><li>volatile修饰变量后可以保证多个线程对该变量操作的内存可见性。即一个线程修改变量的值后，其他线程可以立即得到修改值。</li><li>禁止处理器对指令重排序，保证程序执行的有序性，即保证程序按照代码的先后顺序执行。</li><li>volatile不保证程序执行的原子性。</li></ol><a id="more"></a><h3 id="volatile关键字实现原理（实现机制）"><a href="#volatile关键字实现原理（实现机制）" class="headerlink" title="volatile关键字实现原理（实现机制）"></a>volatile关键字实现原理（实现机制）</h3><ol><li>加入volatile关键字后，对其修饰的变量进行写操作时，JVM会向处理器发送一条lock前缀指令，lock前缀指令相当于一个内存屏障，确保指令再进行重排序时不会把后面的指令排到内存屏障以前，也不会把前面的指令排到内存屏障以后，在执行到内存屏障这条指令时，其前面的指令已经执行完毕；</li><li>lock前缀指令会强制将对缓存的修改回写到系统主存；</li><li>多处理器下的缓存一致协议：每个处理器会嗅探总线上传播的数据来检查自己缓存的值是不是过期了，当处理器发现自己缓存行对应的内存地址被修改，就会将当前处理器的缓存行设置成无效状态，在处理器要对这个数据进行修改操作的时候，会强制重新从系统主存中读取最新数据到处理器缓存。</li></ol><h3 id="volatile关键字使用场景"><a href="#volatile关键字使用场景" class="headerlink" title="volatile关键字使用场景"></a>volatile关键字使用场景</h3><ol><li><p>状态标记量  </p><pre><code>int a = 0;volatile boolean flag = false;public void write() {    a = 2;    flag = true;}public void add() {    if(flag){        int result = a + a;    }}</code></pre></li><li><p>使用双重检查锁定的单例模式实现  </p><pre><code>public class Singleton {    private volatile static Singleton instance = null;    private Singleton() {    }    public static Singleton getInstance() {        if(null == instance){            synchronized (Singleton.class){                if(null == instance){                    instance = new Singleton();                }            }        }        return instance;    }}</code></pre></li></ol>]]></content>
+    
+    <summary type="html">
+    
+      &lt;h3 id=&quot;对volatile关键字的理解&quot;&gt;&lt;a href=&quot;#对volatile关键字的理解&quot; class=&quot;headerlink&quot; title=&quot;对volatile关键字的理解&quot;&gt;&lt;/a&gt;对volatile关键字的理解&lt;/h3&gt;&lt;ol&gt;
+&lt;li&gt;volatile只能修饰变量，不能修饰方法和代码块，是一个变量修饰符。&lt;/li&gt;
+&lt;li&gt;volatile修饰变量后可以保证多个线程对该变量操作的内存可见性。即一个线程修改变量的值后，其他线程可以立即得到修改值。&lt;/li&gt;
+&lt;li&gt;禁止处理器对指令重排序，保证程序执行的有序性，即保证程序按照代码的先后顺序执行。&lt;/li&gt;
+&lt;li&gt;volatile不保证程序执行的原子性。&lt;/li&gt;
+&lt;/ol&gt;
+    
+    </summary>
+    
+      <category term="Java多线程编程" scheme="https://doublexz.github.io/doggie.github.io/categories/Java%E5%A4%9A%E7%BA%BF%E7%A8%8B%E7%BC%96%E7%A8%8B/"/>
+    
+    
+      <category term="Java多线程编程" scheme="https://doublexz.github.io/doggie.github.io/tags/Java%E5%A4%9A%E7%BA%BF%E7%A8%8B%E7%BC%96%E7%A8%8B/"/>
+    
+      <category term="Netty" scheme="https://doublexz.github.io/doggie.github.io/tags/Netty/"/>
+    
+  </entry>
   
   <entry>
     <title>Item-15 最大限度地减少类和成员的可访问性</title>
