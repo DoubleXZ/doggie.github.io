@@ -6,7 +6,7 @@
   <link href="/doggie.github.io/atom.xml" rel="self"/>
   
   <link href="https://doublexz.github.io/doggie.github.io/"/>
-  <updated>2019-04-16T13:32:42.438Z</updated>
+  <updated>2019-04-16T15:04:32.334Z</updated>
   <id>https://doublexz.github.io/doggie.github.io/</id>
   
   <author>
@@ -17,11 +17,39 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>Item-16 在公共类中，使用访问器方法，而不是公共字段</title>
+    <link href="https://doublexz.github.io/doggie.github.io/2019/04/16/Item-16/"/>
+    <id>https://doublexz.github.io/doggie.github.io/2019/04/16/Item-16/</id>
+    <published>2019-04-16T13:38:05.000Z</published>
+    <updated>2019-04-16T15:04:32.334Z</updated>
+    
+    <content type="html"><![CDATA[<p>有时候，你可能想要编写简并类（degenerate classes），这么做除了组成实例字段外而没有其他任何目的：  </p><pre><code>//Degenerate classes like this should not be public !class Point {    public double x;    public double y;}  </code></pre><a id="more"></a><p>&emsp;&emsp;因为这些类的数据字段是可以直接访问的，这些类不提供封装的益处（Item 15）。你无法在不改变API的情况下改变实现，也无法强制执行不变量，并且在访问字段时，无法执行辅助操作。强硬的面向对象程序员认为这些类是诅咒，并且应该被包含私有字段和公共访问器方法（getter）的类和包含存取器（setter）的不可变类替代：  </p><pre><code>//Encapsulation of data by accessor methods and mutatorsclass Point {    private double x;    private double y;    public Point(double x, double y) {        this.x = x;        this.y = y;     }   public double getX() { return x; }   public double getY() { return y; }   public void setX(double x) { this.x = x; }   public void setY(double y) { this.y = y; }}  </code></pre><p>&emsp;&emsp;当然,强硬派在面对公共类时是正确的：如果一个类在其包以外可以被访问，则需要提供访问器方法来维持改变类的内部实现的灵活性。如果公共类暴露其数据字段，则所有改变其表示的希望都会消失，因为客户端代码可以远程分发。<br>&emsp;&emsp;然而，如果一个类是包私有的或者是私有内部类，那么暴露其数据字段不会有本质问题-假设他们在描述类提供的抽象方面做了足够的工作。这种方式比访问器方法方式在类的定义和使用它的客户端代码中产生更少的视觉混乱。既然客户端代码被绑定到类的内部实现上，那么这些代码仅限于包含该类的包。如果实现中的改变符合要求，那么你可以在不触及包外任何代码的情况下进行更改。在私有内部类的案例中，变更的范围进一步限制为附寄类。<br>&emsp;&emsp;Java平台类库中的个别类违反了公共类不应该直接暴露字段的建议。突出的示例包括java.awt包中的Point和Dimention类。这些类应该被看成是警示的故事，而不是被模仿的例子。正如条款67所述，暴露Dimension类内部的决定导致严重的性能问题，至今还存在。<br>&emsp;&emsp;尽管对于公共类直接暴露字段一直不是一个好的主意，但是它比不可变字段危害更小。你无法在不改变其API的情况下改变这个类的实现，并且在读取字段时无法对其采取辅助操作，但可以强制执行不变量。例如：这个类保证其每个实例表示一个有效时间：  </p><pre><code>// Public class with exposed immutable fields - questionablepublic final class Time {   private static final int HOURS_PER_DAY    = 24;   private static final int MINUTES_PER_HOUR = 60;   public final int hour;   public final int minute;   public Time(int hour, int minute) {       if (hour &lt; 0 || hour &gt;= HOURS_PER_DAY)          throw new IllegalArgumentException(&quot;Hour: &quot; + hour);       if (minute &lt; 0 || minute &gt;= MINUTES_PER_HOUR)    throw new IllegalArgumentException(&quot;Min: &quot; + minute); this.hour = hour;    this.minute = minute;    }       ... // Remainder omitted}</code></pre><p>&emsp;&emsp;总之，公共类永远不要暴露可变字段。虽然公共类暴露不可变字段危害比暴露可变字段危害小，但仍是有问题的。但是，有时候包私有或者私有内部类需要暴露字段，无论它是可变还是不可变的字段。</p>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;有时候，你可能想要编写简并类（degenerate classes），这么做除了组成实例字段外而没有其他任何目的：  &lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;//Degenerate classes like this should not be public !
+class Point {
+    public double x;
+    public double y;
+}  
+&lt;/code&gt;&lt;/pre&gt;
+    
+    </summary>
+    
+      <category term="Java" scheme="https://doublexz.github.io/doggie.github.io/categories/Java/"/>
+    
+    
+      <category term="Effective Java 3rd" scheme="https://doublexz.github.io/doggie.github.io/tags/Effective-Java-3rd/"/>
+    
+  </entry>
+  
+  <entry>
     <title>volatile关键字</title>
     <link href="https://doublexz.github.io/doggie.github.io/2019/04/13/volatile%E5%85%B3%E9%94%AE%E5%AD%97/"/>
     <id>https://doublexz.github.io/doggie.github.io/2019/04/13/volatile关键字/</id>
     <published>2019-04-13T13:24:06.000Z</published>
-    <updated>2019-04-16T13:32:42.438Z</updated>
+    <updated>2019-04-16T13:38:55.698Z</updated>
     
     <content type="html"><![CDATA[<h3 id="对volatile关键字的理解"><a href="#对volatile关键字的理解" class="headerlink" title="对volatile关键字的理解"></a>对volatile关键字的理解</h3><ol><li>volatile只能修饰变量，不能修饰方法和代码块，是一个变量修饰符。</li><li>volatile修饰变量后可以保证多个线程对该变量操作的内存可见性。即一个线程修改变量的值后，其他线程可以立即得到修改值。</li><li>禁止处理器对指令重排序，保证程序执行的有序性，即保证程序按照代码的先后顺序执行。</li><li>volatile不保证程序执行的原子性。</li></ol><a id="more"></a><h3 id="volatile关键字实现原理（实现机制）"><a href="#volatile关键字实现原理（实现机制）" class="headerlink" title="volatile关键字实现原理（实现机制）"></a>volatile关键字实现原理（实现机制）</h3><ol><li>加入volatile关键字后，对其修饰的变量进行写操作时，JVM会向处理器发送一条lock前缀指令，lock前缀指令相当于一个内存屏障，确保指令再进行重排序时不会把后面的指令排到内存屏障以前，也不会把前面的指令排到内存屏障以后，在执行到内存屏障这条指令时，其前面的指令已经执行完毕；</li><li>lock前缀指令会强制将对缓存的修改回写到系统主存；</li><li>多处理器下的缓存一致协议：每个处理器会嗅探总线上传播的数据来检查自己缓存的值是不是过期了，当处理器发现自己缓存行对应的内存地址被修改，就会将当前处理器的缓存行设置成无效状态，在处理器要对这个数据进行修改操作的时候，会强制重新从系统主存中读取最新数据到处理器缓存。</li></ol><h3 id="volatile关键字使用场景"><a href="#volatile关键字使用场景" class="headerlink" title="volatile关键字使用场景"></a>volatile关键字使用场景</h3><ol><li><p>状态标记量  </p><pre><code>int a = 0;volatile boolean flag = false;public void write() {    a = 2;    flag = true;}public void add() {    if(flag){        int result = a + a;    }}</code></pre></li><li><p>使用双重检查锁定的单例模式实现  </p><pre><code>public class Singleton {    private volatile static Singleton instance = null;    private Singleton() {    }    public static Singleton getInstance() {        if(null == instance){            synchronized (Singleton.class){                if(null == instance){                    instance = new Singleton();                }            }        }        return instance;    }}</code></pre></li></ol>]]></content>
     
@@ -36,7 +64,7 @@
     
     </summary>
     
-      <category term="Java多线程编程" scheme="https://doublexz.github.io/doggie.github.io/categories/Java%E5%A4%9A%E7%BA%BF%E7%A8%8B%E7%BC%96%E7%A8%8B/"/>
+      <category term="Java" scheme="https://doublexz.github.io/doggie.github.io/categories/Java/"/>
     
     
       <category term="Java多线程编程" scheme="https://doublexz.github.io/doggie.github.io/tags/Java%E5%A4%9A%E7%BA%BF%E7%A8%8B%E7%BC%96%E7%A8%8B/"/>
