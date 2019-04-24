@@ -81,18 +81,18 @@
 
 
 
-<meta name="description" content="不可变类是一种实例不能被修改的简单类。其每个实例包含的所有信息在对象的生命中期中是固定的，因此观察不到任何改变。Java平台类库包含很多不可变类，包括String、包装原生类、BigInteger和BigDecimal。这么做有许多好处：不可变类比可变类更易于设计、实现和使用。他们更少出错并且更安全。">
+<meta name="description" content="简单来说，不可变类是一种实例不能被修改的类。其每个实例包含的信息在对象的整个生命中期中是固定的，因此在这个过程中观察不到任何改变。Java平台类库包含很多不可变类，包括String、包装原生类、BigInteger和BigDecimal。这么做有许多好处：不可变类比可变类更易于设计、实现和使用。他们更少出错并且更安全。">
 <meta name="keywords" content="Effective Java 3rd">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Item-17">
 <meta property="og:url" content="https://doublexz.github.io/doggie.github.io/2019/04/23/Item-17/index.html">
 <meta property="og:site_name" content="CloudXue&#39;s Blog">
-<meta property="og:description" content="不可变类是一种实例不能被修改的简单类。其每个实例包含的所有信息在对象的生命中期中是固定的，因此观察不到任何改变。Java平台类库包含很多不可变类，包括String、包装原生类、BigInteger和BigDecimal。这么做有许多好处：不可变类比可变类更易于设计、实现和使用。他们更少出错并且更安全。">
+<meta property="og:description" content="简单来说，不可变类是一种实例不能被修改的类。其每个实例包含的信息在对象的整个生命中期中是固定的，因此在这个过程中观察不到任何改变。Java平台类库包含很多不可变类，包括String、包装原生类、BigInteger和BigDecimal。这么做有许多好处：不可变类比可变类更易于设计、实现和使用。他们更少出错并且更安全。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-04-23T10:06:12.143Z">
+<meta property="og:updated_time" content="2019-04-24T01:54:18.191Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Item-17">
-<meta name="twitter:description" content="不可变类是一种实例不能被修改的简单类。其每个实例包含的所有信息在对象的生命中期中是固定的，因此观察不到任何改变。Java平台类库包含很多不可变类，包括String、包装原生类、BigInteger和BigDecimal。这么做有许多好处：不可变类比可变类更易于设计、实现和使用。他们更少出错并且更安全。">
+<meta name="twitter:description" content="简单来说，不可变类是一种实例不能被修改的类。其每个实例包含的信息在对象的整个生命中期中是固定的，因此在这个过程中观察不到任何改变。Java平台类库包含很多不可变类，包括String、包装原生类、BigInteger和BigDecimal。这么做有许多好处：不可变类比可变类更易于设计、实现和使用。他们更少出错并且更安全。">
 
 
 
@@ -402,15 +402,15 @@
       
 
       
-        <p>不可变类是一种实例不能被修改的简单类。其每个实例包含的所有信息在对象的生命中期中是固定的，因此观察不到任何改变。Java平台类库包含很多不可变类，包括String、包装原生类、BigInteger和BigDecimal。这么做有许多好处：不可变类比可变类更易于设计、实现和使用。他们更少出错并且更安全。<br><a id="more"></a><br>&emsp;&emsp;创建一个不可变类，要遵循一下五条规则：  </p>
+        <p>简单来说，不可变类是一种实例不能被修改的类。其每个实例包含的信息在对象的整个生命中期中是固定的，因此在这个过程中观察不到任何改变。Java平台类库包含很多不可变类，包括String、包装原生类、BigInteger和BigDecimal。这么做有许多好处：不可变类比可变类更易于设计、实现和使用。他们更少出错并且更安全。<br><a id="more"></a><br>&emsp;&emsp;让一个类不可变，要遵循以下五条规则：  </p>
 <ol>
-<li><strong>禁止提供修改对象状态的方法</strong>（比如存取器mutators）。</li>
-<li><strong>确保类不能被继承</strong>。这会阻止粗心或恶意子类通过表象为类的状态已变更来危害（破坏）类的不可变行为。防止子类化通常是将类定义为final的来完成的，但还有可替代防范，我们后面讨论。</li>
-<li><strong>将所有字段定义成final的</strong>。这可以清楚地以系统强制的方式表达我们的意图。而且，必须确保新创建实例的引用被从一个线程传递给另一个时没有同步的正确行为，正如在内存模型中阐述的那样【JLS, 17.5; Goetz06, 16】。</li>
-<li><strong>将所有字段定义成私有的</strong>。这可以防止客户端通过字段获取不可变对象的访问权并且直接修改这些对象。虽然技术上允许不可变类拥有公共的终态的包含原生值或者不可变对象引用的字段，但不建议这么做，因为它会排除在后续发行版本中修改类的内部表示。</li>
-<li><strong>确保对任何可变组件的独占访问</strong>。如果你的类包含任何可变对象的引用，确保类的客户端不能获取这些对象引用。永远不要初始化一个面向客户端的对象引用字段或者从访问器返回这个字段。在构造方法、访问器和readObject方法中（Item 50）创建防御性副本（Item 80）。  </li>
+<li><strong>禁止提供修改对象状态的方法</strong>（比如存取器mutators，即setter方法）。</li>
+<li><strong>确保该类不能被扩展</strong>。这会阻止粗心或恶意子类通过改变对象的状态来破坏类的不可变行为。为防止类被继承（子类化），通常是将类定义为final的，但还有另一种方式，我们后面讨论。</li>
+<li><strong>将所有字段定义成final的</strong>。这可以清楚地以系统强制的方式表达我们的意图。而且，必须确保新创建实例的引用在缺乏同步机制的情况下,被从一个线程传递给另一个线程时的正确行为，正如在内存模型中阐述的那样【JLS, 17.5; Goetz06, 16】。</li>
+<li><strong>将所有字段定义成私有的</strong>。这可以防止客户端获取被字段引用的可变对象的访问权，并且直接修改这些对象。虽然技术上允许不可变类的公共的终态的子弹包含原生值或不可变对象引用，但不建议这么做，因为它会妨碍了在后续发行版本中修改类的内部表示。</li>
+<li><strong>确保对任何可变组件的互斥访问</strong>。如果类里包含任何可变对象的引用，则要确保类的客户端不能获取指向这些对象引用。永远不要用客户端提供的对象引用来初始化这些字段或者从访问方法中返回这个字段的引用。在构造方法、访问器和readObject方法中（Item 50）请使用保护性拷贝（Item 80）。  </li>
 </ol>
-<p>&emsp;&emsp;在之前条款中的许多类都是不可变的。其中一个是条款11中的PhoneNumber，它的每一个属性都有访问方法，但是没有设置方法。下面是一个稍微复杂点的例子：  </p>
+<p>&emsp;&emsp;在之前条款中的许多示例类都是不可变的。其中一个是条款11中的PhoneNumber，它的每一个属性都有访问方法，但是没有相应的设置方法。下面是一个稍微复杂点的例子：  </p>
 <pre><code>// Immutable complex number class 
 public final class Complex { 
     private final double re; 
@@ -460,7 +460,7 @@ public final class Complex {
     } 
 
 }
-</code></pre><p>&emsp;&emsp;这个类表示一个复合数字（一个包含真实和虚构部分的数字）。除了标准Object方法，它为真实和虚构部分提供了访问方法，并且提供了四个基本的数学运算：加法、减法、乘法和除法。注意数学运算如何创建并返回一个新的Complex实例，而不是修改这个实例。这种模式被称作功能方法，因为方法返回应用函数在其操作数上得出的结果，而没有修改它。将其与程序或命令方法进行对比，其中（后者）将方法过程应用于操作数，从而导致其状态发生变化。注意方法名称是介词(如plus)而不是动词（如add）。这强调了方法不会改变对象值的事实。BigInteger和BigDecimal类不遵循该命名规范，并且它导致了许多实用错误。<br>&emsp;&emsp;如果你对它不熟悉，功能方法可能看起来不自然，但它具有不可变性，这具有许多优点。<strong>不可变对象是简单的</strong>。不可变对象可以处于一个状态，即创建它的状态。如果确保所有构造函数都建立了类不变量，那么可以保证这些不变量始终为真，就无需你或者使用这个类的程序员进一步努力。另一方面，可变对象可以拥有任意的复合状态空间。如果文档没有提供访问方法执行的状态转换的精确描述，则可能很难或者不可能放心的使用可变类。<br>&emsp;&emsp;<strong>不可变类本质上是线程安全的，他们不需要同步</strong>。他们不会被多线程并发访问所破坏。这是实现线程安全最简单的方法。既然没有线程可以观察到另一个线程对不可变对象的任何影响，<strong>那么不可变对象可以被自由地共享</strong>。因此，不可变类应该鼓励客户端在任何可能的地方复用已存在的实例。其中一种简单的方式是为常用值提供共有的静态且终态的常量。例如，Complex类提供如下常量：  </p>
+</code></pre><p>&emsp;&emsp;这个类表示一个复数（y一个包含了实数部分和虚数部分的数字）。除了标准Object方法，它为实数部分和虚数部分部分提供了访问方法，并且提供了四个基本的数学运算：加法、减法、乘法和除法。注意基本运算如何创建的，以及为什么返回一个新的Complex实例，而不是修改原有的实例。这种模式被称作函数是方法（functional approache），因为方法返回应用函数在其操作数上得出的结果，而没有修改这个操作数。与之相应的是程序方法或命令方法，这两种方法都将一个过程应用于操作数，从而导致操作数的状态发生变化。注意方法名称是介词(如plus)而不是动词（如add）。这强调了方法不会改变对象值的事实。BigInteger和BigDecimal类不遵循该命名规范，并且它导致了许多使用错误。<br>&emsp;&emsp;如果你对函数式方法不熟悉，可能会觉得它有点不自然，但它（可以让传进来的参数）具有不可变性，这就具有许多优点。<strong>不可变对象能让很多情况简单化</strong>。不可变对象可以保持一个状态，即创建它的状态。如果确保所有构造函数都建立了类不变量（invariants，约束关系），那么可以保证这些不变量始终有效，就无需你或者使用这个类的程序员做额外的工作。另一方面，可变对象可以拥有任意复杂的状态空间。如果文档没有提供修改方法会造成对象状态转移的精确描述，则可能很难或者不可能放心的使用可变类。<br>&emsp;&emsp;<strong>不可变类本质上（天生的）就是线程安全的，它们不需要同步</strong>。他们不会被多线程并发访问所破坏。这是实现线程安全最简单的方法。既然没有线程可以观察到另一个线程对不可变对象的任何影响，<strong>那么不可变对象可以被自由地共享</strong>。因此，不可变类应该鼓励客户端在任何可能的地方复用现有实例。其中一种简单的方式是为常用值提供共有的静态且终态的常量。例如，Complex类提供如下常量：  </p>
 <pre><code>public static final Complex ZERO = new Complex(0, 0);
 public static final Complex ONE  = new Complex(1, 0);
 public static final Complex I    = new Complex(0, 1);
@@ -600,7 +600,7 @@ public class Complex {
               
                 <a href="/doggie.github.io/archives/">
               
-                  <span class="site-state-item-count">18</span>
+                  <span class="site-state-item-count">19</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -611,7 +611,7 @@ public class Complex {
               
               <div class="site-state-item site-state-categories">
                 <a href="/doggie.github.io/categories/index.html">
-                  <span class="site-state-item-count">1</span>
+                  <span class="site-state-item-count">2</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -622,7 +622,7 @@ public class Complex {
               
               <div class="site-state-item site-state-tags">
                 <a href="/doggie.github.io/tags/index.html">
-                  <span class="site-state-item-count">3</span>
+                  <span class="site-state-item-count">4</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
