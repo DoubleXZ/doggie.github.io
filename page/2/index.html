@@ -1668,7 +1668,133 @@ public class SpellChecker{
       
         
           
-            
+            <h2 id="root-指令"><a href="#root-指令" class="headerlink" title="root 指令"></a>root 指令</h2><p>定义了静态文件的根目录，并且和URI拼接形成最终的本地文件路径。如：</p>
+<pre><code>root /etc/nginx/html；
+</code></pre><p>当请求/static/js/public.js时，则拼接后返回本地服务器文件 /etc/nginx/html/static/js/public.js </p>
+<h2 id="proxy-pass-指令"><a href="#proxy-pass-指令" class="headerlink" title="proxy_pass 指令"></a>proxy_pass 指令</h2><p>将请求传递到URL指向的代理服务器，然后将来自代理服务器的响应回传给客户端。 如：</p>
+<pre><code>location /api {
+    rewrite ^/api/(.*)$  /$1 break;
+    proxy_pass http://localhost:8081;
+}
+</code></pre><p>以上配置表示，对于/api开头的URI进行处理，首先对URI进行重写得到新的URI，然后将请求转发给<code>http://localhost:8081/新的URI</code> （默认请求参数也是会传递过去的！）</p>
+<h2 id="rewrite-指令"><a href="#rewrite-指令" class="headerlink" title="rewrite 指令"></a>rewrite 指令</h2><p>可以多次修改请求的URI。语法为：rewrite  regex replacement flag。第一个参数是URI需要匹配的正则表达式，第二个参数是将要替换的URI，第三个参数可选（lase|break|redirect|permanent）指示是否继续可以重写(last|break)或者返回重定向代码301或者302(redirect|permanent)。如：</p>
+<pre><code>location  /users {
+    rewite ^/users/(.*)$  /show?user=$1 break;
+}
+</code></pre><p>以上配置，对于/users/123 这样的URI会被重写成 /show?user=123 。<br>对于上面proxy_pass实例中rewrite指令，会将/api/app/index重写成/app/index</p>
+<p>flag说明：</p>
+<ul>
+<li>last: 在当前server或者location中停止执行rewrite指令，但是Nginx会继续搜索与新的URI匹配的location，并在匹配的location中执行任何rewrite指令(URI可能会再次改变)，若URI发生改变，则继续搜索与之匹配的location进行处理。</li>
+<li>break: <strong>停止</strong>当前server或者location中rewrite指令的处理，并取消搜索与新URI匹配的location,不会执行location中的rewrite指令。<br><strong>最好不要在server块中的rewrite指令中使用break标志</strong>。  </li>
+</ul>
+<p>在server块中的rewrite指令，使用last标记：</p>
+<pre><code>server  {
+    ...
+    rewrite ^(/file.*)/image/(/*)\..*$  $1/web1/$2.jpeg last;
+    rewrite ^(/file.*)/archive/(/*)\..*$  $1/media/$2.txt last;
+    return 403;
+    ...
+}
+</code></pre><ul>
+<li>例如<code>/file/some/image/20180411</code>被重写成 <code>/file/some/web1/20180411.jpeg</code>。由于last标志，第二个rewrite和return指令被跳过，但是Nginx继续处理更改后的URI，如匹配到某个location，则执行location中的任何指令，包括rewrite指令（这意味着URI可能再次改变）。</li>
+<li>例如<code>/file/some/archive/20180411</code>被重写成<code>/file/some/media/20180411.txt</code>，测试return指令被跳过，但是Nginx继续处理更改后的URI。</li>
+<li>例如<code>/file/some/test/fileName</code> 的URI没有匹配以上任何rewrite指令，则返回403状态码给客户端，Nginx停止处理。  </li>
+</ul>
+<p>在server块中的rewrite指令，使用break标记：</p>
+<pre><code>server  {
+    ...
+    rewrite ^(/file.*)/image/(/*)\..*$  $1/web1/$2.jpeg break;
+    rewrite ^(/file.*)/audio/(/*)\..*$  $1/archive/$2.txt break;
+    return 403;
+    ...
+}
+</code></pre><p>例如<code>/file/some/image/20180411</code>被重写成 <code>/file/some/image/20180411.jpeg</code>。由于break标志，Nginx会继续判断后面的rewrite与新得到URI是否匹配（始终在当前server块中）。</p>
+<p>在location块中的rewrite指令，使用last标记：  </p>
+<pre><code>location  /wechat  {
+    rewrite ^(/file/.*)/image/(.*)\..*$ $1/web1/$2.jpeg last;
+    rewrite ^(/file/.*)/audio/(.*)\..*$ $1/archive/$2.txt last;
+}
+</code></pre><p>例如一个URI匹配第一个rewrite指令，由于last标记，Nginx会将新的URI到所有location中再执行一遍包括rewrite指令。 </p>
+<p>在location块中的rewrite指令，使用break标记：  </p>
+<pre><code>location /wechat  {
+    rewrite ^(/file/.*)/image/(.*)\..*$ $1/web1/$2.jpeg break;
+    rewrite ^(/file/.*)/audio/(.*)\..*$ $1/archive/$2.txt break;
+}
+</code></pre><p>例如一个URI匹配第一个rewrite指令，由于break标记，Nginx会继续在当前location中执行第三行规则中的匹配处理，始终在当前location中。</p>
+<p>location指令接受两种类型的参数</p>
+<ul>
+<li>前缀字符串： 前缀字符串参数，URI必须严格以它开头。</li>
+<li>正则表达式： 正则表达式参数，以<code>~</code>开头表示大小写敏感，以<code>~*</code>开头表示大小写不敏感。正则表达式中的.要加转义字符<code>\</code>，写成<code>\.</code>  </li>
+</ul>
+<p>例如一个匹配以<code>.html</code>或者<code>.htm</code>结尾的URI的location：  </p>
+<pre><code>location  ~  \.html?  { #
+    ...
+}
+</code></pre><p>正则表达式的优先级大于前缀字符串。如果找到匹配的前缀字符串，仍继续搜索正则表达式，但是如果前缀字符串以<code>^~</code>开头，则不再检查正则表达式！<br>具体的搜索匹配流程如下：  </p>
+<ol>
+<li>将URI与所有的前缀字符串进行比较</li>
+<li>=修饰符表明URI必须与前缀字符串相等，如果找到，则停止搜索。</li>
+<li>如果找到的最长前缀匹配字符串以^~开头，则不在搜索正则表达式是否匹配。</li>
+<li>存储匹配的最长前缀字符串。</li>
+<li>测试对比URI与正则表达式。</li>
+<li>找到第一个匹配的正则表达式后停止。</li>
+<li>如果没有正则表达式匹配，则使用4存储的前缀字符串对应的location。  </li>
+</ol>
+<p><strong>=修饰符的优先级最高。如网站首页频繁访问，可以专门定义一个location  来减少搜索匹配次数，提高速度。</strong></p>
+<h2 id="return指令"><a href="#return指令" class="headerlink" title="return指令 "></a>return指令 </h2><p>第一个参数是响应代码，可选的第二个参数可以是重定向的URL或者在响应正文中返回的文本。如</p>
+<pre><code>location /permannetly/moved/url {
+    return 301 http://www.example.com/moved/here;
+}
+</code></pre><p>该指令可以包含在location和server上下文中。</p>
+<h2 id="error-page指令"><a href="#error-page指令" class="headerlink" title="error_page指令 "></a>error_page指令 </h2><p>可以配置特定错误码的错误页面，或者重定向到其他页面。如  </p>
+<pre><code>#在404错误发生时返回/404.html
+error_page 404 /404.html    
+</code></pre><p>该指令定义了如何处理错误，而不会直接返回，而return指令是立即返回。  </p>
+<pre><code>location  /old/path.html {
+    error_page 404 =  301 http://example.com/new/path.html;
+}
+</code></pre><p>当Nginx找不到页面时，它将使用代码301替换404，并将客户端重定向到 <code>http://example.com/new/path.html</code>。比如当客户端仍尝试用旧的 URI 访问页面时，301代码通知浏览器页面已永久移除，并且需要自动替换为返回的新地址。</p>
+<h2 id="try-files指令"><a href="#try-files指令" class="headerlink" title="try_files指令"></a>try_files指令</h2><h2 id="附录-常用正则"><a href="#附录-常用正则" class="headerlink" title="附录 常用正则"></a>附录 常用正则</h2><pre><code>. ： 匹配除换行符以外的任意字符
+? ： 重复0次或1次
++ ： 重复1次或更多次
+*： 重复0次或更多次
+\d ：匹配数字
+^ ： 匹配字符串的开始
+$ ： 匹配字符串的结束
+{n} ： 重复n次
+{n,} ： 重复n次或更多次
+[c] ： 匹配单个字符c
+[a-z]： 匹配a-z小写字母的任意一个
+全局变量
+$args ： #这个变量等于请求行中的参数，同$query_string
+$content_length ： 请求头中的Content-length字段。
+$content_type ： 请求头中的Content-Type字段。
+$document_root ： 当前请求在root指令中指定的值。
+$host ： 请求主机头字段，否则为服务器名称。
+$http_user_agent ： 客户端agent信息
+$http_cookie ： 客户端cookie信息
+$limit_rate ： 这个变量可以限制连接速率。
+$request_method ： 客户端请求的动作，通常为GET或POST。
+$remote_addr ： 客户端的IP地址。
+$remote_port ： 客户端的端口。
+$remote_user ： 已经经过Auth Basic Module验证的用户名。
+$request_filename ： 当前请求的文件路径，由root或alias指令与URI请求生成。
+$scheme ： HTTP方法（如http，https）。
+$server_protocol ： 请求使用的协议，通常是HTTP/1.0或HTTP/1.1。
+$server_addr ： 服务器地址，在完成一次系统调用后可以确定这个值。
+$server_name ： 服务器名称。
+$server_port ： 请求到达服务器的端口号。
+$request_uri ： 包含请求参数的原始URI，不包含主机名，如：/foo/bar.php?arg=baz。
+$uri ： 不带请求参数的当前URI，$uri不包含主机名，如/foo/bar.html。
+$document_uri ： 与$uri相同。
+例如请求：http://localhost:88/test1/test2/test.php
+$host：localhost
+$server_port：88
+$request_uri：/test1/test2/test.php
+$document_uri：/test1/test2/test.php
+$document_root：/var/www/html
+$request_filename：/var/www/html/test1/test2/test.php
+</code></pre>
           
         
       
