@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="Hexo, NexT">
+  <meta name="keywords" content="Nginx,Linux,">
 
 
 
@@ -81,16 +81,18 @@
 
 
 
-<meta name="description" content="CloudXue">
-<meta property="og:type" content="website">
-<meta property="og:title" content="CloudXue&#39;s Blog">
-<meta property="og:url" content="https://doublexz.github.io/doggie.github.io/tags/Effective-Java-3rd/page/2/index.html">
+<meta name="description" content="通常使用Nginx或者Apache作为Web服务器时，默认监听80端口，因此默认会使用root用户去安装，而且，使用yum命令安装时，通常会安装到默认的路径下，默认路径通常是root用户才有执行权限的。如果不需要使用Nginx监听1024以下的端口，且对权限和网络管理比较严格时，能用非root权限解决的，就用普通用户。在此使用编译Nginx源码的方式安装Nginx。 假设已拿到root用户权限，但">
+<meta name="keywords" content="Nginx,Linux">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux系统使用非root用户安装并管理Nginx">
+<meta property="og:url" content="https://doublexz.github.io/doggie.github.io/2019/04/28/Linux系统使用非root用户安装并管理Nginx/index.html">
 <meta property="og:site_name" content="CloudXue&#39;s Blog">
-<meta property="og:description" content="CloudXue">
+<meta property="og:description" content="通常使用Nginx或者Apache作为Web服务器时，默认监听80端口，因此默认会使用root用户去安装，而且，使用yum命令安装时，通常会安装到默认的路径下，默认路径通常是root用户才有执行权限的。如果不需要使用Nginx监听1024以下的端口，且对权限和网络管理比较严格时，能用非root权限解决的，就用普通用户。在此使用编译Nginx源码的方式安装Nginx。 假设已拿到root用户权限，但">
 <meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-04-28T09:40:37.366Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="CloudXue&#39;s Blog">
-<meta name="twitter:description" content="CloudXue">
+<meta name="twitter:title" content="Linux系统使用非root用户安装并管理Nginx">
+<meta name="twitter:description" content="通常使用Nginx或者Apache作为Web服务器时，默认监听80端口，因此默认会使用root用户去安装，而且，使用yum命令安装时，通常会安装到默认的路径下，默认路径通常是root用户才有执行权限的。如果不需要使用Nginx监听1024以下的端口，且对权限和网络管理比较严格时，能用非root权限解决的，就用普通用户。在此使用编译Nginx源码的方式安装Nginx。 假设已拿到root用户权限，但">
 
 
 
@@ -120,13 +122,13 @@
 
 
 
-  <link rel="canonical" href="https://doublexz.github.io/doggie.github.io/tags/Effective-Java-3rd/page/2/">
+  <link rel="canonical" href="https://doublexz.github.io/doggie.github.io/2019/04/28/Linux系统使用非root用户安装并管理Nginx/">
 
 
 
 
 
-  <title>标签: Effective Java 3rd | CloudXue's Blog</title>
+  <title>Linux系统使用非root用户安装并管理Nginx | CloudXue's Blog</title>
   
 
 
@@ -145,7 +147,7 @@
     
   
 
-  <div class="container sidebar-position-left ">
+  <div class="container sidebar-position-left page-post-detail">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -281,212 +283,299 @@
           <div id="content" class="content">
             
 
+  <div id="posts" class="posts-expand">
+    
+
+  
+
   
   
   
-  <div class="post-block tag">
-
-    <div id="posts" class="posts-collapse">
-      <div class="collection-title">
-        <h1>Effective Java 3rd<small>标签</small>
-        </h1>
-      </div>
-
-      
-        
 
   <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://doublexz.github.io/doggie.github.io/doggie.github.io/2019/04/28/Linux系统使用非root用户安装并管理Nginx/">
 
-      <h2 class="post-title">
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Doggie">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/doggie.github.io/images/love.jpeg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="CloudXue's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
         
-            <a class="post-title-link" href="/doggie.github.io/2019/02/27/Item-7/" itemprop="url">
-              
-                <span itemprop="name">Item-7 消除废弃的对象引用</span>
-              
-            </a>
         
-      </h2>
+          <h1 class="post-title" itemprop="name headline">Linux系统使用非root用户安装并管理Nginx</h1>
+        
 
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated" datetime="2019-02-27T17:56:11+08:00" content="2019-02-27">
-          02-27
-        </time>
-      </div>
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-04-28T17:32:30+08:00">
+                2019-04-28
+              </time>
+            
 
-    </header>
-  </article>
+            
 
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/doggie.github.io/categories/Nginx/" itemprop="url" rel="index">
+                    <span itemprop="name">Nginx</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/doggie.github.io/2019/04/28/Linux系统使用非root用户安装并管理Nginx/" class="leancloud_visitors" data-flag-title="Linux系统使用非root用户安装并管理Nginx">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o">本文总阅读量</i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>次
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
 
       
-        
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/doggie.github.io/2019/02/25/Item-6/" itemprop="url">
-              
-                <span itemprop="name">Item-6 避免创建不必要的对象</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated" datetime="2019-02-25T17:51:25+08:00" content="2019-02-25">
-          02-25
-        </time>
-      </div>
-
-    </header>
-  </article>
-
+      
 
       
-        
+        <p>通常使用Nginx或者Apache作为Web服务器时，默认监听80端口，因此默认会使用root用户去安装，而且，使用yum命令安装时，通常会安装到默认的路径下，默认路径通常是root用户才有执行权限的。如果不需要使用Nginx监听1024以下的端口，且对权限和网络管理比较严格时，能用非root权限解决的，就用普通用户。在此使用编译Nginx源码的方式安装Nginx。 假设已拿到root用户权限，但需要使用普通用户去管理Nginx。<br><a id="more"></a></p>
+<h2 id="登录"><a href="#登录" class="headerlink" title="登录"></a>登录</h2><p>root登录服务器 </p>
+<pre><code>ssh root@x.x.x.x
+</code></pre><h2 id="创建普通用户并设置密码"><a href="#创建普通用户并设置密码" class="headerlink" title="创建普通用户并设置密码"></a>创建普通用户并设置密码</h2><p>创建普通用户</p>
+<pre><code># useradd nginx
+</code></pre><p>为nginx用户设置密码为nginx#123</p>
+<pre><code># echo nginx#123|passwd --stdin nginx
+</code></pre><p>创建完毕用户后，切换到nginx用户</p>
+<pre><code># su nginx
+</code></pre><p>进入用户目录</p>
+<pre><code>$ cd ~
+</code></pre><h2 id="安装openssl"><a href="#安装openssl" class="headerlink" title="安装openssl"></a>安装openssl</h2><p>下载地址：<br><a href="https://www.openssl.org/source/" target="_blank" rel="noopener">https://www.openssl.org/source/</a>  </p>
+<p>进入用户目录</p>
+<pre><code>$ cd /home/nginx
+</code></pre><p>删除原有安装（如果有的话）</p>
+<pre><code>$ rm -rf openssl
+$ rm -rf openssl-1.1.0j #（以机器上实际安装的为准）
+</code></pre><p>解压</p>
+<pre><code>$ tar -zxv -f openssl-1.1.0j.tar.gz
+</code></pre><p>进入源码目录</p>
+<pre><code>$ cd openssl-1.1.0j
+</code></pre><p>配置</p>
+<pre><code>$ ./config --prefix=/home/nginx/openssl --openssldir=/home/nginx/openssl/conf
+</code></pre><p>编译安装</p>
+<pre><code>$ make &amp;&amp; make install
+</code></pre><p>检查安装</p>
+<pre><code>$ cd /home/nginx/openssl/bin
+$ openssl version -a
+</code></pre><h2 id="安装pcre"><a href="#安装pcre" class="headerlink" title="安装pcre"></a>安装pcre</h2><p>下载地址：<br><a href="https://ftp.pcre.org/pub/pcre/" target="_blank" rel="noopener">https://ftp.pcre.org/pub/pcre/</a></p>
+<p>进入安装目录</p>
+<pre><code>$ cd /home/nginx/
+</code></pre><p>删除原有安装（如果有的话）</p>
+<pre><code>$ rm -rf pcre
+$ rm -rf pcre-8.43 （以机器上实际安装的为准）
+</code></pre><p>解压</p>
+<pre><code>$ tar -zxv -f pcre-8.43.tar.gz
+</code></pre><p>进入源码目录</p>
+<pre><code>$ cd pcre-8.43 
+</code></pre><p>执行配置</p>
+<pre><code>$./configure --prefix=/home/nginx/pcre/  
+</code></pre><p>编译安装</p>
+<pre><code>$ make &amp;&amp; make install
+</code></pre><h2 id="安装zlib"><a href="#安装zlib" class="headerlink" title="安装zlib"></a>安装zlib</h2><p>下载地址：<br><a href="http://zlib.net/" target="_blank" rel="noopener">http://zlib.net/</a></p>
+<p>进入安装目录</p>
+<pre><code>$cd /usr/local/
+</code></pre><p>删除原有安装（如果有的话）</p>
+<pre><code>$ rm -rf zlib
+$ rm -rf zlib-1.2.11（以机器上实际安装的为准）
+</code></pre><p>解压</p>
+<pre><code>$ tar -zxv -f zlib-1.2.11.tar.gz
+</code></pre><p>进入源码目录</p>
+<pre><code>$ cd zlib-1.2.11
+</code></pre><p>配置</p>
+<pre><code>$./configure --prefix=/home/nginx/zlib/
+</code></pre><p>编译安装</p>
+<pre><code>$ make &amp;&amp; make install
+</code></pre><h2 id="安装nginx"><a href="#安装nginx" class="headerlink" title="安装nginx"></a>安装nginx</h2><p>下载地址：<br><a href="http://nginx.org/en/download.html" target="_blank" rel="noopener">http://nginx.org/en/download.html</a>  </p>
+<p>进入安装目录</p>
+<pre><code>$ cd ~
+</code></pre><p>删除原有安装（如果有的话）</p>
+<pre><code>$ rm -rf nginx
+$ rm -rf nginx-1.14.2
+</code></pre><p>解压</p>
+<pre><code>$ tar -zxvf nginx-1.14.2.tar.gz
+</code></pre><p>进入安装目录</p>
+<pre><code>$ cd nginx-1.14.2
+</code></pre><p>配置(使用openssl、pcre、zlib的源码路径)</p>
+<pre><code>$ ./configure \
+--user=nginx \
+--group=nginx \
+--prefix=/home/nignx/nginx \
+--with-http_ssl_module \
+--with-openssl=/home/nignx/openssl-1.1.0j \
+--with-pcre=/home/nignx/pcre-8.43 \
+--with-zlib=/home/nignx/zlib-1.2.11 \
+--with-http_stub_status_module \
+--with-threads
+</code></pre><p>编译安装</p>
+<pre><code>$ make &amp;&amp; make install
+</code></pre><p>修改监听端口为非1024</p>
+<pre><code>$ vi ~/nginx/conf/nginx.conf
+server {
+    listen      8089;
+    server_name localhost;
 
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/doggie.github.io/2019/02/11/Item-5/" itemprop="url">
-              
-                <span itemprop="name">Item-5 优先选择依赖注入而非硬编码资源的关联关系</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated" datetime="2019-02-11T17:47:31+08:00" content="2019-02-11">
-          02-11
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-      
-        
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/doggie.github.io/2019/02/11/Item-4/" itemprop="url">
-              
-                <span itemprop="name">Item-4 使用私有构造方法禁止类的实例化</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated" datetime="2019-02-11T17:41:34+08:00" content="2019-02-11">
-          02-11
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-      
-        
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/doggie.github.io/2019/01/11/Item-3/" itemprop="url">
-              
-                <span itemprop="name">Item-3 强制对单例属性使用私有构造方法和枚举类型</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated" datetime="2019-01-11T17:24:52+08:00" content="2019-01-11">
-          01-11
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-      
-        
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/doggie.github.io/2019/01/10/Item-2/" itemprop="url">
-              
-                <span itemprop="name">Item-2 当面对很多构造方法参数时，请考虑使用构建器</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated" datetime="2019-01-10T16:52:25+08:00" content="2019-01-10">
-          01-10
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-      
-        
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/doggie.github.io/2018/12/29/Item-1/" itemprop="url">
-              
-                <span itemprop="name">Item-1 考虑使用静态工厂方法代替构造方法</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated" datetime="2018-12-29T16:26:02+08:00" content="2018-12-29">
-          12-29
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
+    location {
+        root    html;
+        index   index.html  index.htm;
+    }
+}
+</code></pre><p>验证</p>
+<pre><code>$ /home/nginx/nginx/sbin/nginx -V
+nginx version: nginx/1.14.2
+built by gcc 4.4.7 20120313 (Red Hat 4.4.7-11) (GCC) 
+built with OpenSSL 1.1.0j  20 Nov 2018
+TLS SNI support enabled
+configure arguments: --user=nginx --group=nginx --prefix=/home/nginx/nginx --with-http_ssl_module --with-openssl=/home/nginx/openssl-1.1.0j --with-pcre=/home/nginx/pcre-8.43 --with-zlib=/home/nginx/zlib-1.2.11 --with-http_stub_status_module --with-threads
+</code></pre><h2 id="启动、重启"><a href="#启动、重启" class="headerlink" title="启动、重启"></a>启动、重启</h2><p>启动：</p>
+<pre><code>$ /home/nginx/nginx/sbin/nginx 
+</code></pre><p>重启</p>
+<pre><code>$ /home/nginx/nginx/sbin/nginx -s reload
+</code></pre><h2 id="停止"><a href="#停止" class="headerlink" title="停止"></a>停止</h2><p>查询nginx主进程号 </p>
+<pre><code>$ ps -ef | grep nginx
+</code></pre><p>停止进程 </p>
+<pre><code>$ kill -QUIT 主进程号 
+</code></pre><p>快速停止 </p>
+<pre><code>$ kill -TERM 主进程号 
+</code></pre><p>强制停止 </p>
+<pre><code>$ pkill -9 nginx
+</code></pre><h2 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h2><p>测试端口 </p>
+<pre><code>$ netstat –na|grep 8089n
+</code></pre><p>浏览器中测试 </p>
+<pre><code>$ curl localhost:8089
+</code></pre>
       
     </div>
+    
+    
+    
 
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/doggie.github.io/tags/Nginx/" rel="tag"># Nginx</a>
+          
+            <a href="/doggie.github.io/tags/Linux/" rel="tag"># Linux</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/doggie.github.io/2019/04/23/Item-17/" rel="next" title="Item-17 使可变性最小化">
+                <i class="fa fa-chevron-left"></i> Item-17 使可变性最小化
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
   </div>
   
   
   
+  </article>
 
-  
-  <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/doggie.github.io/tags/Effective-Java-3rd/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/doggie.github.io/tags/Effective-Java-3rd/">1</a><span class="page-number current">2</span>
-  </nav>
 
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
 
 
           </div>
@@ -494,6 +583,10 @@
 
 
           
+
+  
+
+
 
         </div>
         
@@ -514,8 +607,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -600,6 +702,22 @@
         </div>
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#登录"><span class="nav-number">1.</span> <span class="nav-text">登录</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#创建普通用户并设置密码"><span class="nav-number">2.</span> <span class="nav-text">创建普通用户并设置密码</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装openssl"><span class="nav-number">3.</span> <span class="nav-text">安装openssl</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装pcre"><span class="nav-number">4.</span> <span class="nav-text">安装pcre</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装zlib"><span class="nav-number">5.</span> <span class="nav-text">安装zlib</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装nginx"><span class="nav-number">6.</span> <span class="nav-text">安装nginx</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#启动、重启"><span class="nav-number">7.</span> <span class="nav-text">启动、重启</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#停止"><span class="nav-number">8.</span> <span class="nav-text">停止</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#测试"><span class="nav-number">9.</span> <span class="nav-text">测试</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
@@ -763,6 +881,10 @@
 
 
   
+  <script type="text/javascript" src="/doggie.github.io/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/doggie.github.io/js/src/post-details.js?v=5.1.4"></script>
+
+
 
   
 
