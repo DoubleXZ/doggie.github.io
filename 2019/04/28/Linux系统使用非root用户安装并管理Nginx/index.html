@@ -89,7 +89,7 @@
 <meta property="og:site_name" content="CloudXue&#39;s Blog">
 <meta property="og:description" content="通常使用Nginx或者Apache作为Web服务器时，默认监听80端口，因此默认会使用root用户去安装，而且，使用yum命令安装时，通常会安装到默认的路径下，默认路径通常是root用户才有执行权限的。如果不需要使用Nginx监听1024以下的端口，且对权限和网络管理比较严格时，能用非root权限解决的，就用普通用户。在此使用编译Nginx源码的方式安装Nginx。 假设已拿到root用户权限，但">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-04-28T09:42:24.448Z">
+<meta property="og:updated_time" content="2019-04-28T09:47:36.736Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Linux系统使用非root用户安装并管理Nginx">
 <meta name="twitter:description" content="通常使用Nginx或者Apache作为Web服务器时，默认监听80端口，因此默认会使用root用户去安装，而且，使用yum命令安装时，通常会安装到默认的路径下，默认路径通常是root用户才有执行权限的。如果不需要使用Nginx监听1024以下的端口，且对权限和网络管理比较严格时，能用非root权限解决的，就用普通用户。在此使用编译Nginx源码的方式安装Nginx。 假设已拿到root用户权限，但">
@@ -415,7 +415,7 @@
 <pre><code>$ cd ~
 </code></pre><h2 id="安装openssl"><a href="#安装openssl" class="headerlink" title="安装openssl"></a>安装openssl</h2><p>下载地址：<br><a href="https://www.openssl.org/source/" target="_blank" rel="noopener">https://www.openssl.org/source/</a>  </p>
 <p>进入用户目录</p>
-<pre><code>$ cd /home/nginx
+<pre><code>$ cd ~
 </code></pre><p>删除原有安装（如果有的话）</p>
 <pre><code>$ rm -rf openssl
 $ rm -rf openssl-1.1.0j #（以机器上实际安装的为准）
@@ -432,7 +432,7 @@ $ rm -rf openssl-1.1.0j #（以机器上实际安装的为准）
 $ openssl version -a
 </code></pre><h2 id="安装pcre"><a href="#安装pcre" class="headerlink" title="安装pcre"></a>安装pcre</h2><p>下载地址：<br><a href="https://ftp.pcre.org/pub/pcre/" target="_blank" rel="noopener">https://ftp.pcre.org/pub/pcre/</a></p>
 <p>进入安装目录</p>
-<pre><code>$ cd /home/nginx/
+<pre><code>$ cd ~
 </code></pre><p>删除原有安装（如果有的话）</p>
 <pre><code>$ rm -rf pcre
 $ rm -rf pcre-8.43 （以机器上实际安装的为准）
@@ -446,7 +446,7 @@ $ rm -rf pcre-8.43 （以机器上实际安装的为准）
 <pre><code>$ make &amp;&amp; make install
 </code></pre><h2 id="安装zlib"><a href="#安装zlib" class="headerlink" title="安装zlib"></a>安装zlib</h2><p>下载地址：<br><a href="http://zlib.net/" target="_blank" rel="noopener">http://zlib.net/</a></p>
 <p>进入安装目录</p>
-<pre><code>$cd /usr/local/
+<pre><code>$ cd ~
 </code></pre><p>删除原有安装（如果有的话）</p>
 <pre><code>$ rm -rf zlib
 $ rm -rf zlib-1.2.11（以机器上实际安装的为准）
