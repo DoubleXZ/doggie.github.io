@@ -81,18 +81,18 @@
 
 
 
-<meta name="description" content="root 指令定义了静态文件的根目录，并且和URI拼接形成最终的本地文件路径。如： root /etc/nginx/html； 当请求/static/js/public.js时，则拼接后返回本地服务器文件 /etc/nginx/html/static/js/public.js  proxy_pass 指令将请求传递到URL指向的代理服务器，然后将来自代理服务器的响应回传给客户端。 如： locat">
+<meta name="description" content="主要记录了root、proxy_pass、rewrite、return、error_page的用法。">
 <meta name="keywords" content="Nginx">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Nginx常用指令使用总结">
 <meta property="og:url" content="https://doublexz.github.io/doggie.github.io/2018/04/18/Nginx常用指令使用总结/index.html">
 <meta property="og:site_name" content="CloudXue&#39;s Blog">
-<meta property="og:description" content="root 指令定义了静态文件的根目录，并且和URI拼接形成最终的本地文件路径。如： root /etc/nginx/html； 当请求/static/js/public.js时，则拼接后返回本地服务器文件 /etc/nginx/html/static/js/public.js  proxy_pass 指令将请求传递到URL指向的代理服务器，然后将来自代理服务器的响应回传给客户端。 如： locat">
+<meta property="og:description" content="主要记录了root、proxy_pass、rewrite、return、error_page的用法。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-04-24T12:52:32.361Z">
+<meta property="og:updated_time" content="2019-04-30T08:03:29.274Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Nginx常用指令使用总结">
-<meta name="twitter:description" content="root 指令定义了静态文件的根目录，并且和URI拼接形成最终的本地文件路径。如： root /etc/nginx/html； 当请求/static/js/public.js时，则拼接后返回本地服务器文件 /etc/nginx/html/static/js/public.js  proxy_pass 指令将请求传递到URL指向的代理服务器，然后将来自代理服务器的响应回传给客户端。 如： locat">
+<meta name="twitter:description" content="主要记录了root、proxy_pass、rewrite、return、error_page的用法。">
 
 
 
@@ -402,7 +402,8 @@
       
 
       
-        <h2 id="root-指令"><a href="#root-指令" class="headerlink" title="root 指令"></a>root 指令</h2><p>定义了静态文件的根目录，并且和URI拼接形成最终的本地文件路径。如：</p>
+        <p>主要记录了root、proxy_pass、rewrite、return、error_page的用法。<br><a id="more"></a></p>
+<h2 id="root-指令"><a href="#root-指令" class="headerlink" title="root 指令"></a>root 指令</h2><p>定义了静态文件的根目录，并且和URI拼接形成最终的本地文件路径。如：</p>
 <pre><code>root /etc/nginx/html；
 </code></pre><p>当请求/static/js/public.js时，则拼接后返回本地服务器文件 /etc/nginx/html/static/js/public.js </p>
 <h2 id="proxy-pass-指令"><a href="#proxy-pass-指令" class="headerlink" title="proxy_pass 指令"></a>proxy_pass 指令</h2><p>将请求传递到URL指向的代理服务器，然后将来自代理服务器的响应回传给客户端。 如：</p>
