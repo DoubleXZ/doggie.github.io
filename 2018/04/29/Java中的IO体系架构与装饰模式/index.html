@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="Hexo, NexT">
+  <meta name="keywords" content="Netty,设计模式,">
 
 
 
@@ -81,16 +81,21 @@
 
 
 
-<meta name="description" content="CloudXue">
-<meta property="og:type" content="website">
-<meta property="og:title" content="CloudXue&#39;s Blog">
-<meta property="og:url" content="https://doublexz.github.io/doggie.github.io/archives/2019/01/index.html">
+<meta name="description" content="输入/输出流的概念输入/输出时，数据在通信通道中流动。所谓“数据流（stream）”指的是所有数据通信通道中，数据的起点和终点。信息的通道就是一个数据流。只要是数据从一个地方“流”到另一个地方，这种数据的通道都可以成为数据流。输入/输出是相对于程序来说的。程序在使用数据时所扮演的角色有两个：一个是源，一个是目的。若程序是数据流的源，即数据流的提供者，这个数据流对程序来说就是一个“输出数据流”（数据">
+<meta name="keywords" content="Netty,设计模式">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java中的IO体系架构与装饰模式">
+<meta property="og:url" content="https://doublexz.github.io/doggie.github.io/2018/04/29/Java中的IO体系架构与装饰模式/index.html">
 <meta property="og:site_name" content="CloudXue&#39;s Blog">
-<meta property="og:description" content="CloudXue">
+<meta property="og:description" content="输入/输出流的概念输入/输出时，数据在通信通道中流动。所谓“数据流（stream）”指的是所有数据通信通道中，数据的起点和终点。信息的通道就是一个数据流。只要是数据从一个地方“流”到另一个地方，这种数据的通道都可以成为数据流。输入/输出是相对于程序来说的。程序在使用数据时所扮演的角色有两个：一个是源，一个是目的。若程序是数据流的源，即数据流的提供者，这个数据流对程序来说就是一个“输出数据流”（数据">
 <meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://www.plantuml.com/plantuml/svg/xPDFIyCm6CRl_HG1Bniw-W7qeAA286wmetX8sxTRN9hKD9tEFmTXbu4J4Rs8U7Ld3oAe-6LcjuzXRAbiI-fXPtjAt_UNzEtpFC5E90Ls9N8fZYAqpS9OrgK07A1JQn7Xl4sOHAhgbSf8DWK_KcXryzY5K1BE5FZRTpeIaBEtlvIMkEzd2mgiO2Vbh86Y5WbBwOhzyG7SneHYXqBH56rEFFKdF2eaeWvpLPsH4_0oFC2YLSh7foGWicpa14GWYuvrEAU0MNfOFGv3BYGehQnpAzDrFVPz4E1Dw9jtb5vhGk2Etjh04klLBKB1M9KWfkrRK8DJB1K_vIjXoxQTN5ua3xtaiJjyUna_tOnxpwFxxjVxtUXsCEdclzlpkBr36Ep6WJDh25BFwWQ40bmi8NsrxU5hFxaQZFlNmu_F7_NpGwhE0RXITxf6GbEEQd7KTB3RqZjrE8o1kORGg1V26basvvhKcjorSbQfcEEiKRCPDW7JSTOHNHyDqQJI29CsEcIMoRBqIvTfOBZi1UZi5I_0Z84gWWr9-0O0">
+<meta property="og:image" content="http://www.plantuml.com/plantuml/svg/tP9DQm8n48Rl_ee1BvQwly1UAgtGqmeUfOSaJZ2IRfR9n0zQ_xiVQs4riu9NRs7oJ9BtcIWTcPHXC5x526NYEl6C2TKF_FO0Na7z4-lW5h0XnpXm5OD-0LvIs4JuAZ-t1cjseJftj42zOmGz_tw47SBf-61ji_1OtU-sFiNbu3vZV8WeC_jU4trylFwTIEtQ3Yvx4-THBZDIvgn_hJ4a7jrcVKQ1fLwXOK7JrDMu4EhZP2sIkFMXM4adqJ7GfNBb-EslA3ecc7FPD4NaPh8290JEeJoyy6kQvqiwkk1CK1VOLWO7">
+<meta property="og:updated_time" content="2019-04-30T07:58:24.723Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="CloudXue&#39;s Blog">
-<meta name="twitter:description" content="CloudXue">
+<meta name="twitter:title" content="Java中的IO体系架构与装饰模式">
+<meta name="twitter:description" content="输入/输出流的概念输入/输出时，数据在通信通道中流动。所谓“数据流（stream）”指的是所有数据通信通道中，数据的起点和终点。信息的通道就是一个数据流。只要是数据从一个地方“流”到另一个地方，这种数据的通道都可以成为数据流。输入/输出是相对于程序来说的。程序在使用数据时所扮演的角色有两个：一个是源，一个是目的。若程序是数据流的源，即数据流的提供者，这个数据流对程序来说就是一个“输出数据流”（数据">
+<meta name="twitter:image" content="http://www.plantuml.com/plantuml/svg/xPDFIyCm6CRl_HG1Bniw-W7qeAA286wmetX8sxTRN9hKD9tEFmTXbu4J4Rs8U7Ld3oAe-6LcjuzXRAbiI-fXPtjAt_UNzEtpFC5E90Ls9N8fZYAqpS9OrgK07A1JQn7Xl4sOHAhgbSf8DWK_KcXryzY5K1BE5FZRTpeIaBEtlvIMkEzd2mgiO2Vbh86Y5WbBwOhzyG7SneHYXqBH56rEFFKdF2eaeWvpLPsH4_0oFC2YLSh7foGWicpa14GWYuvrEAU0MNfOFGv3BYGehQnpAzDrFVPz4E1Dw9jtb5vhGk2Etjh04klLBKB1M9KWfkrRK8DJB1K_vIjXoxQTN5ua3xtaiJjyUna_tOnxpwFxxjVxtUXsCEdclzlpkBr36Ep6WJDh25BFwWQ40bmi8NsrxU5hFxaQZFlNmu_F7_NpGwhE0RXITxf6GbEEQd7KTB3RqZjrE8o1kORGg1V26basvvhKcjorSbQfcEEiKRCPDW7JSTOHNHyDqQJI29CsEcIMoRBqIvTfOBZi1UZi5I_0Z84gWWr9-0O0">
 
 
 
@@ -120,13 +125,13 @@
 
 
 
-  <link rel="canonical" href="https://doublexz.github.io/doggie.github.io/archives/2019/01/">
+  <link rel="canonical" href="https://doublexz.github.io/doggie.github.io/2018/04/29/Java中的IO体系架构与装饰模式/">
 
 
 
 
 
-  <title>归档 | CloudXue's Blog</title>
+  <title>Java中的IO体系架构与装饰模式 | CloudXue's Blog</title>
   
 
 
@@ -145,7 +150,7 @@
     
   
 
-  <div class="container sidebar-position-left page-archive">
+  <div class="container sidebar-position-left page-post-detail">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -281,107 +286,324 @@
           <div id="content" class="content">
             
 
+  <div id="posts" class="posts-expand">
+    
+
+  
+
   
   
   
-  <div class="post-block archive">
-    <div id="posts" class="posts-collapse">
-      <span class="archive-move-on"></span>
-
-      <span class="archive-page-counter">
-        
-        
-        
-          
-        
-        嗯..! 目前共计 21 篇日志。 继续努力。
-      </span>
-
-      
-
-        
-        
-        
-
-        
-          
-          <div class="collection-title">
-            <h1 class="archive-year" id="archive-year-2019">2019</h1>
-          </div>
-        
-        
-
-        
 
   <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://doublexz.github.io/doggie.github.io/doggie.github.io/2018/04/29/Java中的IO体系架构与装饰模式/">
 
-      <h2 class="post-title">
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Doggie">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/doggie.github.io/images/love.jpeg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="CloudXue's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
         
-            <a class="post-title-link" href="/doggie.github.io/2019/01/11/Item-3/" itemprop="url">
-              
-                <span itemprop="name">Item-3 强制对单例属性使用私有构造方法和枚举类型</span>
-              
-            </a>
         
-      </h2>
+          <h1 class="post-title" itemprop="name headline">Java中的IO体系架构与装饰模式</h1>
+        
 
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated" datetime="2019-01-11T17:24:52+08:00" content="2019-01-11">
-          01-11
-        </time>
-      </div>
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-29T13:36:40+08:00">
+                2018-04-29
+              </time>
+            
 
-    </header>
-  </article>
+            
 
+            
+          </span>
 
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/doggie.github.io/categories/Java/" itemprop="url" rel="index">
+                    <span itemprop="name">Java</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/doggie.github.io/categories/Java/设计模式/" itemprop="url" rel="index">
+                    <span itemprop="name">设计模式</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/doggie.github.io/2018/04/29/Java中的IO体系架构与装饰模式/" class="leancloud_visitors" data-flag-title="Java中的IO体系架构与装饰模式">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o">本文总阅读量</i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>次
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
 
       
-
-        
-        
-        
-
-        
-        
-
-        
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/doggie.github.io/2019/01/10/Item-2/" itemprop="url">
-              
-                <span itemprop="name">Item-2 当面对很多构造方法参数时，请考虑使用构建器</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated" datetime="2019-01-10T16:52:25+08:00" content="2019-01-10">
-          01-10
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-
       
 
+      
+        <h2 id="输入-输出流的概念"><a href="#输入-输出流的概念" class="headerlink" title="输入/输出流的概念"></a>输入/输出流的概念</h2><p>输入/输出时，数据在通信通道中流动。所谓“数据流（stream）”指的是所有数据通信通道中，数据的起点和终点。信息的通道就是一个数据流。只要是数据从一个地方“流”到另一个地方，这种数据的通道都可以成为数据流。输入/输出是<strong>相对于程序</strong>来说的。程序在使用数据时所扮演的角色有两个：一个是源，一个是目的。若程序是数据流的源，即数据流的提供者，这个数据流对程序来说就是一个“输出数据流”（数据从程序流出）。若程序是数据流的终点，这个数据流对程序而言就是一个“输入数据流”（数据从程序外流向程序）。<br><a id="more"></a></p>
+<h2 id="流的分类"><a href="#流的分类" class="headerlink" title="流的分类"></a>流的分类</h2><ol>
+<li>从功能上分：输入流与输出流  </li>
+<li>从结构上分：</li>
+</ol>
+<ul>
+<li>字节流 ：以字节为处理单位或称面向字节。其输入和输出的基础是InputStream和OutputStream这两个抽象类。字节流的输入输出操作由这两个类的子类实现。</li>
+<li>字符流 ：以字符为处理单位或称面向字符。其输入和输出的基础是Reader和Writer这两个抽象类。字符流的输入和输出操作由这两个类的子类实现。  </li>
+</ul>
+<ol start="3">
+<li>其他维度分：</li>
+</ol>
+<ul>
+<li>节点流：从特定地方读写的流类，如磁盘或一块内存区域</li>
+<li>过滤流：使用节点流作为输入输出。过滤流是使用一个已经存在的输入流或者输出流连接创建的。  </li>
+<li>java.io包中的输入流区分节点流与过滤流</li>
+</ul>
+<img src="http://www.plantuml.com/plantuml/svg/xPDFIyCm6CRl_HG1Bniw-W7qeAA286wmetX8sxTRN9hKD9tEFmTXbu4J4Rs8U7Ld3oAe-6LcjuzXRAbiI-fXPtjAt_UNzEtpFC5E90Ls9N8fZYAqpS9OrgK07A1JQn7Xl4sOHAhgbSf8DWK_KcXryzY5K1BE5FZRTpeIaBEtlvIMkEzd2mgiO2Vbh86Y5WbBwOhzyG7SneHYXqBH56rEFFKdF2eaeWvpLPsH4_0oFC2YLSh7foGWicpa14GWYuvrEAU0MNfOFGv3BYGehQnpAzDrFVPz4E1Dw9jtb5vhGk2Etjh04klLBKB1M9KWfkrRK8DJB1K_vIjXoxQTN5ua3xtaiJjyUna_tOnxpwFxxjVxtUXsCEdclzlpkBr36Ep6WJDh25BFwWQ40bmi8NsrxU5hFxaQZFlNmu_F7_NpGwhE0RXITxf6GbEEQd7KTB3RqZjrE8o1kORGg1V26basvvhKcjorSbQfcEEiKRCPDW7JSTOHNHyDqQJI29CsEcIMoRBqIvTfOBZi1UZi5I_0Z84gWWr9-0O0">
+<ul>
+<li>java.io包中的输出流区分子节点与过滤流</li>
+</ul>
+<img src="http://www.plantuml.com/plantuml/svg/tP9DQm8n48Rl_ee1BvQwly1UAgtGqmeUfOSaJZ2IRfR9n0zQ_xiVQs4riu9NRs7oJ9BtcIWTcPHXC5x526NYEl6C2TKF_FO0Na7z4-lW5h0XnpXm5OD-0LvIs4JuAZ-t1cjseJftj42zOmGz_tw47SBf-61ji_1OtU-sFiNbu3vZV8WeC_jU4trylFwTIEtQ3Yvx4-THBZDIvgn_hJ4a7jrcVKQ1fLwXOK7JrDMu4EhZP2sIkFMXM4adqJ7GfNBb-EslA3ecc7FPD4NaPh8290JEeJoyy6kQvqiwkk1CK1VOLWO7">
+<h2 id="Java-I-O库的设计原则"><a href="#Java-I-O库的设计原则" class="headerlink" title="Java I/O库的设计原则"></a>Java I/O库的设计原则</h2><p>Java的I/O库给我们提供了一个称作连接的机制。可以将一个流与另一个流首尾相接，形成一个流管道的链接。这种机制实际上是一种被称为Decorator（装饰）设计模式的应用。<br>装饰模式又名包装（Wrapper）模式。它以对客户端透明的方式扩展<strong>对象</strong>的功能，<strong>动态</strong>的给一个对象附加上更多的责任，换言之，客户端并不会觉得对象在装饰前和装饰后有什么不同。它是继承关系的一个替代方案，可以在不创建更多子类的情况下，通过创建一个包装对象来将对象的功能动态的加以扩展。<br><strong>装饰模式把客户端的调用委派到被装饰类</strong>。装饰模式的关键在于这种扩展是完全透明的。  </p>
+<h2 id="装饰模式的角色"><a href="#装饰模式的角色" class="headerlink" title="装饰模式的角色"></a>装饰模式的角色</h2><ul>
+<li>抽象构件角色（Component）：给出一个抽象接口，以规范准备接收附加责任的对象。</li>
+<li>具体构件角色（Concrete Component）：定义一个将要接收附加责任的类。</li>
+<li>装饰角色（Decorator）：<strong>持有一个构件（Component）对象的引用</strong>，并定义一个与抽象构件接口一致的接口。</li>
+<li>具体装饰角色（Concrete Decorator）：负责给构件对象“贴上”附加的责任。</li>
+</ul>
+<p>代码实现：<br>抽象构件角色：</p>
+<pre><code>public interface Component {
+    void doSomeThing();
+}
+</code></pre><p>具体构件角色:</p>
+<pre><code>public class ConcreteComponent implements Component {
+    @Override
+    public void doSomeThing(){
+        System.out.println(&quot;Function A:具体构件实现的功能&quot;);
+    }
+}
+</code></pre><p>装饰角色:</p>
+<pre><code>public class Decorator implements Component {
+    //持有一个构件对象的引用
+    private Component component;
+
+    public Decorator (Component component) {
+        this.component = component;
+    }
+    //通过实现构件对象接口，来定义一个与抽象构件接口一致的接口
+    @Override
+    public void doSomeThing() {
+        component.doSomeThing();
+    }
+}
+</code></pre><p>具体装饰角色B:</p>
+<pre><code>public class ConcreteDecoratorB extends Decorator {
+    @Override
+    public void doSomeThing() {
+        super.doSomeThing();
+        this.doAnotherThing();
+    }
+
+    public void doAnotherThing() {
+        System.out.println(&quot;Function B：具体装饰角色包装的功能&quot;);
+    }
+}
+</code></pre><p>具体装饰角色C:</p>
+<pre><code>public class ConcreteDecoratorC extends Decorator {
+    @Override
+    public void doSomeThing() {
+        super.doSomeThing();
+        this.doAnotherThing();
+    }
+
+    public void doAnotherThing() {
+        System.out.println(&quot;Function C: 具体装饰角色包装的功能&quot;);
+    }
+}
+</code></pre><p>客户端：</p>
+<pre><code>public class Client {
+    public static void main (String[] args) {
+        Component component = new CocreteDecoratorB(new ConcreteDecoratorC(new ConcreteComponent()));
+        component.doSomeThing();
+    }
+}
+---------------------------------------------
+
+Function A：具体构件实现的功
+Function B：具体装饰角色包装的功能
+Function C：具体装饰角色包装的功能
+
+Process finished with exit code 0
+</code></pre><h2 id="装饰模式的特点"><a href="#装饰模式的特点" class="headerlink" title="装饰模式的特点"></a>装饰模式的特点</h2><ul>
+<li>装饰对象和真是对象有相同的接口，如示例中的Decorator对象有与Component对象一样的doSomeThing接口。这样客户端就可以已和真实对象相同的方式和装饰对象交互。</li>
+<li>装饰对象包含一个真是对象的引用，如示例中Decorator持有一个Component类型的字段（<code>private Component component;</code>）</li>
+<li>装饰对象接收所有来自客户端的请求，把这些请求转发给真实的对象，示例中通过重写抽象构件的doSomeThing方法，调用super.doSomeThing()方法实现。</li>
+<li><strong>装饰对象可以在转发这些请求以前或以后增加一些附加功能</strong>。这样就确保了在运行时，不用修改给定对象的结构就可以在外部增加附加的功能。如实例中在重写的doSomeThing方法中调用了具体装饰角色的doAnotherThing()方法。在面向对象设计中，通常是通过继承来实现对给定类的功能扩展。</li>
+</ul>
+<h2 id="装饰模式与继承的区别"><a href="#装饰模式与继承的区别" class="headerlink" title="装饰模式与继承的区别"></a>装饰模式与继承的区别</h2><p>装饰模式：  </p>
+<ul>
+<li>用来扩展<strong>对象</strong>的功能</li>
+<li>不需要子类</li>
+<li><strong>动态的</strong></li>
+<li><strong>运行时</strong>分配职责</li>
+<li>防止由于子类而导致的复杂和混乱</li>
+<li>更多的灵活性</li>
+<li>对于一个给定的对象，同时可能有多个不同的装饰对象，客户端可以通过它的需要选择合适的装饰对象发送消息</li>
+</ul>
+<p>继承：</p>
+<ul>
+<li>用来扩展一<strong>类</strong>对象的功能</li>
+<li>需要子类</li>
+<li><strong>静态的</strong></li>
+<li><strong>编译时</strong>分配职责</li>
+<li>导致很多子类产生</li>
+<li>缺乏灵活性</li>
+</ul>
+<h2 id="装饰模式的适用情况"><a href="#装饰模式的适用情况" class="headerlink" title="装饰模式的适用情况"></a>装饰模式的适用情况</h2><ul>
+<li>想要透明且动态的给对象增加新的职责（方法）而又不影响其他对象。</li>
+<li>给对象增加的职责在未来可能会发生变化。</li>
+<li>用子类扩展功能不实际的情况下。</li>
+</ul>
+<p>参考：圣思园年费课程<br><a href="http://www.iprogramming.cn/netty.html" target="_blank" rel="noopener">《精通并发与Netty》</a></p>
+
+      
     </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/doggie.github.io/tags/Netty/" rel="tag"># Netty</a>
+          
+            <a href="/doggie.github.io/tags/设计模式/" rel="tag"># 设计模式</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/doggie.github.io/2018/04/18/Nginx常用指令使用总结/" rel="next" title="Nginx常用指令使用总结">
+                <i class="fa fa-chevron-left"></i> Nginx常用指令使用总结
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/doggie.github.io/2018/12/29/Item-1/" rel="prev" title="Item-1 考虑使用静态工厂方法代替构造方法">
+                Item-1 考虑使用静态工厂方法代替构造方法 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
   </div>
   
   
   
+  </article>
 
-  
 
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
 
 
           </div>
@@ -389,6 +611,10 @@
 
 
           
+
+  
+
+
 
         </div>
         
@@ -409,8 +635,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -495,6 +730,22 @@
         </div>
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#输入-输出流的概念"><span class="nav-number">1.</span> <span class="nav-text">输入/输出流的概念</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#流的分类"><span class="nav-number">2.</span> <span class="nav-text">流的分类</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Java-I-O库的设计原则"><span class="nav-number">3.</span> <span class="nav-text">Java I/O库的设计原则</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#装饰模式的角色"><span class="nav-number">4.</span> <span class="nav-text">装饰模式的角色</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#装饰模式的特点"><span class="nav-number">5.</span> <span class="nav-text">装饰模式的特点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#装饰模式与继承的区别"><span class="nav-number">6.</span> <span class="nav-text">装饰模式与继承的区别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#装饰模式的适用情况"><span class="nav-number">7.</span> <span class="nav-text">装饰模式的适用情况</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
@@ -658,6 +909,10 @@
 
 
   
+  <script type="text/javascript" src="/doggie.github.io/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/doggie.github.io/js/src/post-details.js?v=5.1.4"></script>
+
+
 
   
 
