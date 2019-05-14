@@ -296,6 +296,168 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://doublexz.github.io/doggie.github.io/doggie.github.io/2019/03/18/Item-10/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Doggie">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/doggie.github.io/images/love.jpeg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="CloudXue's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/doggie.github.io/2019/03/18/Item-10/" itemprop="url">Item-10 重写equals方法时请遵循通用规范</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-03-18T11:09:59+08:00">
+                2019-03-18
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/doggie.github.io/categories/Java/" itemprop="url" rel="index">
+                    <span itemprop="name">Java</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/doggie.github.io/2019/03/18/Item-10/" class="leancloud_visitors" data-flag-title="Item-10 重写equals方法时请遵循通用规范">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <p>重写equals方法很简单，但是很多地方会出错，且后果严重。避免问题的最简单的方式是不重写equals方法，使类的每一个实例只跟它自身相等。如果符合以下任何条件，都是正确的做法：  </p>
+<ul>
+<li><strong>每个类的实例本质上都是唯一的</strong>。这对表示活动实体而非值的类（例如Thread类）来说是正确的。<code>Object</code>类提供的<code>equals</code>实现对这些类来说具有非常正确的行为。  </li>
+<li><strong>类不需要提供“逻辑相等”测试</strong>。例如，<code>java.util.regax.Pattern</code>可以重写equals方法来检查两个<code>Pattern</code>实例是否表示相同的正则表达式，但是设计者不认为客户端需要或者想要这个功能。在这种情况下，从<code>Object</code>类中继承equals实现是理想的选择。</li>
+<li><strong>父类已经重写了equals方法，则父类的行为适合这些子类</strong>。例如，大部分<code>Set</code>实现从<code>AbstractSet</code>继承equals方法实现，<code>List</code>实现从<code>AbstractList</code>继承，<code>Map</code>从<code>AbstractMap</code>继承。  </li>
+<li><strong>类是私有的或包级私有的，可以确定它的equals方法永远不会被调用</strong>。如果你非常厌恶风险，可以重写equals方法来确保它不会被意外地调用：
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/doggie.github.io/2019/03/18/Item-10/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </li></ul></div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://doublexz.github.io/doggie.github.io/doggie.github.io/2019/03/05/Item-9/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1708,174 +1870,6 @@ public class SpellChecker{
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://doublexz.github.io/doggie.github.io/doggie.github.io/2018/04/29/Java中的IO体系架构与装饰模式/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Doggie">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/doggie.github.io/images/love.jpeg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="CloudXue's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/doggie.github.io/2018/04/29/Java中的IO体系架构与装饰模式/" itemprop="url">Java中的IO体系架构与装饰模式</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-29T13:36:40+08:00">
-                2018-04-29
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category">
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/doggie.github.io/categories/Java/" itemprop="url" rel="index">
-                    <span itemprop="name">Java</span>
-                  </a>
-                </span>
-
-                
-                
-                  ， 
-                
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/doggie.github.io/categories/Java/设计模式/" itemprop="url" rel="index">
-                    <span itemprop="name">设计模式</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-             <span id="/doggie.github.io/2018/04/29/Java中的IO体系架构与装饰模式/" class="leancloud_visitors" data-flag-title="Java中的IO体系架构与装饰模式">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <h2 id="输入-输出流的概念"><a href="#输入-输出流的概念" class="headerlink" title="输入/输出流的概念"></a>输入/输出流的概念</h2><p>输入/输出时，数据在通信通道中流动。所谓“数据流（stream）”指的是所有数据通信通道中，数据的起点和终点。信息的通道就是一个数据流。只要是数据从一个地方“流”到另一个地方，这种数据的通道都可以成为数据流。输入/输出是<strong>相对于程序</strong>来说的。程序在使用数据时所扮演的角色有两个：一个是源，一个是目的。若程序是数据流的源，即数据流的提供者，这个数据流对程序来说就是一个“输出数据流”（数据从程序流出）。若程序是数据流的终点，这个数据流对程序而言就是一个“输入数据流”（数据从程序外流向程序）。<br>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/doggie.github.io/2018/04/29/Java中的IO体系架构与装饰模式/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </p></div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1928,7 +1922,7 @@ public class SpellChecker{
               
                 <a href="/doggie.github.io/archives/">
               
-                  <span class="site-state-item-count">21</span>
+                  <span class="site-state-item-count">22</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
