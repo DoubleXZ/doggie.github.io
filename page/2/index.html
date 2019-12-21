@@ -296,6 +296,320 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://doublexz.github.io/doggie.github.io/doggie.github.io/2019/03/30/Item-13/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Doggie">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/doggie.github.io/images/love.jpeg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="CloudXue's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/doggie.github.io/2019/03/30/Item-13/" itemprop="url">Item-13 重写clone方法要谨慎</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-03-30T11:14:04+08:00">
+                2019-03-30
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/doggie.github.io/categories/Java/" itemprop="url" rel="index">
+                    <span itemprop="name">Java</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/doggie.github.io/2019/03/30/Item-13/" class="leancloud_visitors" data-flag-title="Item-13 重写clone方法要谨慎">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <p><code>Cloneable</code>接口路旨在作为一个mixin接口，用于声明类允许克隆。不幸的是，它不能满足这个目标。它的主要缺陷是缺少clone方法，且Object的<code>clone</code>方法是protected的。如果不通过反射，就不能仅仅因为实现了<code>Cloneable</code>接口就在对象上调用<code>clone</code>方法。即使是反射调用也会失败，因为不能保证该对象有一个可访问的<code>clone</code>方法。尽管存在这个缺陷和其他许多问题，但该功能（facility）应用广泛，因此值得去理解它。本条款告诉你如何实现一个行为良好的clone方法，讨论何时适合这样做，并给出替代方法。  </p>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/doggie.github.io/2019/03/30/Item-13/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://doublexz.github.io/doggie.github.io/doggie.github.io/2019/03/23/Item-12/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Doggie">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/doggie.github.io/images/love.jpeg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="CloudXue's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/doggie.github.io/2019/03/23/Item-12/" itemprop="url">Item-12 始终重写toString方法</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-03-23T11:14:00+08:00">
+                2019-03-23
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/doggie.github.io/categories/Java/" itemprop="url" rel="index">
+                    <span itemprop="name">Java</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/doggie.github.io/2019/03/23/Item-12/" class="leancloud_visitors" data-flag-title="Item-12 始终重写toString方法">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <p>尽管Object类提供了一个toString方法的实现，但其返回的字符创通常不是类的使用者想要看到的。该字符串由类的名字后面紧跟@符号和哈希码的无符号十六进制表示组成，例如：PhoneNumber@163b91。toSting的通用规范是这么说的：返回的字符串应该是“一个简洁但信息丰富的表示，以便人们阅读”。尽管可以认为PhoneNumber@163b91是简洁易读的，但与707-867-5309相比，其信息量不大。toString规范还说“建议所有的子类重写该方法”。这确实是一个好的建议。<br>&emsp;&emsp;尽管遵循toString规范没有遵循equals和hashCode规范要紧(Item 10 和 11)，<strong>提供良好的toString实现会使你的类使用起来更愉快，并且使使用该类的系统更易于调试</strong>。把对象传递给print、printf，字符串连接运算，或断言，或者调试器打印时，会自动调用toString方法。即使你永远不会在某个对象上调用toString方法，其他对象也会。例如，一个含有你自定义对象引用的组件会在日志错误信息中包含该对象的字符串实现。如果你没有重写toString方法，日志信息虽然很全但是没有用处。<br>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/doggie.github.io/2019/03/23/Item-12/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </p></div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://doublexz.github.io/doggie.github.io/doggie.github.io/2019/03/22/Item-11/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1560,320 +1874,6 @@ public class SpellChecker{
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://doublexz.github.io/doggie.github.io/doggie.github.io/2019/01/11/Item-3/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Doggie">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/doggie.github.io/images/love.jpeg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="CloudXue's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/doggie.github.io/2019/01/11/Item-3/" itemprop="url">Item-3 强制对单例属性使用私有构造方法和枚举类型</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-01-11T17:24:52+08:00">
-                2019-01-11
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category">
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/doggie.github.io/categories/Java/" itemprop="url" rel="index">
-                    <span itemprop="name">Java</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-             <span id="/doggie.github.io/2019/01/11/Item-3/" class="leancloud_visitors" data-flag-title="Item-3 强制对单例属性使用私有构造方法和枚举类型">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <p>单例是一个只实例化一次的类[Gamma95]。单例要么表示一个无状态的对象（比如函数，条款25），要么表示一个本质上独一无二的系统组件。<strong>将一个类创建为单例会导致它的客户端代码很难测试，</strong>因为我们无法为单例替换模拟实现，除非实现了作为其类型的接口。<br>&emsp;&emsp;有两种实现单例的通用方式。他们的做法都是将构造方法设为私有并且导出一个公有的静态成员来提供对<strong>唯一</strong>实例的访问，在第一种方式中，该成员变量是final字段。<br>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/doggie.github.io/2019/01/11/Item-3/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </p></div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://doublexz.github.io/doggie.github.io/doggie.github.io/2019/01/10/Item-2/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Doggie">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/doggie.github.io/images/love.jpeg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="CloudXue's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/doggie.github.io/2019/01/10/Item-2/" itemprop="url">Item-2 当面对很多构造方法参数时，请考虑使用构建器</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-01-10T16:52:25+08:00">
-                2019-01-10
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category">
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/doggie.github.io/categories/Java/" itemprop="url" rel="index">
-                    <span itemprop="name">Java</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-             <span id="/doggie.github.io/2019/01/10/Item-2/" class="leancloud_visitors" data-flag-title="Item-2 当面对很多构造方法参数时，请考虑使用构建器">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <p>&emsp;&emsp;静态工厂和构造方法有共同的限制：他们面对大量可选参数的时候不能很好的扩展。想想一下出现在食品包装背面代表营养成分的类。这个标签中有几个必要的字段-分量大小、每瓶容量以及每份的卡路里数，还有20多个可选的字段，如总脂肪量、饱和脂肪酸、反式脂肪酸、胆固醇以及钠元素等等。大多数产品中，只有几项可选字段有非零值。<br>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/doggie.github.io/2019/01/10/Item-2/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </p></div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1926,7 +1926,7 @@ public class SpellChecker{
               
                 <a href="/doggie.github.io/archives/">
               
-                  <span class="site-state-item-count">23</span>
+                  <span class="site-state-item-count">25</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
