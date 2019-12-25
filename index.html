@@ -400,7 +400,15 @@
       
         
           
-            
+            <p>返回Class对象代表的(类、接口、数组类、原生类型或者void)实体的名字：  </p>
+<ul>
+<li>如果class对象表示一个引用类型而非数组类型，那么返回Java语言规范指定的该类的二进制名字；</li>
+<li>如果class对象表示一个原生类型或void，那么返回的名字是与原生类型或者void相关的Java语言关键字；  </li>
+<li>如果class对象表示一个数组类，那么返回的名字的内部形式是：元素类型的名字前加数组位数个’[‘字符。  </li>
+</ul>
+<p>元素类型的名字编码如下：<br> Element Type | Encoding<br>—|—<br>boolean | Z<br>byte | B<br>char | C<br>class or interface | Lclassname;<br>double | D<br>float | F<br>int | I<br>long | J<br>short | S</p>
+<p>类或接口的<code>classname</code>是class对象的二进制名字，例如：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">String.class.getName()</span><br><span class="line">    returns &quot;java.lang.String&quot;</span><br><span class="line">byte.class.getName()</span><br><span class="line">    returns &quot;byte&quot;</span><br><span class="line">(new Object[3]).getClass().getName()</span><br><span class="line">    returns &quot;[Ljava.lang.Object;&quot;</span><br><span class="line">(new int[3][4][5][6][7][8][9]).getClass().getName()</span><br><span class="line">    returns &quot;[[[[[[[I&quot;</span><br></pre></td></tr></table></figure></p>
+
           
         
       

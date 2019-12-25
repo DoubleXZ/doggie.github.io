@@ -3,7 +3,7 @@
   <entry>
     <title><![CDATA[Class类中的getName方法]]></title>
     <url>%2Fdoggie.github.io%2F2019%2F12%2F25%2FClass%E7%B1%BB%E4%B8%AD%E7%9A%84getName%E6%96%B9%E6%B3%95%2F</url>
-    <content type="text"></content>
+    <content type="text"><![CDATA[返回Class对象代表的(类、接口、数组类、原生类型或者void)实体的名字： 如果class对象表示一个引用类型而非数组类型，那么返回Java语言规范指定的该类的二进制名字； 如果class对象表示一个原生类型或void，那么返回的名字是与原生类型或者void相关的Java语言关键字； 如果class对象表示一个数组类，那么返回的名字的内部形式是：元素类型的名字前加数组位数个’[‘字符。 元素类型的名字编码如下： Element Type | Encoding—|—boolean | Zbyte | Bchar | Cclass or interface | Lclassname;double | Dfloat | Fint | Ilong | Jshort | S 类或接口的classname是class对象的二进制名字，例如：12345678String.class.getName() returns &quot;java.lang.String&quot;byte.class.getName() returns &quot;byte&quot;(new Object[3]).getClass().getName() returns &quot;[Ljava.lang.Object;&quot;(new int[3][4][5][6][7][8][9]).getClass().getName() returns &quot;[[[[[[[I&quot;]]></content>
       <categories>
         <category>Java</category>
       </categories>
