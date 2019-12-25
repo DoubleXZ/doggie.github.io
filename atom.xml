@@ -6,7 +6,7 @@
   <link href="/doggie.github.io/atom.xml" rel="self"/>
   
   <link href="https://doublexz.github.io/doggie.github.io/"/>
-  <updated>2019-12-21T00:28:32.610Z</updated>
+  <updated>2019-12-25T01:36:51.873Z</updated>
   <id>https://doublexz.github.io/doggie.github.io/</id>
   
   <author>
@@ -15,6 +15,49 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Class类中的getName方法</title>
+    <link href="https://doublexz.github.io/doggie.github.io/2019/12/25/Class%E7%B1%BB%E4%B8%AD%E7%9A%84getName%E6%96%B9%E6%B3%95/"/>
+    <id>https://doublexz.github.io/doggie.github.io/2019/12/25/Class类中的getName方法/</id>
+    <published>2019-12-25T01:36:24.000Z</published>
+    <updated>2019-12-25T01:36:51.873Z</updated>
+    
+    <summary type="html">
+    
+    </summary>
+    
+      <category term="Java" scheme="https://doublexz.github.io/doggie.github.io/categories/Java/"/>
+    
+    
+      <category term="JVM" scheme="https://doublexz.github.io/doggie.github.io/tags/JVM/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>SpringBoot应用启动流程源码分析</title>
+    <link href="https://doublexz.github.io/doggie.github.io/2019/12/21/SpringBoot%E5%BA%94%E7%94%A8%E5%90%AF%E5%8A%A8%E6%B5%81%E7%A8%8B%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/"/>
+    <id>https://doublexz.github.io/doggie.github.io/2019/12/21/SpringBoot应用启动流程源码分析/</id>
+    <published>2019-12-21T00:56:54.000Z</published>
+    <updated>2019-12-25T08:41:00.733Z</updated>
+    
+    <content type="html"><![CDATA[<p>在main方法中调用<code>SpringApplication.run(SpringLectureApplication.class, args)</code>，传入我们自己编写的启动类的class对象<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">//run方法的具化形式</span><br><span class="line">public static ConfigurableApplicationContext run(Class&lt;?&gt; primarySource,</span><br><span class="line">        String... args) &#123;</span><br><span class="line">    return run(new Class&lt;?&gt;[] &#123; primarySource &#125;, args);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">//run方法的泛化形式</span><br><span class="line">public static ConfigurableApplicationContext run(Class&lt;?&gt;[] primarySources,</span><br><span class="line">        String[] args) &#123;</span><br><span class="line">    return new SpringApplication(primarySources).run(args);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p><hr><p>在run方法中，通过构造方法创建<code>SpringApplication</code>实例，然后调用实例run方法进行启动。创建<code>SpringApplication</code>实例时，应用上下文将会从特定的源中加载beans，且该实例可以在调用之前被定制。<br>分析<code>SpringApplication</code>的构造方法：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">//SpringApplication构造方法的具化形式</span><br><span class="line">public SpringApplication(Class&lt;?&gt;... primarySources) &#123;</span><br><span class="line">    this(null, primarySources);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">//SpringApplication构造方法的泛化形式</span><br><span class="line">public SpringApplication(ResourceLoader resourceLoader, Class&lt;?&gt;... primarySources) &#123;</span><br><span class="line">    this.resourceLoader = resourceLoader;</span><br><span class="line">    Assert.notNull(primarySources, &quot;PrimarySources must not be null&quot;);</span><br><span class="line">    this.primarySources = new LinkedHashSet&lt;&gt;(Arrays.asList(primarySources));</span><br><span class="line">    //根据类路径中的jar包名字推断应用类型： NONE、SERVLET、REACTIVE</span><br><span class="line">    this.webApplicationType = WebApplicationType.deduceFromClasspath();</span><br><span class="line">    //先获取初始化器实例集合，再设置初始化器</span><br><span class="line">    setInitializers((Collection) getSpringFactoriesInstances(</span><br><span class="line">            ApplicationContextInitializer.class));</span><br><span class="line">    //设置监听器</span><br><span class="line">    setListeners((Collection) getSpringFactoriesInstances(ApplicationListener.class));</span><br><span class="line">    //主类名赋值</span><br><span class="line">    this.mainApplicationClass = deduceMainApplicationClass();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p><hr><p>重点分析<code>SpringApplication</code>中的<code>(Collection) getSpringFactoriesInstances(            ApplicationContextInitializer.class)</code>方法，获取初始化器集合：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">//getSpringFactoriesInstances方法的具化形式</span><br><span class="line">private &lt;T&gt; Collection&lt;T&gt; getSpringFactoriesInstances(Class&lt;T&gt; type) &#123;</span><br><span class="line">    return getSpringFactoriesInstances(type, new Class&lt;?&gt;[] &#123;&#125;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">//getSpringFactoriesInstances方法的泛化形式 获取Spring工厂名字</span><br><span class="line">private &lt;T&gt; Collection&lt;T&gt; getSpringFactoriesInstances(Class&lt;T&gt; type,</span><br><span class="line">        Class&lt;?&gt;[] parameterTypes, Object... args) &#123;</span><br><span class="line">    ClassLoader classLoader = getClassLoader();</span><br><span class="line">    // Use names and ensure unique to protect against duplicates</span><br><span class="line">    //获得Spring中实现了type接口类的全限定类名集合</span><br><span class="line">    Set&lt;String&gt; names = new LinkedHashSet&lt;&gt;(</span><br><span class="line">            SpringFactoriesLoader.loadFactoryNames(type, classLoader));</span><br><span class="line">    //根据全限定类名，通过反射创建Spring工厂实例集合</span><br><span class="line">    List&lt;T&gt; instances = createSpringFactoriesInstances(type, parameterTypes,</span><br><span class="line">            classLoader, args, names);</span><br><span class="line">    AnnotationAwareOrderComparator.sort(instances);</span><br><span class="line">    return instances;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p><hr><p>首先获取实现了<code>ApplicationContextInitializer</code>接口类的全限定类名集合：<br>在获取过程中，会将读取到的所有内容加载到缓存中，方便后续使用，该缓存为<code>org.springframework.core.io.support.SpringFactoriesLoader.java</code>类中定义的成员变量：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">private static final Map&lt;ClassLoader, MultiValueMap&lt;String, String&gt;&gt; cache = new ConcurrentReferenceHashMap&lt;&gt;();</span><br></pre></td></tr></table></figure></p><p>加载过程：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">private static Map&lt;String, List&lt;String&gt;&gt; loadSpringFactories(@Nullable ClassLoader classLoader) &#123;</span><br><span class="line">    //原数据结构</span><br><span class="line">    //MultiValueMap&lt;String, String&gt; result = cache.get(classLoader);</span><br><span class="line">    //个人认为这种定义方式更好理解</span><br><span class="line">    MultiValueMap&lt;String, List&lt;String&gt;&gt; result = cache.get(classLoader);</span><br><span class="line">    if (result != null) &#123;</span><br><span class="line">        return result;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    try &#123;</span><br><span class="line">        //根据给定的名字,(从类路径中)找到所有的资源</span><br><span class="line">        Enumeration&lt;URL&gt; urls = (classLoader != null ?</span><br><span class="line">                classLoader.getResources(FACTORIES_RESOURCE_LOCATION) :</span><br><span class="line">                ClassLoader.getSystemResources(FACTORIES_RESOURCE_LOCATION));</span><br><span class="line">        result = new LinkedMultiValueMap&lt;&gt;();</span><br><span class="line">        while (urls.hasMoreElements()) &#123;</span><br><span class="line">            URL url = urls.nextElement();</span><br><span class="line">            UrlResource resource = new UrlResource(url);</span><br><span class="line">            Properties properties = PropertiesLoaderUtils.loadProperties(resource);</span><br><span class="line">            for (Map.Entry&lt;?, ?&gt; entry : properties.entrySet()) &#123;</span><br><span class="line">                String factoryClassName = ((String) entry.getKey()).trim();</span><br><span class="line">                for (String factoryName : StringUtils.commaDelimitedListToStringArray((String) entry.getValue())) &#123;</span><br><span class="line">                    result.add(factoryClassName, factoryName.trim());</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        //将才spring.factories中读取的内容放入缓存中</span><br><span class="line">        cache.put(classLoader, result);</span><br><span class="line">        return result;</span><br><span class="line">    &#125;</span><br><span class="line">    catch (IOException ex) &#123;</span><br><span class="line">        throw new IllegalArgumentException(&quot;Unable to load factories from location [&quot; +</span><br><span class="line">                FACTORIES_RESOURCE_LOCATION + &quot;]&quot;, ex);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p><p>从哪些里获取这些资源呢？答案是从约定的文件中获取：<br>通过Debug发现，这些资源从<code>META-INF/spring.factories</code>文件中加载，加载的路径包括：<br><code>spring-boot-autoconfiguration-version.jar/META-INF/spring.factories</code><br><code>spring-boot-version.jar/META-INF/spring.factories</code><br><code>spring-beans-version.jar/META-INF/spring.factories</code>  </p><p>分析<code>spring.factories</code>文件的内容得出：<br>其格式遵从properties文件规范，以key和value对的形式配置，多个value值中间使用逗号分隔。主要配置了Initializers、Application Listeners、Auto Configuration Import Listeners、Auto Configuration Import Filters、Auto Configure、Failure analyzers、Template availability providers等相关的实现类，这些类用于完成Spring Boot的一系列功能。<br>通过文件流的形式依次读取，将读取到的内容放入<code>LinkedMultiValueMap</code>中，key为<code>spring.factories</code>中读取到的key，value为key对应value值的一个并集，即把多个文件中相同key值对应的value进行去重后合并。  </p><p>最后将<code>LinkedMultiValueMap&lt;String,List&lt;String&gt;()</code>作为value,类加载器作为key放入缓存<code>MultiValueMap&lt;String, List&lt;String&gt;&gt;</code>  </p><hr><p>拿到全限定类名后，使用反射创建实例<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">private &lt;T&gt; List&lt;T&gt; createSpringFactoriesInstances(Class&lt;T&gt; type,</span><br><span class="line">        Class&lt;?&gt;[] parameterTypes, ClassLoader classLoader, Object[] args,</span><br><span class="line">        Set&lt;String&gt; names) &#123;</span><br><span class="line">    //创建一个已知大小的集合用于存储实例对象        </span><br><span class="line">    List&lt;T&gt; instances = new ArrayList&lt;&gt;(names.size());</span><br><span class="line">    //循环全限定类名集合</span><br><span class="line">    for (String name : names) &#123;</span><br><span class="line">        try &#123;</span><br><span class="line">            //获取Class对象</span><br><span class="line">            Class&lt;?&gt; instanceClass = ClassUtils.forName(name, classLoader);</span><br><span class="line">            Assert.isAssignable(type, instanceClass);</span><br><span class="line">            //获取Constructor对象</span><br><span class="line">            Constructor&lt;?&gt; constructor = instanceClass</span><br><span class="line">                    .getDeclaredConstructor(parameterTypes);</span><br><span class="line">            //反射创建实例</span><br><span class="line">            T instance = (T) BeanUtils.instantiateClass(constructor, args);</span><br><span class="line">            instances.add(instance);</span><br><span class="line">        &#125;</span><br><span class="line">        catch (Throwable ex) &#123;</span><br><span class="line">            throw new IllegalArgumentException(</span><br><span class="line">                    &quot;Cannot instantiate &quot; + type + &quot; : &quot; + name, ex);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    return instances;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p><p>以上为创建初始化器实例并设置的过程，该过程完毕后，会设置监听器：从缓存中拿到实现了<code>ApplicationListener</code>接口的类名集合，通过反射创建实例集合，最后完成赋值。  </p><p>最后会推断主类名，比较讨巧的是，通过运行期异常的堆栈信息来获取。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">private Class&lt;?&gt; deduceMainApplicationClass() &#123;</span><br><span class="line">    try &#123;</span><br><span class="line">        StackTraceElement[] stackTrace = new RuntimeException().getStackTrace();</span><br><span class="line">        //循环遍历堆栈元素</span><br><span class="line">        for (StackTraceElement stackTraceElement : stackTrace) &#123;</span><br><span class="line">            if (&quot;main&quot;.equals(stackTraceElement.getMethodName())) &#123;</span><br><span class="line">                return Class.forName(stackTraceElement.getClassName());</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    catch (ClassNotFoundException ex) &#123;</span><br><span class="line">        // Swallow and continue</span><br><span class="line">    &#125;</span><br><span class="line">    return null;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;在main方法中调用&lt;code&gt;SpringApplication.run(SpringLectureApplication.class, args)&lt;/code&gt;，传入我们自己编写的启动类的class对象&lt;br&gt;&lt;figure class=&quot;highlight pla
+      
+    
+    </summary>
+    
+      <category term="Java" scheme="https://doublexz.github.io/doggie.github.io/categories/Java/"/>
+    
+    
+      <category term="SpringBoot" scheme="https://doublexz.github.io/doggie.github.io/tags/SpringBoot/"/>
+    
+  </entry>
   
   <entry>
     <title>@Configuration注解深入详解</title>
@@ -210,9 +253,9 @@ class Point {
       <category term="Java" scheme="https://doublexz.github.io/doggie.github.io/categories/Java/"/>
     
     
-      <category term="Java多线程编程" scheme="https://doublexz.github.io/doggie.github.io/tags/Java%E5%A4%9A%E7%BA%BF%E7%A8%8B%E7%BC%96%E7%A8%8B/"/>
-    
       <category term="Netty" scheme="https://doublexz.github.io/doggie.github.io/tags/Netty/"/>
+    
+      <category term="Java多线程编程" scheme="https://doublexz.github.io/doggie.github.io/tags/Java%E5%A4%9A%E7%BA%BF%E7%A8%8B%E7%BC%96%E7%A8%8B/"/>
     
   </entry>
   
@@ -437,60 +480,6 @@ class Point {
       &lt;p&gt;在需要&lt;strong&gt;一个对象&lt;/strong&gt;时，总是重复使用单个对象来代替创建一个具备等价功能的新对象。重用既快速又时尚。如果对象是不可变的，那么它总是可以被重用（Item 17）。&lt;br&gt;&amp;emsp;&amp;emsp;作为禁止的极端案例，思考以下情景：  &lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;String s = new String(&amp;quot;bikini&amp;quot;); //DON&amp;apos;T DO THIS
 &lt;/code&gt;&lt;/pre&gt;
-    
-    </summary>
-    
-      <category term="Java" scheme="https://doublexz.github.io/doggie.github.io/categories/Java/"/>
-    
-    
-      <category term="Effective Java 3rd" scheme="https://doublexz.github.io/doggie.github.io/tags/Effective-Java-3rd/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Item-5 优先选择依赖注入而非硬编码资源的关联关系</title>
-    <link href="https://doublexz.github.io/doggie.github.io/2019/02/11/Item-5/"/>
-    <id>https://doublexz.github.io/doggie.github.io/2019/02/11/Item-5/</id>
-    <published>2019-02-11T09:47:31.000Z</published>
-    <updated>2019-04-10T06:35:14.080Z</updated>
-    
-    <content type="html"><![CDATA[<p>许多类依赖一个或多个底层资源。例如，拼写检查依赖于字典。<strong>我们常常会看到这种类被实现为静态辅助类</strong>（Item 4）：  </p><pre><code>//Inappropriate use of static utility - inflexiable &amp; untestable!public class SpellChecker{    private static final Lexicon dictionary = ...;    private SpellChecker(){} //Noninstantiable    public static boolean isValid(String word) {...}    public static List&lt;String&gt; suggestions(String typo) {...}}</code></pre><a id="more"></a><p><strong>与之类似，我们有时也会看到这些类被实现为单例</strong>（Item 3）：</p><pre><code>//Inappropriate use of singleton - inflexible &amp; untestable !public class SpellChecker{    private final Lexicon dictionary = ...;    private SpellChecker(...) {}    public static INSTANCE = new SpellChecker(...);    public boolean isValid(String word) {...}    public List&lt;String&gt; suggestions(String typo) {...}}</code></pre><p>&emsp;&emsp;以上两种方式没有一种是令人满意的，因为他们都假设只有一个字典<strong>可供使用</strong>。在实际中每一门语言都有它自己的字典，并且特殊字典用于特殊词汇。此外，我们还需要一个特殊字典进行测试。 <strong>认为一个字典能够满足所有情况只不过是一种美好的愿望罢了</strong>。<br>&emsp;&emsp;你可以尝试将dictionary字段定义为非final的，并且添加一个方法改变在已存在的拼写检查实例中修改字典来让<code>SpellChecker</code>类支持多种字典，<strong>不过这么做有些笨拙、易出错，并且在并发设置下无法正常工作</strong>。<br>&emsp;&emsp;<strong>我们所需要的是支持类的多个实例的能力（在该示例中就是SpellCheck）,每个实例都会使用客户端所需要的资源（在该示例中就是字典）</strong>。满足这个需要的一个简单模式是<strong>在创建一个新实例的时候将资源传递给构造方法</strong>。这是依赖注入的一种形式：字典是拼写检查器的依赖并且在创建拼写检查实例的时候将字典注入进去。  </p><pre><code>//Dependency injection provides flexibility and testabilitypublic class SpellChecker {    private final Lexicon dictionary;    public SpellChecker(Lexicon dictionary) {        this.dictionary = Objects.requireNonNull(dictionary);    }    public boolean isValid(String word) {...}    public List&lt;String&gt; suggestions (String typo) {...}}</code></pre><p>&emsp;&emsp;依赖注入模式太简单了以至于许多程序员使用它多年，只不过尚不知道它还有这个名字而已。尽管我们的拼写检查器示例只有单个资源（字典），不过依赖注入<strong>可用于</strong>任意数量的资源和任意依赖图表。它能够保证不变性（Item 17），这样多客户端可以共享依赖对象（假设这些客户端需要相同的底层资源）。依赖注入适合于构造方法、静态工厂（Item 1）和构建器（Item 2）。<br>&emsp;&emsp;<strong>该模式的一个很有用的变种是将资源工厂传递给构造方法</strong>。工厂是一个可以被重复调用连创建不同实例的对象。<strong>这种工厂是工厂方法模式的一种具化形式</strong>[Gamma95].Java 8中介绍的<code>Supplier&lt;T&gt;</code>接口非常适合于表示工厂。那些包含<code>Supplier&lt;T&gt;</code>入参的方法通过绑定的通配符类型来限制工厂的类型参数，<strong>从而可以让客户端传递的工厂能够创建所指定类型的任何子类型</strong>。例如，下面这个方法使用客户端提供的用于生成每个瓷砖的工厂来创建一个马赛克：  </p><pre><code>Mosaic create(Supplier&lt;? extends Tile&gt; tileFactory) {...}</code></pre><p>&emsp;&emsp;尽管依赖注入极大地提高了灵活性和可测性，但是它会让严格约束成千上万依赖的大项目变得混乱。<strong>这种混乱可以通过依赖注入框架来消除，比如说Dagger、Guice、或者Spring</strong>。这些框架的使用超出了本书的范围，但是请注意： 那些专为手动依赖注入而设计的API通常适用于这些框架。<br>&emsp;&emsp;总结一下，如果一个类依赖于一个或多个底层资源，而这些底层资源的行为会影响这个类的行为，那么请不要使用单例或者静态辅助类来实现 ，也不要让类直接创建这些资源。相反，传递一个资源或者工厂到构造方法（或者静态工厂和构建器）来创建它们。这种实践被称为依赖注入，将极大的增强类的灵活性、重用性和可测试性。</p>]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;许多类依赖一个或多个底层资源。例如，拼写检查依赖于字典。&lt;strong&gt;我们常常会看到这种类被实现为静态辅助类&lt;/strong&gt;（Item 4）：  &lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;//Inappropriate use of static utility - inflexiable &amp;amp; untestable!
-public class SpellChecker{
-    private static final Lexicon dictionary = ...;
-
-    private SpellChecker(){} //Noninstantiable
-
-    public static boolean isValid(String word) {...}
-    public static List&amp;lt;String&amp;gt; suggestions(String typo) {...}
-}
-&lt;/code&gt;&lt;/pre&gt;
-    
-    </summary>
-    
-      <category term="Java" scheme="https://doublexz.github.io/doggie.github.io/categories/Java/"/>
-    
-    
-      <category term="Effective Java 3rd" scheme="https://doublexz.github.io/doggie.github.io/tags/Effective-Java-3rd/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Item-4 使用私有构造方法禁止类的实例化</title>
-    <link href="https://doublexz.github.io/doggie.github.io/2019/02/11/Item-4/"/>
-    <id>https://doublexz.github.io/doggie.github.io/2019/02/11/Item-4/</id>
-    <published>2019-02-11T09:41:34.000Z</published>
-    <updated>2019-04-10T06:33:58.751Z</updated>
-    
-    <content type="html"><![CDATA[<p>有时候，你会编写这样一个类，它仅包含一组静态方法和静态字段。<strong>这种类有一个不太好的名声，因为有些人会滥用他们，不从对象的角度来思考，而是坚信他们的想法是正确无误的。</strong>。它们可用于将针对原生值或者数组的方法<strong>划分到一起</strong>，就像在<code>java.lang.Math</code>和<code>java.util.Arrays</code>中一样。<strong>还可以将静态方法划分到一起，包括工厂（Item 1），用于实现了某个接口的对象，比如说<code>java.util.Collections</code></strong>。（在Java 8中，你可以把这类方法放在接口中，如果想要自己修改）最后，还可以将针对final类的方法划分到一起，因为你不能把他们放在子类中。<a id="more"></a><br>&emsp;&emsp;这些<strong>辅助类</strong>不是为了实例化而设计的：<strong>实例本身是荒谬的</strong>。然而，若没有显示的构造方法，编译器就会提供一个公有的无参的默认构造方法。对用户而言，很难区分这个构造方法与其他构造方法。<strong>我们常常会在已发布的API中看到无意中被实例化的类</strong>。<br>&emsp;&emsp;<strong>通过把类定义成抽象类的方式来强制禁止实例化是不可行的。</strong>类可以被子类化，并且子类可以实例化的。此外，它误导用户认为此类是为继承而设计的（Item 19）。然而，有一个简单的方式可以确保类无法被实例化。只有一个类没有显示构造方法时，才会生成一个默认构造方法，因此可以通过在类中增加一个私有构造方法来确保类无法被实例化。  </p><pre><code>//Noninstantiable utility classpublic class UtilityClass {    //Supperss default constructor for noninstantiability    private UtilityClass(){        throw new AssertionError();    }    ... //Remainder omitted}</code></pre><p>&emsp;&emsp;因为显示构造方法是私有的，它在类之外是不能被访问的。<code>AssertionError</code>严格来说是不需要的，但是它提供了一层保险，一旦在类中偶然的调用了构造方法。这保证了类在任何情况下不能实例化。这个惯用方法有点反直觉，因为提供构造方法的目的仅仅是为了不能被实例化。因此更明智的做法是加上注释，就像前面展示的一样。<br>&emsp;&emsp;这种做法的副作用是导致类不能被子类化。所有构造方法都得显示或隐式的调用父类构造方法，而子类在这种情况下没有可访问到的父类构造方法去调用。</p>]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;有时候，你会编写这样一个类，它仅包含一组静态方法和静态字段。&lt;strong&gt;这种类有一个不太好的名声，因为有些人会滥用他们，不从对象的角度来思考，而是坚信他们的想法是正确无误的。&lt;/strong&gt;。它们可用于将针对原生值或者数组的方法&lt;strong&gt;划分到一起&lt;/strong&gt;，就像在&lt;code&gt;java.lang.Math&lt;/code&gt;和&lt;code&gt;java.util.Arrays&lt;/code&gt;中一样。&lt;strong&gt;还可以将静态方法划分到一起，包括工厂（Item 1），用于实现了某个接口的对象，比如说&lt;code&gt;java.util.Collections&lt;/code&gt;&lt;/strong&gt;。（在Java 8中，你可以把这类方法放在接口中，如果想要自己修改）最后，还可以将针对final类的方法划分到一起，因为你不能把他们放在子类中。
     
     </summary>
     
