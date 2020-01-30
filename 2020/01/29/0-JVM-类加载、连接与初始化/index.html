@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="Effective Java 3rd,">
+  <meta name="keywords" content="JVM,">
 
 
 
@@ -81,18 +81,18 @@
 
 
 
-<meta name="description" content="有时候，你可能想要编写组合了实例字段的类没有其他任何目的：   //Degenerate classes like this should not be public ! class Point {     public double x;     public double y; }">
-<meta name="keywords" content="Effective Java 3rd">
+<meta name="description" content="Java程序运行的过程在Java代码中，类型的加载、连接与初始化过程都是在程序运行期间完成的，这样就提供了更大的灵活性，增加了更多的可能性。    加载： 指的是查找并加载类的二进制数据，将类的.class文件中的二进制数据读入到内存中，将其放在运行时数据区的方法区内，然后在内存中创建一个java.lang.Class对象（规范并未说明Class对象位于哪里，HotSpot虚拟机将其放在了方法区中">
+<meta name="keywords" content="JVM">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Item-16 在公共类中，使用访问器方法，而不是公共字段">
-<meta property="og:url" content="https://doublexz.github.io/doggie.github.io/2019/04/16/Item-16/index.html">
+<meta property="og:title" content="0_JVM_类加载、连接与初始化">
+<meta property="og:url" content="https://doublexz.github.io/doggie.github.io/2020/01/29/0-JVM-类加载、连接与初始化/index.html">
 <meta property="og:site_name" content="CloudXue&#39;s Blog">
-<meta property="og:description" content="有时候，你可能想要编写组合了实例字段的类没有其他任何目的：   //Degenerate classes like this should not be public ! class Point {     public double x;     public double y; }">
+<meta property="og:description" content="Java程序运行的过程在Java代码中，类型的加载、连接与初始化过程都是在程序运行期间完成的，这样就提供了更大的灵活性，增加了更多的可能性。    加载： 指的是查找并加载类的二进制数据，将类的.class文件中的二进制数据读入到内存中，将其放在运行时数据区的方法区内，然后在内存中创建一个java.lang.Class对象（规范并未说明Class对象位于哪里，HotSpot虚拟机将其放在了方法区中">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-04-17T06:03:10.783Z">
+<meta property="og:updated_time" content="2020-01-30T06:04:14.665Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Item-16 在公共类中，使用访问器方法，而不是公共字段">
-<meta name="twitter:description" content="有时候，你可能想要编写组合了实例字段的类没有其他任何目的：   //Degenerate classes like this should not be public ! class Point {     public double x;     public double y; }">
+<meta name="twitter:title" content="0_JVM_类加载、连接与初始化">
+<meta name="twitter:description" content="Java程序运行的过程在Java代码中，类型的加载、连接与初始化过程都是在程序运行期间完成的，这样就提供了更大的灵活性，增加了更多的可能性。    加载： 指的是查找并加载类的二进制数据，将类的.class文件中的二进制数据读入到内存中，将其放在运行时数据区的方法区内，然后在内存中创建一个java.lang.Class对象（规范并未说明Class对象位于哪里，HotSpot虚拟机将其放在了方法区中">
 
 
 
@@ -122,13 +122,13 @@
 
 
 
-  <link rel="canonical" href="https://doublexz.github.io/doggie.github.io/2019/04/16/Item-16/">
+  <link rel="canonical" href="https://doublexz.github.io/doggie.github.io/2020/01/29/0-JVM-类加载、连接与初始化/">
 
 
 
 
 
-  <title>Item-16 在公共类中，使用访问器方法，而不是公共字段 | CloudXue's Blog</title>
+  <title>0_JVM_类加载、连接与初始化 | CloudXue's Blog</title>
   
 
 
@@ -297,7 +297,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://doublexz.github.io/doggie.github.io/doggie.github.io/2019/04/16/Item-16/">
+    <link itemprop="mainEntityOfPage" href="https://doublexz.github.io/doggie.github.io/doggie.github.io/2020/01/29/0-JVM-类加载、连接与初始化/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Doggie">
@@ -314,7 +314,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">Item-16 在公共类中，使用访问器方法，而不是公共字段</h1>
+          <h1 class="post-title" itemprop="name headline">0_JVM_类加载、连接与初始化</h1>
         
 
         <div class="post-meta">
@@ -326,8 +326,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-04-16T21:38:05+08:00">
-                2019-04-16
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-01-29T21:44:19+08:00">
+                2020-01-29
               </time>
             
 
@@ -366,7 +366,7 @@
 
           
           
-             <span id="/doggie.github.io/2019/04/16/Item-16/" class="leancloud_visitors" data-flag-title="Item-16 在公共类中，使用访问器方法，而不是公共字段">
+             <span id="/doggie.github.io/2020/01/29/0-JVM-类加载、连接与初始化/" class="leancloud_visitors" data-flag-title="0_JVM_类加载、连接与初始化">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -402,47 +402,71 @@
       
 
       
-        <p>有时候，你可能想要编写组合了实例字段的类没有其他任何目的：  </p>
-<pre><code>//Degenerate classes like this should not be public !
-class Point {
-    public double x;
-    public double y;
-}  
-</code></pre><a id="more"></a>
-<p>&emsp;&emsp;因为这些类的数据字段可以直接被访问，这些类<strong>具有</strong>封装的优势（Item 15）。你无法在不改变API的情况下改变其<strong>表示形式</strong>，也无法强制执行不变量，并且当字段被访问时，无法采取辅助措施。<strong>坚持</strong>面向对象程序员对着种类深恶痛绝，认为应该被包含私有字段和公共访问方法（getter）的类替代，<strong>对于可变类来说，应该包含存取器（setter）（设置方法）</strong>：  </p>
-<pre><code>//Encapsulation of data by accessor methods and mutators
-class Point {
-    private double x;
-    private double y;
-
-    public Point(double x, double y) {
-        this.x = x;
-        this.y = y; 
-    }
-
-   public double getX() { return x; }
-   public double getY() { return y; }
-
-   public void setX(double x) { this.x = x; }
-   public void setY(double y) { this.y = y; }
-}  
-</code></pre><p>&emsp;&emsp;当然,<strong>在面对公共类时，坚持面向对象的程序员是正确的</strong>：<strong>如果一个类在其包以外可以被访问，则需要提供访问器方法</strong>，来维持改变类的内部展示的灵活性。如果公共类暴露其数据字段，则所有改变其内不展示的希望都会消失，因为客户端代码<strong>遍布各处了</strong>。<br>&emsp;&emsp;然而，<strong>如果一个类是包私有的或者是私有内部类，那么暴露其数据字段不会有本质问题</strong>-假设他们在描述该类提供的抽象方面做了足够的工作。无论是类的定义还是使用它的客户端代码中，这种方式比<strong>提供</strong>访问方法方式产生更少的视觉混乱。虽然客户端代码被绑定到类的内部展示上，但是这些代码被限定在包含该类的包中。如果<strong>需要修改类的内不展示</strong>，那么你可以在不触及包外任何代码的情况下进行更改。在私有内部类的案例中，变更范围被进一步限制在外围类（附寄类）里。<br>&emsp;&emsp;Java平台类库中的个别几个类违反了公共类不应该直接暴露字段的建议的类。突出的示例包括java.awt包中的Point和Dimention类。这些类<strong>不仅不值得模仿，而且应该被当做反面教材</strong>。正如条款67所述，暴露Dimension类内部（数据）的决定导致严重的性能问题，且该问题至今还存在。<br>&emsp;&emsp;尽管对于公共类直接暴露字段一直不是一个好的主意，<strong>但如果这些字段是不可变的，那么危害也不大</strong>。你依旧无法在不改变其API的情况下改变这个类的展示，并且在读取字段时无法对其采取辅助措施，但可以强制执行不变量。例如：这个类保证其每个实例表示一个有效时间：  </p>
-<pre><code>// Public class with exposed immutable fields - questionable
-public final class Time {
-   private static final int HOURS_PER_DAY    = 24;
-   private static final int MINUTES_PER_HOUR = 60;
-   public final int hour;
-   public final int minute;
-   public Time(int hour, int minute) {
-       if (hour &lt; 0 || hour &gt;= HOURS_PER_DAY)
-          throw new IllegalArgumentException(&quot;Hour: &quot; + hour);
-       if (minute &lt; 0 || minute &gt;= MINUTES_PER_HOUR)
-    throw new IllegalArgumentException(&quot;Min: &quot; + minute); this.hour = hour;
-    this.minute = minute;
-    }
-       ... // Remainder omitted
-}
-</code></pre><p>&emsp;&emsp;总之，公共类永远不要暴露可变字段。虽然公共类暴露不可变字段的情况危害小，但仍是有问题的。但是，有时候需要用包私有类或者私有内部类暴露字段，无论它是可变还是不可变的字段。</p>
+        <h2 id="Java程序运行的过程"><a href="#Java程序运行的过程" class="headerlink" title="Java程序运行的过程"></a>Java程序运行的过程</h2><p>在Java代码中，类型的加载、连接与初始化过程都是在程序运行期间完成的，这样就提供了更大的灵活性，增加了更多的可能性。  </p>
+<ul>
+<li>加载： 指的是查找并加载类的二进制数据，将类的.class文件中的二进制数据读入到内存中，将其放在运行时数据区的方法区内，然后在内存中创建一个java.lang.Class对象（规范并未说明Class对象位于哪里，HotSpot虚拟机将其放在了方法区中），用来封装类在方法区中的数据结构；<br>加载.class文件的方式有：    <ul>
+<li>从本地系统中直接加载</li>
+<li>通过网络下载.class文件  </li>
+<li>从zip、jar等归档文件中加载.class文件</li>
+<li>从专有数据库中提取.class文件</li>
+<li>将Java源文件动态编译为.class文件（动态代理）</li>
+</ul>
+</li>
+<li><p>连接： 又分为三个阶段：验证、准备和解析  </p>
+<ul>
+<li>验证： 确保被加载的类的正确性</li>
+<li>准备： 为类的静态变量分配内存，并将其初始化为默认值</li>
+<li>解析： 把类中的符号引用转换为直接引用</li>
+</ul>
+</li>
+<li>初始化： 为类的静态变量赋予正确的初始值</li>
+<li>类的使用</li>
+<li>类的卸载</li>
+</ul>
+<h2 id="Java虚拟机结束生命周期的集中情况"><a href="#Java虚拟机结束生命周期的集中情况" class="headerlink" title="Java虚拟机结束生命周期的集中情况"></a>Java虚拟机结束生命周期的集中情况</h2><ul>
+<li>执行了System.exit()方法</li>
+<li>程序正常执行结束</li>
+<li>程序在执行过程中遇到异常或错误而异常终止</li>
+<li>由于操作系统出现错误而导致Java虚拟机进程终止</li>
+</ul>
+<h2 id="JVM对类的使用分为两种情况"><a href="#JVM对类的使用分为两种情况" class="headerlink" title="JVM对类的使用分为两种情况"></a>JVM对类的使用分为两种情况</h2><p>主动使用（七种）：</p>
+<ul>
+<li>创建类的实例</li>
+<li>访问某个类或接口的静态变量，或者对其赋值</li>
+<li>调用类的静态方法</li>
+<li>反射</li>
+<li>初始化一个类的子类</li>
+<li>Java虚拟机启动时被标明为启动类的类（包含main方法）</li>
+<li>JDK 1.7开始提供的动态语言支持</li>
+</ul>
+<p>被动使用：<br>其他使用类的方式都被看作是被动使用，不会被初始化  </p>
+<p>所有的Java虚拟机实现必须在每个类或接口被Java程序“首次主动使用”时才初始化他们。 </p>
+<p>示例：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">public class MyTest1 &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        System.out.println(MyChild1.str);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">class MyParent1 &#123;</span><br><span class="line">    public static String str = &quot;hello world&quot;;</span><br><span class="line">    static &#123;</span><br><span class="line">        System.out.println(&quot;MyParent1 static block&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">class MyChild1 extends MyParent1 &#123;</span><br><span class="line">    static &#123;</span><br><span class="line">        System.out.println(&quot;MyChild1 static block&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>运行结果是</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">MyParent1 static block</span><br><span class="line">hello world</span><br></pre></td></tr></table></figure>
+<p>如果在子类中添加静态变量并打印呢?<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">public class MyTest1 &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        System.out.println(MyChild1.str2);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">class MyParent1 &#123;</span><br><span class="line">    public static String str = &quot;hello world&quot;;</span><br><span class="line">    static &#123;</span><br><span class="line">        System.out.println(&quot;MyParent1 static block&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">class MyChild1 extends MyParent1 &#123;</span><br><span class="line">    public static String str1 = &quot;welcome&quot;;</span><br><span class="line">    static &#123;</span><br><span class="line">        System.out.println(&quot;MyChild1 static block&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>运行结果是:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">MyParent1 static block</span><br><span class="line">MyChild1 static block</span><br><span class="line">welcome</span><br></pre></td></tr></table></figure></p>
+<p>第一个例子中，实际打印父类中定义的静态变量，即对父类的主动使用，并没有主动使用子类，因此不会对子类初始化。谁定义的静态变量表示对谁的主动使用。得出如下结论：<br>对于静态变量来说，只有直接定义了该字段的类才会被初始化；  </p>
+<p>第二个例子中，实际打印子类中的静态变量，即对子类的主动使用，要初始化子类。当一个类在初始化时，要求其父类已经初始化完毕了，所以会打印子类中静态代码块信息。  </p>
+<p>对于第一个例子，子类没有初始化，那么是否被加载呢？通过Java虚拟机命令，<code>-XX:+TraceClassLoading</code>观察得出，子类是被加载了<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">...</span><br><span class="line">[Loaded com.shengsiyuan.jvm.classloader.MyTest1 from file:/Users/xuexiao/IdeaProjects/jvm_lecture/out/production/classes/]</span><br><span class="line">[Loaded sun.launcher.LauncherHelper$FXHelper from /Library/Java/JavaVirtualMachines/jdk1.8.0_162.jdk/Contents/Home/jre/lib/rt.jar]</span><br><span class="line">[Loaded java.lang.Class$MethodArray from /Library/Java/JavaVirtualMachines/jdk1.8.0_162.jdk/Contents/Home/jre/lib/rt.jar]</span><br><span class="line">[Loaded java.lang.Void from /Library/Java/JavaVirtualMachines/jdk1.8.0_162.jdk/Contents/Home/jre/lib/rt.jar]</span><br><span class="line">[Loaded com.shengsiyuan.jvm.classloader.MyParent1 from file:/Users/xuexiao/IdeaProjects/jvm_lecture/out/production/classes/]</span><br><span class="line">[Loaded com.shengsiyuan.jvm.classloader.MyChild1 from file:/Users/xuexiao/IdeaProjects/jvm_lecture/out/production/classes/]</span><br><span class="line">MyParent1 static block</span><br><span class="line">hello world</span><br><span class="line">[Loaded java.lang.Shutdown from /Library/Java/JavaVirtualMachines/jdk1.8.0_162.jdk/Contents/Home/jre/lib/rt.jar]</span><br><span class="line">[Loaded java.lang.Shutdown$Lock from /Library/Java/JavaVirtualMachines/jdk1.8.0_162.jdk/Contents/Home/jre/lib/rt.jar]</span><br></pre></td></tr></table></figure></p>
+<h2 id="JVM-参数"><a href="#JVM-参数" class="headerlink" title="JVM 参数"></a>JVM 参数</h2><p>总体来说，有三种使用方式：<br><code>-XX:+&lt;option&gt;</code> 表示用于开启option选项<br><code>-XX:-&lt;option&gt;</code> 表示用于关闭option选项<br><code>-XX:&lt;option&gt;=&lt;value&gt;</code> 表示将option选项赋值为value  </p>
+<h2 id="常量的本质"><a href="#常量的本质" class="headerlink" title="常量的本质"></a>常量的本质</h2><p>先看以下示例：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">public class MyTest2 &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        System.out.println(MyParent2.str);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">class MyParent2 &#123;</span><br><span class="line">    public static final String str = &quot;hello world&quot;;</span><br><span class="line">    static &#123;</span><br><span class="line">        System.out.println(&quot;MyParent2 static block&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>运行结果是：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hello world</span><br></pre></td></tr></table></figure></p>
+<p>final 表示一个常量，不能被改变，它在编译阶段会存入到调用这个常量的方法所在类的常量池中(即str这个常量会被存入到MyTest2这个类的常量池中)，本质上调用类并没有直接引用到定义常量的类，因此不会触发定义常量的类的初始化。<br>注意：这里指的是将常量存放到了MyTest2的常量池中，之后MyTest2与MyParent2就没有任何关系了，甚至可以将MyTest2的class文件删除。</p>
+<p>以上结论可以通过反编译结果进行印证<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">➜  classes javap -c com.shengsiyuan.jvm.classloader.MyTest2</span><br><span class="line">Compiled from &quot;MyTest2.java&quot;</span><br><span class="line">public class com.shengsiyuan.jvm.classloader.MyTest2 &#123;</span><br><span class="line">  public com.shengsiyuan.jvm.classloader.MyTest2();</span><br><span class="line">    Code:</span><br><span class="line">       0: aload_0</span><br><span class="line">       1: invokespecial #1                  // Method java/lang/Object.&quot;&lt;init&gt;&quot;:()V</span><br><span class="line">       4: return</span><br><span class="line"></span><br><span class="line">  public static void main(java.lang.String[]);</span><br><span class="line">    Code:</span><br><span class="line">       0: getstatic     #2                  // Field java/lang/System.out:Ljava/io/PrintStream;</span><br><span class="line">       3: ldc           #4                  // String hello world</span><br><span class="line">       5: invokevirtual #5                  // Method java/io/PrintStream.println:(Ljava/lang/String;)V</span><br><span class="line">       8: return</span><br><span class="line">&#125;</span><br><span class="line">➜ classes</span><br></pre></td></tr></table></figure></p>
+<p>getstatic表示对main方法的调用；<br>ldc: 在反编译的结果中已经是一个字符串”hello world”，说明MyParent1.str这个引用在编译阶段已经变成了具体的字符串，这个字符串就存在MyTest2的常量池中。</p>
+<h2 id="助记符"><a href="#助记符" class="headerlink" title="助记符"></a>助记符</h2><ul>
+<li>ldc： 表示将int、float或String类型的常量值从常量池中推送至栈顶</li>
+<li>bipush： 表示将单字节(-128-127)的常量值推送至栈顶</li>
+<li>sipush： 表示将一个短整型常量值(-32768-32767)推送至栈顶  </li>
+<li>iconst_1： 表示将int类型1推送至栈顶  </li>
+<li>iconst_2： 表示将int类型2推送至栈顶 </li>
+<li>iconst_3： 表示将int类型3推送至栈顶 </li>
+<li>iconst_4： 表示将int类型4推送至栈顶 </li>
+<li>iconst_5： 表示将int类型5推送至栈顶  </li>
+</ul>
+<hr>
+<p>From：圣思园年费课程：<a href="http://www.iprogramming.cn/jvm.html" target="_blank" rel="noopener">《深入理解JVM》</a> 学习笔记</p>
 
       
     </div>
@@ -460,7 +484,7 @@ public final class Time {
       
         <div class="post-tags">
           
-            <a href="/doggie.github.io/tags/Effective-Java-3rd/" rel="tag"># Effective Java 3rd</a>
+            <a href="/doggie.github.io/tags/JVM/" rel="tag"># JVM</a>
           
         </div>
       
@@ -473,8 +497,8 @@ public final class Time {
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/doggie.github.io/2019/04/13/volatile关键字/" rel="next" title="volatile关键字">
-                <i class="fa fa-chevron-left"></i> volatile关键字
+              <a href="/doggie.github.io/2020/01/26/SpringBoot对SpringMVC的整合原理/" rel="next" title="SpringBoot对SpringMVC的整合原理">
+                <i class="fa fa-chevron-left"></i> SpringBoot对SpringMVC的整合原理
               </a>
             
           </div>
@@ -483,8 +507,8 @@ public final class Time {
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/doggie.github.io/2019/04/23/Item-17/" rel="prev" title="Item-17 使可变性最小化">
-                Item-17 使可变性最小化 <i class="fa fa-chevron-right"></i>
+              <a href="/doggie.github.io/2020/01/30/1-JVM-编译期常量与运行期常量及数组创建的本质/" rel="prev" title="1_JVM_编译期常量与运行期常量及数组创建的本质">
+                1_JVM_编译期常量与运行期常量及数组创建的本质 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -537,8 +561,17 @@ public final class Time {
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -623,6 +656,22 @@ public final class Time {
         </div>
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Java程序运行的过程"><span class="nav-number">1.</span> <span class="nav-text">Java程序运行的过程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Java虚拟机结束生命周期的集中情况"><span class="nav-number">2.</span> <span class="nav-text">Java虚拟机结束生命周期的集中情况</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#JVM对类的使用分为两种情况"><span class="nav-number">3.</span> <span class="nav-text">JVM对类的使用分为两种情况</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#JVM-参数"><span class="nav-number">4.</span> <span class="nav-text">JVM 参数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#常量的本质"><span class="nav-number">5.</span> <span class="nav-text">常量的本质</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#助记符"><span class="nav-number">6.</span> <span class="nav-text">助记符</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       

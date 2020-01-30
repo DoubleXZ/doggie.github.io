@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="Effective Java 3rd,">
+  <meta name="keywords" content="JVM,">
 
 
 
@@ -81,18 +81,18 @@
 
 
 
-<meta name="description" content="有时候，你可能想要编写组合了实例字段的类没有其他任何目的：   //Degenerate classes like this should not be public ! class Point {     public double x;     public double y; }">
-<meta name="keywords" content="Effective Java 3rd">
+<meta name="description" content="接口初始化规则首先要明确，接口中定义的变量都为常量，public static final修饰符通常可以省略示例：1234567891011121314public class MyTest5 &amp;#123;    public static void main(String[] args) &amp;#123;        System.out.println(MyChild5.b);    &amp;#125">
+<meta name="keywords" content="JVM">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Item-16 在公共类中，使用访问器方法，而不是公共字段">
-<meta property="og:url" content="https://doublexz.github.io/doggie.github.io/2019/04/16/Item-16/index.html">
+<meta property="og:title" content="2_JVM_接口初始化规则与类加载器准备阶段和初始化阶段的重要意义">
+<meta property="og:url" content="https://doublexz.github.io/doggie.github.io/2020/01/30/2-JVM-接口初始化规则与类加载器准备阶段和初始化阶段的重要意义/index.html">
 <meta property="og:site_name" content="CloudXue&#39;s Blog">
-<meta property="og:description" content="有时候，你可能想要编写组合了实例字段的类没有其他任何目的：   //Degenerate classes like this should not be public ! class Point {     public double x;     public double y; }">
+<meta property="og:description" content="接口初始化规则首先要明确，接口中定义的变量都为常量，public static final修饰符通常可以省略示例：1234567891011121314public class MyTest5 &amp;#123;    public static void main(String[] args) &amp;#123;        System.out.println(MyChild5.b);    &amp;#125">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-04-17T06:03:10.783Z">
+<meta property="og:updated_time" content="2020-01-30T13:28:01.492Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Item-16 在公共类中，使用访问器方法，而不是公共字段">
-<meta name="twitter:description" content="有时候，你可能想要编写组合了实例字段的类没有其他任何目的：   //Degenerate classes like this should not be public ! class Point {     public double x;     public double y; }">
+<meta name="twitter:title" content="2_JVM_接口初始化规则与类加载器准备阶段和初始化阶段的重要意义">
+<meta name="twitter:description" content="接口初始化规则首先要明确，接口中定义的变量都为常量，public static final修饰符通常可以省略示例：1234567891011121314public class MyTest5 &amp;#123;    public static void main(String[] args) &amp;#123;        System.out.println(MyChild5.b);    &amp;#125">
 
 
 
@@ -122,13 +122,13 @@
 
 
 
-  <link rel="canonical" href="https://doublexz.github.io/doggie.github.io/2019/04/16/Item-16/">
+  <link rel="canonical" href="https://doublexz.github.io/doggie.github.io/2020/01/30/2-JVM-接口初始化规则与类加载器准备阶段和初始化阶段的重要意义/">
 
 
 
 
 
-  <title>Item-16 在公共类中，使用访问器方法，而不是公共字段 | CloudXue's Blog</title>
+  <title>2_JVM_接口初始化规则与类加载器准备阶段和初始化阶段的重要意义 | CloudXue's Blog</title>
   
 
 
@@ -297,7 +297,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://doublexz.github.io/doggie.github.io/doggie.github.io/2019/04/16/Item-16/">
+    <link itemprop="mainEntityOfPage" href="https://doublexz.github.io/doggie.github.io/doggie.github.io/2020/01/30/2-JVM-接口初始化规则与类加载器准备阶段和初始化阶段的重要意义/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Doggie">
@@ -314,7 +314,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">Item-16 在公共类中，使用访问器方法，而不是公共字段</h1>
+          <h1 class="post-title" itemprop="name headline">2_JVM_接口初始化规则与类加载器准备阶段和初始化阶段的重要意义</h1>
         
 
         <div class="post-meta">
@@ -326,8 +326,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-04-16T21:38:05+08:00">
-                2019-04-16
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-01-30T17:00:56+08:00">
+                2020-01-30
               </time>
             
 
@@ -366,7 +366,7 @@
 
           
           
-             <span id="/doggie.github.io/2019/04/16/Item-16/" class="leancloud_visitors" data-flag-title="Item-16 在公共类中，使用访问器方法，而不是公共字段">
+             <span id="/doggie.github.io/2020/01/30/2-JVM-接口初始化规则与类加载器准备阶段和初始化阶段的重要意义/" class="leancloud_visitors" data-flag-title="2_JVM_接口初始化规则与类加载器准备阶段和初始化阶段的重要意义">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -402,47 +402,21 @@
       
 
       
-        <p>有时候，你可能想要编写组合了实例字段的类没有其他任何目的：  </p>
-<pre><code>//Degenerate classes like this should not be public !
-class Point {
-    public double x;
-    public double y;
-}  
-</code></pre><a id="more"></a>
-<p>&emsp;&emsp;因为这些类的数据字段可以直接被访问，这些类<strong>具有</strong>封装的优势（Item 15）。你无法在不改变API的情况下改变其<strong>表示形式</strong>，也无法强制执行不变量，并且当字段被访问时，无法采取辅助措施。<strong>坚持</strong>面向对象程序员对着种类深恶痛绝，认为应该被包含私有字段和公共访问方法（getter）的类替代，<strong>对于可变类来说，应该包含存取器（setter）（设置方法）</strong>：  </p>
-<pre><code>//Encapsulation of data by accessor methods and mutators
-class Point {
-    private double x;
-    private double y;
-
-    public Point(double x, double y) {
-        this.x = x;
-        this.y = y; 
-    }
-
-   public double getX() { return x; }
-   public double getY() { return y; }
-
-   public void setX(double x) { this.x = x; }
-   public void setY(double y) { this.y = y; }
-}  
-</code></pre><p>&emsp;&emsp;当然,<strong>在面对公共类时，坚持面向对象的程序员是正确的</strong>：<strong>如果一个类在其包以外可以被访问，则需要提供访问器方法</strong>，来维持改变类的内部展示的灵活性。如果公共类暴露其数据字段，则所有改变其内不展示的希望都会消失，因为客户端代码<strong>遍布各处了</strong>。<br>&emsp;&emsp;然而，<strong>如果一个类是包私有的或者是私有内部类，那么暴露其数据字段不会有本质问题</strong>-假设他们在描述该类提供的抽象方面做了足够的工作。无论是类的定义还是使用它的客户端代码中，这种方式比<strong>提供</strong>访问方法方式产生更少的视觉混乱。虽然客户端代码被绑定到类的内部展示上，但是这些代码被限定在包含该类的包中。如果<strong>需要修改类的内不展示</strong>，那么你可以在不触及包外任何代码的情况下进行更改。在私有内部类的案例中，变更范围被进一步限制在外围类（附寄类）里。<br>&emsp;&emsp;Java平台类库中的个别几个类违反了公共类不应该直接暴露字段的建议的类。突出的示例包括java.awt包中的Point和Dimention类。这些类<strong>不仅不值得模仿，而且应该被当做反面教材</strong>。正如条款67所述，暴露Dimension类内部（数据）的决定导致严重的性能问题，且该问题至今还存在。<br>&emsp;&emsp;尽管对于公共类直接暴露字段一直不是一个好的主意，<strong>但如果这些字段是不可变的，那么危害也不大</strong>。你依旧无法在不改变其API的情况下改变这个类的展示，并且在读取字段时无法对其采取辅助措施，但可以强制执行不变量。例如：这个类保证其每个实例表示一个有效时间：  </p>
-<pre><code>// Public class with exposed immutable fields - questionable
-public final class Time {
-   private static final int HOURS_PER_DAY    = 24;
-   private static final int MINUTES_PER_HOUR = 60;
-   public final int hour;
-   public final int minute;
-   public Time(int hour, int minute) {
-       if (hour &lt; 0 || hour &gt;= HOURS_PER_DAY)
-          throw new IllegalArgumentException(&quot;Hour: &quot; + hour);
-       if (minute &lt; 0 || minute &gt;= MINUTES_PER_HOUR)
-    throw new IllegalArgumentException(&quot;Min: &quot; + minute); this.hour = hour;
-    this.minute = minute;
-    }
-       ... // Remainder omitted
-}
-</code></pre><p>&emsp;&emsp;总之，公共类永远不要暴露可变字段。虽然公共类暴露不可变字段的情况危害小，但仍是有问题的。但是，有时候需要用包私有类或者私有内部类暴露字段，无论它是可变还是不可变的字段。</p>
+        <h2 id="接口初始化规则"><a href="#接口初始化规则" class="headerlink" title="接口初始化规则"></a>接口初始化规则</h2><p>首先要明确，接口中定义的变量都为常量，public static final修饰符通常可以省略<br>示例：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">public class MyTest5 &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        System.out.println(MyChild5.b);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">interface MyParent5 &#123;</span><br><span class="line">    public static int a = 5;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">interface MyChild5 extends MyParent5 &#123;</span><br><span class="line">    public static int b = 6;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>打印结果：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">6</span><br></pre></td></tr></table></figure></p>
+<p>当一个接口在初始化时，并不要求其父接口都完成了初始化；<br>只有在真正使用到父接口的时候（如引用接口中所定义的常量时），才会初始化。</p>
+<h2 id="类加载器准备阶段与初始化阶段"><a href="#类加载器准备阶段与初始化阶段" class="headerlink" title="类加载器准备阶段与初始化阶段"></a>类加载器准备阶段与初始化阶段</h2><p>判断下面程序的运行结果：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">public class MyTest6 &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        Singleton singleton = Singleton.getInstance();</span><br><span class="line">        System.out.println(&quot;counter1: &quot; + Singleton.counter1);</span><br><span class="line">        System.out.println(&quot;counter2: &quot; + Singleton.counter2);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">class Singleton &#123;</span><br><span class="line">    public static int counter1;</span><br><span class="line">    public static int counter2 = 0;</span><br><span class="line"></span><br><span class="line">    private Singleton singleton = new Singleton();</span><br><span class="line">    private Singleton() &#123;</span><br><span class="line">        counter1++;</span><br><span class="line">        counter2++;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public Singleton getInstance()&#123;</span><br><span class="line">        return singleton;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>运行结果：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">counter1: 1</span><br><span class="line">counter2: 1</span><br></pre></td></tr></table></figure></p>
+<p>调整Singleton类中变量的顺序，再运行：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">public class MyTest6 &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        Singleton singleton = Singleton.getInstance();</span><br><span class="line">        System.out.println(&quot;counter1: &quot; + Singleton.counter1);</span><br><span class="line">        System.out.println(&quot;counter2: &quot; + Singleton.counter2);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">class Singleton &#123;</span><br><span class="line">    public static int counter1;</span><br><span class="line">    private Singleton singleton = new Singleton();</span><br><span class="line">    private Singleton() &#123;</span><br><span class="line">        counter1++;</span><br><span class="line">        counter2++;</span><br><span class="line">    &#125;</span><br><span class="line">    public static int counter2 = 0;</span><br><span class="line"></span><br><span class="line">    public Singleton getInstance()&#123;</span><br><span class="line">        return singleton;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>运行结果：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">counter1: 1</span><br><span class="line">counter2: 0</span><br></pre></td></tr></table></figure></p>
+<p>若为counter1显示赋值为1<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">public class MyTest6 &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        Singleton singleton = Singleton.getInstance();</span><br><span class="line">        System.out.println(&quot;counter1: &quot; + Singleton.counter1);</span><br><span class="line">        System.out.println(&quot;counter2: &quot; + Singleton.counter2);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">class Singleton &#123;</span><br><span class="line">    public static int counter1 = 1;</span><br><span class="line">    private Singleton singleton = new Singleton();</span><br><span class="line">    private Singleton() &#123;</span><br><span class="line">        counter1++;</span><br><span class="line">        counter2++;</span><br><span class="line">    &#125;</span><br><span class="line">    public static int counter2 = 0;</span><br><span class="line"></span><br><span class="line">    public Singleton getInstance()&#123;</span><br><span class="line">        return singleton;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>运行结果是：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">counter1: 2</span><br><span class="line">counter2: 0</span><br></pre></td></tr></table></figure></p>
+<p>MyTest6主函数中，Singleton.getInstance()的调用，表明了对Singleton类主动使用，所以要初始化Singleton类。<br>在初始化之前，JVM会对Singleton类进行加载和连接，连接的第二阶段，会为counter1、counter2、和singleton赋默认值分别是0、0、null。然后再执行初始化操作：  </p>
+<ul>
+<li>第一个例子中，调用构造方法后，counter1和counter2分别为1，初始化结束；  </li>
+<li>第二个例子中，调用构造方法后，counter1和cunter2分别为1和1，继续执行，counter2被初始化成0，初始化结束；</li>
+<li>第三个例子中，连接阶段counter1和counter2都是0，初始化阶段，counter1被初始化为1，然后调用构造方法后，counter1和counter2分别为2和0，初始化继续，counter2变成了0</li>
+</ul>
 
       
     </div>
@@ -460,7 +434,7 @@ public final class Time {
       
         <div class="post-tags">
           
-            <a href="/doggie.github.io/tags/Effective-Java-3rd/" rel="tag"># Effective Java 3rd</a>
+            <a href="/doggie.github.io/tags/JVM/" rel="tag"># JVM</a>
           
         </div>
       
@@ -473,8 +447,8 @@ public final class Time {
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/doggie.github.io/2019/04/13/volatile关键字/" rel="next" title="volatile关键字">
-                <i class="fa fa-chevron-left"></i> volatile关键字
+              <a href="/doggie.github.io/2020/01/30/1-JVM-编译期常量与运行期常量及数组创建的本质/" rel="next" title="1_JVM_编译期常量与运行期常量及数组创建的本质">
+                <i class="fa fa-chevron-left"></i> 1_JVM_编译期常量与运行期常量及数组创建的本质
               </a>
             
           </div>
@@ -482,10 +456,6 @@ public final class Time {
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/doggie.github.io/2019/04/23/Item-17/" rel="prev" title="Item-17 使可变性最小化">
-                Item-17 使可变性最小化 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -537,8 +507,17 @@ public final class Time {
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -623,6 +602,22 @@ public final class Time {
         </div>
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#接口初始化规则"><span class="nav-number">1.</span> <span class="nav-text">接口初始化规则</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#类加载器准备阶段与初始化阶段"><span class="nav-number">2.</span> <span class="nav-text">类加载器准备阶段与初始化阶段</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
