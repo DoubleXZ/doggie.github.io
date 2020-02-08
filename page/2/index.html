@@ -296,6 +296,1054 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://doublexz.github.io/doggie.github.io/doggie.github.io/2020/01/26/Kafka学习第四篇-实践篇/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Doggie">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/doggie.github.io/images/love.jpeg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="CloudXue's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/doggie.github.io/2020/01/26/Kafka学习第四篇-实践篇/" itemprop="url">Kafka学习第四篇-实践篇</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-01-26T10:11:55+08:00">
+                2020-01-26
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/doggie.github.io/categories/消息队列/" itemprop="url" rel="index">
+                    <span itemprop="name">消息队列</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/doggie.github.io/2020/01/26/Kafka学习第四篇-实践篇/" class="leancloud_visitors" data-flag-title="Kafka学习第四篇-实践篇">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h4 id="总体思路"><a href="#总体思路" class="headerlink" title="总体思路"></a>总体思路</h4><ul>
+<li>浏览器或POSTMAN或者curl命令行作为生产者提供消息；</li>
+<li>SpringBoot提供消费者，将从Kafka拉取的消息打印出来；</li>
+<li>命令行终端启动消费者打印出从Kafa拉取的消息  </li>
+</ul>
+<h4 id="gradle引入Kafka及相关依赖"><a href="#gradle引入Kafka及相关依赖" class="headerlink" title="gradle引入Kafka及相关依赖"></a>gradle引入Kafka及相关依赖</h4><p>在build.gradle中引入相关jar包 </p>
+<ul>
+<li>org.springframework.kafka:spring-kafka用于集成kafka</li>
+<li>com.google.code.gson:gson用于格式化消息数据<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">dependencies &#123;</span><br><span class="line">    compile(</span><br><span class="line">            &quot;org.springframework.boot:spring-boot-starter-web&quot;,</span><br><span class="line">            &quot;javax.servlet:jstl&quot;,</span><br><span class="line">            &quot;org.apache.tomcat.embed:tomcat-embed-jasper&quot;,</span><br><span class="line">            &quot;org.springframework.boot:spring-boot-starter-json&quot;,</span><br><span class="line">            &quot;org.springframework.kafka:spring-kafka&quot;,</span><br><span class="line">            &quot;com.google.code.gson:gson&quot;</span><br><span class="line">    )</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h4 id="application-yml添加kafka配置"><a href="#application-yml添加kafka配置" class="headerlink" title="application.yml添加kafka配置"></a>application.yml添加kafka配置</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">spring:</span><br><span class="line">    kafka:</span><br><span class="line">        producer:</span><br><span class="line">            bootstrap-servers: localhost:9092</span><br><span class="line">            key-serializer: org.apache.kafka.common.serialization.StringSerializer</span><br><span class="line">            value-serializer: org.apache.kafka.common.serialization.StringSerializer</span><br><span class="line">        consumer:</span><br><span class="line">            group-id: myGroup</span><br><span class="line">            key-deserializer: org.apache.kafka.common.serialization.StringDeserializer</span><br><span class="line">            value-deserializer: org.apache.kafka.common.serialization.StringDeserializer</span><br></pre></td></tr></table></figure>
+<h4 id="创建消息实体"><a href="#创建消息实体" class="headerlink" title="创建消息实体"></a>创建消息实体</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line">package com.shengsiyuan.boot.kafka;</span><br><span class="line"></span><br><span class="line">import java.util.Date;</span><br><span class="line"></span><br><span class="line">public class KafkaMessage &#123;</span><br><span class="line">    private long id;</span><br><span class="line">    private String username;</span><br><span class="line">    private String password;</span><br><span class="line">    private Date date;</span><br><span class="line"></span><br><span class="line">    public long getId() &#123;</span><br><span class="line">        return id;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void setId(long id) &#123;</span><br><span class="line">        this.id=id;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public String getUsername() &#123;</span><br><span class="line">        return username;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void setUsername(String username) &#123;</span><br><span class="line">        this.username=username;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public String getPassword() &#123;</span><br><span class="line">        return password;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void setPassword(String password) &#123;</span><br><span class="line">        this.password=password;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public Date getDate() &#123;</span><br><span class="line">        return date;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void setDate(Date date) &#123;</span><br><span class="line">        this.date=date;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="创建生产者"><a href="#创建生产者" class="headerlink" title="创建生产者"></a>创建生产者</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">package com.shengsiyuan.boot.kafka;</span><br><span class="line"></span><br><span class="line">import com.google.gson.Gson;</span><br><span class="line">import org.springframework.beans.factory.annotation.Autowired;</span><br><span class="line">import org.springframework.kafka.core.KafkaTemplate;</span><br><span class="line">import org.springframework.stereotype.Component;</span><br><span class="line"></span><br><span class="line">@Component</span><br><span class="line">public class KafkaProducer &#123;</span><br><span class="line"></span><br><span class="line">    @Autowired</span><br><span class="line">    private KafkaTemplate&lt;String, String&gt; kafkaTemplate;</span><br><span class="line"></span><br><span class="line">    public void sendMessage(KafkaMessage kafkaMessage)&#123;</span><br><span class="line">        System.out.println(&quot;sendMessage invoked!&quot;);</span><br><span class="line">        kafkaTemplate.send(&quot;myTopic&quot;, new Gson().toJson(kafkaMessage));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="创建消费者"><a href="#创建消费者" class="headerlink" title="创建消费者"></a>创建消费者</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">package com.shengsiyuan.boot.kafka;</span><br><span class="line"></span><br><span class="line">import org.apache.kafka.clients.consumer.ConsumerRecord;</span><br><span class="line">import org.springframework.kafka.annotation.KafkaListener;</span><br><span class="line">import org.springframework.stereotype.Component;</span><br><span class="line"></span><br><span class="line">@Component</span><br><span class="line">public class KafkaConsumer &#123;</span><br><span class="line"></span><br><span class="line">    @KafkaListener(topics=&quot;myTopic&quot;, groupId=&quot;myGroup&quot;)</span><br><span class="line">    public void obtainMessage(ConsumerRecord&lt;String, String&gt; record)&#123;</span><br><span class="line">        System.out.println(&quot;Consumer obtains message!&quot;);</span><br><span class="line">        System.out.println(&quot;record topic: &quot; + record.topic());</span><br><span class="line">        System.out.println(&quot;record partition: &quot; + record.partition());</span><br><span class="line">        System.out.println(&quot;record key :&quot; + record.key());</span><br><span class="line">        System.out.println(&quot;record value: &quot; + record.value());</span><br><span class="line">        System.out.println(&quot;record offset:&quot; + record.offset());</span><br><span class="line">        System.out.println(&quot;record timestamp&quot; + record.timestamp());</span><br><span class="line">        System.out.println(&quot;record serializedKeySize: &quot; + record.serializedKeySize());</span><br><span class="line">        System.out.println(&quot;record serializedValueSize: &quot; + record.serializedValueSize());</span><br><span class="line">        System.out.println(&quot;=========================&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="创建Controller"><a href="#创建Controller" class="headerlink" title="创建Controller"></a>创建Controller</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line">package com.shengsiyuan.boot.controller;</span><br><span class="line"></span><br><span class="line">import com.shengsiyuan.boot.kafka.KafkaMessage;</span><br><span class="line">import com.shengsiyuan.boot.kafka.KafkaProducer;</span><br><span class="line">import org.slf4j.Logger;</span><br><span class="line">import org.slf4j.LoggerFactory;</span><br><span class="line">import org.springframework.beans.factory.annotation.Autowired;</span><br><span class="line">import org.springframework.web.bind.annotation.*;</span><br><span class="line"></span><br><span class="line">import java.util.Date;</span><br><span class="line"></span><br><span class="line">/**</span><br><span class="line"> * @Program spring_lecture</span><br><span class="line"> * @Title: KafkaController</span><br><span class="line"> * @Description:</span><br><span class="line"> * @Author: XueXiao</span><br><span class="line"> * @Create: 2020-01-22 17:46:02</span><br><span class="line"> */</span><br><span class="line">@RestController</span><br><span class="line">@RequestMapping(value=&quot;/kafka&quot;)</span><br><span class="line">public class KafkaController &#123;</span><br><span class="line"></span><br><span class="line">    private static final Logger logger =LoggerFactory.getLogger(KafkaController.class);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    @Autowired</span><br><span class="line">    private KafkaProducer kafkaProducer;</span><br><span class="line"></span><br><span class="line">    @RequestMapping(value=&quot;/get-msg&quot;, method=RequestMethod.GET)</span><br><span class="line">    public KafkaMessage sendMsg(@RequestParam(name=&quot;id&quot;) long id,</span><br><span class="line">                                @RequestParam(name=&quot;username&quot;) String username,</span><br><span class="line">                                @RequestParam(name=&quot;password&quot;) String password)&#123;</span><br><span class="line">        logger.info(&quot;sendMsg method is invoked!&quot;);</span><br><span class="line">        KafkaMessage kafkaMessage = new KafkaMessage();</span><br><span class="line">        kafkaMessage.setId(id);</span><br><span class="line">        kafkaMessage.setUsername(username);</span><br><span class="line">        kafkaMessage.setPassword(password);</span><br><span class="line">        kafkaMessage.setDate(new Date());</span><br><span class="line"></span><br><span class="line">        kafkaProducer.sendMessage(kafkaMessage);</span><br><span class="line"></span><br><span class="line">        return kafkaMessage;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @RequestMapping(value=&quot;/post-msg&quot;, method=RequestMethod.POST)</span><br><span class="line">    public KafkaMessage sendMessage(@RequestBody KafkaMessage kafkaMessage)&#123;</span><br><span class="line">        logger.info(&quot;sendMessage method is invoked!&quot;);</span><br><span class="line">        kafkaMessage.setDate(new Date());</span><br><span class="line"></span><br><span class="line">        kafkaProducer.sendMessage(kafkaMessage);</span><br><span class="line"></span><br><span class="line">        return kafkaMessage;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="使用curl发送POST请求验证"><a href="#使用curl发送POST请求验证" class="headerlink" title="使用curl发送POST请求验证"></a>使用curl发送POST请求验证</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl -X POST -H &quot;Content-Type:application/json&quot; -d &apos;&#123;&quot;id&quot;:321,&quot;username&quot;:&quot;王五&quot;,&quot;password&quot;:&quot;123321&quot;&#125;&apos; http://localhost:9090/kafka/post-msg</span><br></pre></td></tr></table></figure>
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://doublexz.github.io/doggie.github.io/doggie.github.io/2020/01/22/Kafka学习第三篇-理论进阶篇/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Doggie">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/doggie.github.io/images/love.jpeg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="CloudXue's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/doggie.github.io/2020/01/22/Kafka学习第三篇-理论进阶篇/" itemprop="url">Kafka学习第三篇-理论进阶篇</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-01-22T21:08:08+08:00">
+                2020-01-22
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/doggie.github.io/categories/消息队列/" itemprop="url" rel="index">
+                    <span itemprop="name">消息队列</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/doggie.github.io/2020/01/22/Kafka学习第三篇-理论进阶篇/" class="leancloud_visitors" data-flag-title="Kafka学习第三篇-理论进阶篇">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="关于kafka分区"><a href="#关于kafka分区" class="headerlink" title="关于kafka分区"></a>关于kafka分区</h2><ul>
+<li>每个分区都是一个有序、不可变的消息队列，后续新来的消息会源源不断地，持续追加到分区的后面，这相当于一种结构化的提交日志。</li>
+<li>分区中的每一条消息都会被分配一个连续的id值（即offset）,该值用于唯一标识分区中的每一条消息。  </li>
+</ul>
+<h2 id="分区的作用"><a href="#分区的作用" class="headerlink" title="分区的作用"></a>分区的作用</h2><ul>
+<li>分区中的消息数据是存储在日志文件中的，而且同一分区中的消息数据是按照发送顺序严格有序的。分区在逻辑上对应一个日志，当生产者将消息写入分区中时，实际上是写到了分区所对应的日志当中。而日志可以看做是一种逻辑上的概念，它对应于磁盘上的一个目录。一个日志文件由多个Segment（段）来构成，每个Segment对应于一个索引文件与一个日志文件。</li>
+<li>借助于分区，我们可以实现Kafka Server的水平扩展。对于一台机器来说，无论是物理机还是虚拟机，其运行能力总归是有上线的。当一台机器达到其能力上限时就无法再扩展了，即垂直扩展能力总是受到硬件制约的。通过使用分区，我们可以将一个主题中的消息分散到不同的Kafka Server上（这里需要使用Kafka集群），这样当期几点能力不足时，我们只需添加机器就可以了，在新的机器上创建新的分区，这样理论上就可以实现无限的水平扩展能力。</li>
+<li>分区还可以实现并行处理能力，向一个主题所发送的消息会发送给该主题所拥有的不同的分区中，这样消息就可以实现并行发送与处理，由多个分区来接收所发送的消息。</li>
+</ul>
+<h2 id="Segment（段）"><a href="#Segment（段）" class="headerlink" title="Segment（段）"></a>Segment（段）</h2><p>一个partition是由一系列有序、不可变的消息所构成的。一个partition中的消息数量可能会非常多，因此显然不能将所有消息都保存到一个文件中。因此，类似于log4j的rolling log，当partition中的消息数量增长到一定程度后，消息文件会进行切割，新的消息会被写到一个新的文件当中，当新的文件增长到一定程度后，新的消息又会被写到另一个新的文件当中，以此类推；这一个个新的数据文件我们称之为Segment（段）。  </p>
+<p>因此，一个partition在物理上是由一个或者多个segment构成的。每个segment中则保存了真实的消息数据。  </p>
+<h2 id="partition与segment之间的关系"><a href="#partition与segment之间的关系" class="headerlink" title="partition与segment之间的关系"></a>partition与segment之间的关系</h2><ul>
+<li>每个partition都相当于一个大型文件被分配到多个大小相等的segment数据文件中，每个segment中的消息数量未必相等（这与消息大小有着紧密的关系，不同的消息所占与的磁盘空间显然是不一样的），这个特点使得老的segment文件可以很容易就被删除掉，有助于提升磁盘的利用效率。</li>
+<li>每个partition只需要支持顺序读写即可，segment文件的生命周期是由Kafka Server的配置参数决定的。比如说，server.properties文件中的参数项log.retention.hours=168表示7天后删除老的消息文件。  </li>
+</ul>
+<h2 id="关于分区目录中的4个文件的含义与作用"><a href="#关于分区目录中的4个文件的含义与作用" class="headerlink" title="关于分区目录中的4个文件的含义与作用"></a>关于分区目录中的4个文件的含义与作用</h2><ul>
+<li>.index： 它是segment文件的索引文件，它与.log日志文件是成对出现的。后缀.index表示这是个索引文件。</li>
+<li>.log： 它是segment文件的数据文件，用于存储实际的消息。该文件是二进制格式的。segment文件的命名规则是partition全局的第一个segment从0开始，后续每个segment文件名为上一个segment文件最后条消息的offset值。没有数字则用0填充。若主题消息较少，则只有一个数据文件。</li>
+<li>.timeindex： 该文件是一个基于消息日期的索引文件，主要用途是在一些根据日期或是时间来寻找消息的场景下使用，在基于时间的日志rolling或是基于基于时间的日至保留策略等情况下也会使用。实际上该文件是在Kafka较新的版本中才增加的，老版本Kafka是没有该文件的。它是对<em>.index文件的一个有益补充。</em>.index文件是基于偏移量的索引文件，而 *.timeindex则是基于时间戳的索引文件。  </li>
+<li>leader-epoch-checkpoint： 是leader的一个缓存文件。实际上，它是与Kafka的HW(High Water)和LEO(Log End Offset)相关的一个重要文件。</li>
+</ul>
+<h2 id="Kafka脚本重要命令"><a href="#Kafka脚本重要命令" class="headerlink" title="Kafka脚本重要命令"></a>Kafka脚本重要命令</h2><p>创建主题<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">bin/kafka-topics.sh --create --zookeeper localhost;2181 --replication-factor 1 --partitions --topic myTopic</span><br><span class="line">``` </span><br><span class="line">显示已有主题列表</span><br></pre></td></tr></table></figure></p>
+<p>bin/kafka-topics.sh –list –zookeeper localhost:218<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">查看某个主题详细信息</span><br></pre></td></tr></table></figure></p>
+<p>bin/kafka-topics.sh –describe –topic myTopic –zookeeper localhost 2181<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">开启生产者</span><br></pre></td></tr></table></figure></p>
+<p>bin/kafka-console-producer.sh –broker-list localhost:9092 –topic myTopic<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">开启消费者</span><br></pre></td></tr></table></figure></p>
+<p>bin/kafka-console-consumer.sh –bootstrap-server localhost:9092 –topic myTopic –from beginning<br><code>`</code></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://doublexz.github.io/doggie.github.io/doggie.github.io/2020/01/07/Kafka学习第二篇-理论篇/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Doggie">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/doggie.github.io/images/love.jpeg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="CloudXue's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/doggie.github.io/2020/01/07/Kafka学习第二篇-理论篇/" itemprop="url">Kafka学习第二篇-理论篇</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-01-07T09:38:44+08:00">
+                2020-01-07
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/doggie.github.io/categories/消息队列/" itemprop="url" rel="index">
+                    <span itemprop="name">消息队列</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/doggie.github.io/2020/01/07/Kafka学习第二篇-理论篇/" class="leancloud_visitors" data-flag-title="Kafka学习第二篇-理论篇">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="Kafka简介"><a href="#Kafka简介" class="headerlink" title="Kafka简介"></a>Kafka简介</h2><p>Kafka被用于构建实时的数据管道和流式app。它具备水平扩展性、容错性、速度快，且已运行在多家公司的生产环境中。<br>Kafka是一个分布式的流式平台。分布式流式平台具备三个关键能力：  </p>
+<ul>
+<li>发布和订阅消息，类似于消息队列或企业消息传输系统</li>
+<li>以容错的持久化方式存储消息</li>
+<li>在消息发生时可以实时处理它们</li>
+</ul>
+<p>Kafka通常用于两大类应用：</p>
+<ul>
+<li>构建实时的流式数据管道，可以从系统和应用之间可靠地获取数据；</li>
+<li>构建实时的流式应用，可以传输和响应数据流。</li>
+</ul>
+<p>几个概念：</p>
+<ul>
+<li>Kafka以集群的形式运行在一个或者多个服务器上，可以跨越多个数据中心。</li>
+<li>Kafka集群以目录的形式存储消息，称之为主题。</li>
+<li>每条记录包含key、value和时间戳</li>
+</ul>
+<p>Kafka有四中核心API：</p>
+<ul>
+<li>Producer API允许应用发布消息到一个或者多个Kafka主题。</li>
+<li>Consumer API允许订阅一个或者多个主题，并处理主题对其产生的消息。</li>
+<li>Streams API允许应用作为一个流处理器，消费来自一个或多个主题的输入流，并产生输出流到一个或多个主题，有效的将输入流转换为输出流。</li>
+<li>Connector API允许构建和运行可重用的生产者或消费者，将Kafka主题连接到现有的应用程序或数据系统。例如，关系型数据库的连接器将会捕获每张表的改变。  </li>
+</ul>
+<p>在Kafka中，客户端与服务端之间的通讯是通过一个简单的、高性能的、语言无关的TCP协议完成。这个协议是版本化的，且能够向后兼容老版本。官方提供了Java客户端，但其实客户端可以使用其他语言。  </p>
+<p><img src="http://kafka.apache.org/23/images/kafka-apis.png" alt></p>
+<h2 id="Topics-and-Logs-主题与日志"><a href="#Topics-and-Logs-主题与日志" class="headerlink" title="Topics and Logs(主题与日志)"></a>Topics and Logs(主题与日志)</h2><p>首先研究下Kafka为消息提供的核心抽象概念-主题(topic)。</p>
+<p>主题是发布记录的类别或者源(feed)名称。Kafka中的主题总是多用户的；即主题可以有零个、一个或多个消费者来订阅写入其中的数据。  </p>
+<p>对每一个主题，kafka集群管理着一个如下的分区日志(partitioned log)：</p>
+<p><img src="http://kafka.apache.org/23/images/log_anatomy.png" alt><br>每个分区是一个有序的、不可变的记录序列，这个序列会持续的增加，形成一个结构化提交日志。分区中的每条记录被赋予一个称为偏移量(offset)的序列化ID值来唯一标识分区中的记录。  </p>
+<p>Kafka集群使用一个可配置的保留期来持久化所有发布的记录，无论该记录是否被消费。例如，如果保留策略被设置为两天，那么在记录发布后的两天内，他都是可以被用于消费的，两天后，将会被丢弃来释放空间。Kafka的性能是一个关于数据大小的有效常量，因此长时间存储数据不会有任何问题。  </p>
+<p><img src="http://kafka.apache.org/23/images/log_consumer.png" alt><br>实际上，每个消费者唯一持有的元数据是消费者在日志中的偏移量或位置。该偏移量由消费者控制：通常，消费者会根据读取的记录线性地增加偏移量，但实际上，鉴于消费者控制这个位置，它可能以它喜欢的任何顺序消费记录。例如，消费者可以重置老的偏移量来重新处理以前的数据，或者跳过开头到最近的数据，并以此为起始位置开始消费。  </p>
+<p>这些特点的结合意味着Kafka的消费者是非常廉价的，它们的去或留不会对集群或其他消费者产生任何影响。例如，可以使用命令行工具’tail’任何主题的内容，而不会对已有的消费者产生任何影响。  </p>
+<p>日志中分区有几个用途。首先，他们允许日志扩展到超出单个服务器的大小。每个单独的分区必须适合持有它的服务器，但是一个主题可能包含多个分区，所以它可以处理任意数量的数据。其次，他们作为平行的单元，在这一点上可以做的更多。</p>
+<h2 id="Distribution-分销"><a href="#Distribution-分销" class="headerlink" title="Distribution(分销)"></a>Distribution(分销)</h2><p>日志分区遍布Kafka集群的服务器中，每台服务器处理数据和共享分区的请求。每个分区被复制到可配置数量的服务器上用于容错。  </p>
+<p>每个分区都有一台服务器作为“leader”，零台或更多服务器作为“followrs”。leader为分区处理所有的读写请求，follower会被动的复制leader。如果leader挂了，其中的一个follower会自动成为leader。每台服务器会作为某些分区的leader和其他分区的follower，因此负载在集群中可以很好的被均衡。</p>
+<h2 id="Producers-生产者"><a href="#Producers-生产者" class="headerlink" title="Producers(生产者)"></a>Producers(生产者)</h2><p>生产者将发布数据到其选择的主题。生产者负责选择发布哪条记录到主题下的哪个分区。这可以使用round-robin算法实现简单的负载均衡，或者通过语义分区函数实现。分区时通常使用第二种。</p>
+<h2 id="Consumers-消费者"><a href="#Consumers-消费者" class="headerlink" title="Consumers(消费者)"></a>Consumers(消费者)</h2><p>消费者会在他们身上打上名为消费者组的标签，且每一条发布到主题的记录会被分发给订阅了消费者组中每一个的消费者实例。消费者实例可以运行在单独的进程中，也可以运行在单独的服务器上。  </p>
+<p>如果所有的消费者实例在相同的消费者组中，那么消息会被有效的负载均衡到每一个消费者实例上。  </p>
+<p>如果所有的消费者实例在不同的消费者组中，那么每一条记录将会被广播到所有的消费者进程中。  </p>
+<p><img src="http://kafka.apache.org/23/images/consumer-groups.png" alt="11111"><br>两个服务器的Kafka集群，拥有四个分区（P0-P4）和两个消费者组。消费者组A有两个消费者实例，消费者组B有四个消费者实例。  </p>
+<p>更常见的是，我们发现主题有少量的消费者组，每一个消费者组都有一个“逻辑订阅者”。每个消费者组由多个消费者实例组成，用于扩容和容错。这只不过是发布-订阅语义，其中订阅服务器是消费者集群，而不是单个进程。  </p>
+<p>Kafka中实现消费的方式是通过在消费者实例上划分日志中的分区，以便在任何时间点每一个实例是“公平共享”分区的专有消费者。这种维护组中成员资格的过程由Kafka协议动态处理。如果一个新的实例加入到组中，它会从组中其他成员那里分担一些分区；如果某个实例挂掉了，它的分区会被分发给其他活跃的实例。  </p>
+<p>Kafka只提供分区内记录的总顺序，而不提供主题中不同分区之间的总顺序。对于大部分应用来说，按分区排序和按键分区数据的能力已经足够了。然而，如果你需要记录总的顺序，可以通过只有一个分区的主题来实现，尽管这意味着每个消费者组只有一个消费者进程。  </p>
+<h2 id="Multi-tenancy"><a href="#Multi-tenancy" class="headerlink" title="Multi-tenancy"></a>Multi-tenancy</h2><p>可以将Kafka部署为多租户(Multi-tenancy)解决方案。Multi-tenancy可以通过配置哪个主题生产或者消费数据的方式来实现。还有对配额(quotas)的支持。管理员可以定义和强制请求上的配额来控制客户端使用的代理资源。</p>
+<h2 id="Guarantee"><a href="#Guarantee" class="headerlink" title="Guarantee"></a>Guarantee</h2><p>高性能kafka给予以下保证：  </p>
+<ul>
+<li>生产者发送消息到特定的主题分区，将会按照消息发送的顺序被追加。也就是说，如果消息M1和M2由同一个生产者发送，且M1先发送，那么M1的偏移量比M2小，且比M2更早的出现在日志中。</li>
+<li>消费者实例按照日志中存储的顺序查看消息。</li>
+<li>对于拥有N个副本的主题，最多容忍N-1个服务器故障，从而保证不会丢失任何提交到日志中的记录。 </li>
+</ul>
+<h2 id="Kafka-as-a-Messaging-System"><a href="#Kafka-as-a-Messaging-System" class="headerlink" title="Kafka as a Messaging System"></a>Kafka as a Messaging System</h2><h2 id="Kafka-as-a-Storage-System"><a href="#Kafka-as-a-Storage-System" class="headerlink" title="Kafka as a Storage System"></a>Kafka as a Storage System</h2><h2 id="Kafka-for-Stream-Processing"><a href="#Kafka-for-Stream-Processing" class="headerlink" title="Kafka for Stream Processing"></a>Kafka for Stream Processing</h2><h2 id="Putting-the-Pieces-Together-综合应用"><a href="#Putting-the-Pieces-Together-综合应用" class="headerlink" title="Putting the Pieces Together(综合应用)"></a>Putting the Pieces Together(综合应用)</h2>
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://doublexz.github.io/doggie.github.io/doggie.github.io/2020/01/06/Kafka学习第一篇-入门篇/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Doggie">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/doggie.github.io/images/love.jpeg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="CloudXue's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/doggie.github.io/2020/01/06/Kafka学习第一篇-入门篇/" itemprop="url">Kafka学习第一篇-入门篇</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-01-06T16:30:59+08:00">
+                2020-01-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/doggie.github.io/categories/消息队列/" itemprop="url" rel="index">
+                    <span itemprop="name">消息队列</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/doggie.github.io/2020/01/06/Kafka学习第一篇-入门篇/" class="leancloud_visitors" data-flag-title="Kafka学习第一篇-入门篇">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="软件安装"><a href="#软件安装" class="headerlink" title="软件安装"></a>软件安装</h2><p><a href="http://kafka.apache.org/downloads" target="_blank" rel="noopener">官网下载Kafka</a> ,选择<code>kafka_2.11-2.4.0.tgz</code>下载<br>Kafka 严重依赖ZooKeeper，通过ZooKeeper管理各种数据和元数据，所以可以使用Kafka自带的ZZooKeeper,也可以去<a href="http://zookeeper.apache.org/" target="_blank" rel="noopener">Zookeeper官网下载</a><br>示例使用Kafka自带ZooKeeper。 </p>
+<h2 id="第一个示例"><a href="#第一个示例" class="headerlink" title="第一个示例"></a>第一个示例</h2><h3 id="Step-1-下载Kafka并解压"><a href="#Step-1-下载Kafka并解压" class="headerlink" title="Step 1: 下载Kafka并解压"></a>Step 1: 下载Kafka并解压</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">tar -xvf kafka_2.11-2.4.0.tgz</span><br><span class="line">cd kafka_2.11-2.4.0</span><br></pre></td></tr></table></figure>
+<h3 id="Step-2-启动-Server"><a href="#Step-2-启动-Server" class="headerlink" title="Step 2:启动 Server"></a>Step 2:启动 Server</h3><p>启动ZooKeeper实例<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bin/zookeeper-server-start.sh config/zookeeper.properties</span><br></pre></td></tr></table></figure></p>
+<p>出现以下信息表示ZooKeeper启动成功<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[2020-01-06 17:09:05,071] INFO binding to port 0.0.0.0/0.0.0.0:2181 (org.apache.zookeeper.server.NIOServerCnxnFactory)</span><br><span class="line">[2020-01-06 17:09:05,087] INFO zookeeper.snapshotSizeFactor = 0.33 (org.apache.zookeeper.server.ZKDatabase)</span><br><span class="line">[2020-01-06 17:09:05,089] INFO Snapshotting: 0x0 to /tmp/zookeeper/version-2/snapshot.0 (org.apache.zookeeper.server.persistence.FileTxnSnapLog)</span><br><span class="line">[2020-01-06 17:09:05,092] INFO Snapshotting: 0x0 to /tmp/zookeeper/version-2/snapshot.0 (org.apache.zookeeper.server.persistence.FileTxnSnapLog)</span><br><span class="line">[2020-01-06 17:09:05,112] INFO Using checkIntervalMs=60000 maxPerMinute=10000 (org.apache.zookeeper.server.ContainerManager)</span><br></pre></td></tr></table></figure></p>
+<p>新建一个终端窗口，启动Kafka server<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bin/kafka-server-start.sh config/server.properties</span><br></pre></td></tr></table></figure></p>
+<p>出现以下信息表示Kafka server启动成功<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[2020-01-06 17:15:19,195] INFO [SocketServer brokerId=0] Started data-plane processors for 1 acceptors (kafka.network.SocketServer)</span><br><span class="line">[2020-01-06 17:15:19,198] INFO Kafka version: 2.4.0 (org.apache.kafka.common.utils.AppInfoParser)</span><br><span class="line">[2020-01-06 17:15:19,198] INFO Kafka commitId: 77a89fcf8d7fa018 (org.apache.kafka.common.utils.AppInfoParser)</span><br><span class="line">[2020-01-06 17:15:19,198] INFO Kafka startTimeMs: 1578302119196 (org.apache.kafka.common.utils.AppInfoParser)</span><br><span class="line">[2020-01-06 17:15:19,200] INFO [KafkaServer id=0] started (kafka.server.KafkaServer)</span><br></pre></td></tr></table></figure></p>
+<h3 id="Setp-3-创建主题"><a href="#Setp-3-创建主题" class="headerlink" title="Setp 3: 创建主题"></a>Setp 3: 创建主题</h3><p>新建一个终端窗口，创建一个只有一个分区和副本的名为”test”的主题（topic）<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bin/kafka-topics.sh --create --bootstrap-server localhost:9090 --replication-factor 1 --partitions 1 --topic test</span><br></pre></td></tr></table></figure></p>
+<p>查看主题列表<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">bin/kafka-topics.sh --list --bootstrap-server localhost:9092</span><br><span class="line">test</span><br></pre></td></tr></table></figure></p>
+<p>表示主题创建成功！</p>
+<h3 id="Setp-4-发送一些消息"><a href="#Setp-4-发送一些消息" class="headerlink" title="Setp 4: 发送一些消息"></a>Setp 4: 发送一些消息</h3><p>Kafka的命令行客户端将从一个文件或者标准输入获取输入信息，并将其作为消息发送给Kafka集群。默认情况下，每一行作为一个单独的消息发出。<br>新建生产者终端窗口：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">bin/kafka-console-producer.sh --broker-list localhost:9092 --topic test</span><br><span class="line">&gt;这是一个消息</span><br><span class="line">&gt;Hello World</span><br><span class="line">&gt;你好吗</span><br><span class="line">&gt;</span><br></pre></td></tr></table></figure></p>
+<h3 id="Step-5-启动消费者"><a href="#Step-5-启动消费者" class="headerlink" title="Step 5: 启动消费者"></a>Step 5: 启动消费者</h3><p>Kafka也有一个命令行客户端，可以将消息展示到标准输出。<br>新建消费者终端窗口：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test --from-beginning</span><br><span class="line">[2020-01-06 17:38:03,925] WARN [Consumer clientId=consumer-console-consumer-58504-1, groupId=console-consumer-58504] Connection to node 0 (/172.21.3.9:9092) could not be established. Broker may not be available. (org.apache.kafka.clients.NetworkClient)</span><br><span class="line">这是一个消息</span><br><span class="line">Hello World</span><br><span class="line">你好吗</span><br></pre></td></tr></table></figure></p>
+<p>启动后，生产者发送到topic的消息会被拉取并显示。此时，切换到生产者终端窗口，继续输入消息，消息会被实时发送给消费者。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://doublexz.github.io/doggie.github.io/doggie.github.io/2020/01/02/SpringBoot集成WebSocket示例/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Doggie">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/doggie.github.io/images/love.jpeg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="CloudXue's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/doggie.github.io/2020/01/02/SpringBoot集成WebSocket示例/" itemprop="url">SpringBoot集成WebSocket示例</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-01-02T15:00:30+08:00">
+                2020-01-02
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/doggie.github.io/categories/Java-Web/" itemprop="url" rel="index">
+                    <span itemprop="name">Java Web</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/doggie.github.io/2020/01/02/SpringBoot集成WebSocket示例/" class="leancloud_visitors" data-flag-title="SpringBoot集成WebSocket示例">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="WebSocket"><a href="#WebSocket" class="headerlink" title="WebSocket "></a>WebSocket </h2><p>WebSocket是HTML5的一种新的协议，建立在TCP协议之上，实现了客户端和服务端全双工异步通信。<br>它和HTTP最大的不同是：  </p>
+<ul>
+<li>WebSocket是一种双向通信协议，WebSocket服务器和Browser/Client Agent都能主动向对方发送或者接收数据；</li>
+<li>WebSocket需要类似TCP的客户端和服务器端通过握手连接，连接成功后才能相互通信。  </li>
+</ul>
+<p>WebSocket协议提供了一种标准的方式，在客户端与服务端之间通过使用单一的TCP连接建立一个全双工的、双向通信渠道。它是区别于HTTP的TCP协议，但设计用于HTTP，使用80和443端口，且允许复用已有的防火墙规则。  </p>
+<p>WebSocket交互始于HTTP请求，使用HTTP的<code>Upgrade</code>头来进行升级，切换到WebSocket协议：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">GET /spring-websocket-portfolio/portfolio HTTP/1.1</span><br><span class="line">Host: localhost:8080</span><br><span class="line">Upgrade: websocket</span><br><span class="line">Connection: Upgrade</span><br><span class="line">Sec-WebSocket-Key: Uc9l9TMkWGbHFD2qnFHltg==</span><br><span class="line">Sec-WebSocket-Protocol: v10.stomp, v11.stomp</span><br><span class="line">Sec-WebSocket-Version: 13</span><br><span class="line">Origin: http://localhost:8080</span><br></pre></td></tr></table></figure></p>
+<p>服务端返回101状态码，而非200状态码。  </p>
+<pre><code>HTTP/1.1 101 Switching Protocols
+Upgrade: websocket
+Connection: Upgrade
+Sec-WebSocket-Accept: 1qVdfYHU9hPOl4JYYNXF623Gzn0=
+Sec-WebSocket-Protocol: v10.stomp
+</code></pre><p>在这次成功的握手后，HTTP升级请求底层的TCP套接字仍会为客户端和服务端开启，用于发送和接收消息。  </p>
+<h2 id="HTTP-VS-WebSocket"><a href="#HTTP-VS-WebSocket" class="headerlink" title="HTTP VS WebSocket"></a>HTTP VS WebSocket</h2><p>即使WebSocket被设计成与HTTP兼容，且以HTTP请求开始，理解这两个协议的不同架构和应用程序模型是很重要的。  </p>
+<p>在HTTP和REST中，已用通过URL被分成多个模块。客户端通过访问这些URL，以请求-响应的形式来与应用交互。服务端基于HTTP的URL、方法和请求头，将请求路由的相关的处理器。  </p>
+<p>相比之下，WebSocket只有一个用于初始化连接的URL，然后所有的应用消息在相同的TCP连接上传递。这一点完全不同于异步的、事件驱动的消息传递架构。  </p>
+<p>WebSocket也是一种低级的传输协议，不像HTTP为消息内容定义语义。这意味着，除非客户端和服务端在消息语义上达成一致，否则不会路由和处理该消息。  </p>
+<p>WebSocketk客户端和服务端可以在HTTP握手请求上通过<code>Sec-WebSocket-Protocol</code>头，协商使用一种高级的消息传输协议（如，STOMP）</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://doublexz.github.io/doggie.github.io/doggie.github.io/2019/12/31/使用非root用户停止和启动Apache、Nginx的方法/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Doggie">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/doggie.github.io/images/love.jpeg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="CloudXue's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/doggie.github.io/2019/12/31/使用非root用户停止和启动Apache、Nginx的方法/" itemprop="url">使用非root用户停止和启动Apache、Nginx的方法</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-12-31T10:31:18+08:00">
+                2019-12-31
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/doggie.github.io/categories/Linux/" itemprop="url" rel="index">
+                    <span itemprop="name">Linux</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/doggie.github.io/2019/12/31/使用非root用户停止和启动Apache、Nginx的方法/" class="leancloud_visitors" data-flag-title="使用非root用户停止和启动Apache、Nginx的方法">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>Apache或Nginx监听80或者443端口，root权限被回收后，修改配置文件需要重启的情况下，通过给二进制文件set UID的方式实现： </p>
+<h2 id="Apache"><a href="#Apache" class="headerlink" title="Apache"></a>Apache</h2><p>root用户登录进入到<code>/opt/apache/</code>bin目录下<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"># cd /opt/apache/bin</span><br><span class="line"># chown root httpd</span><br><span class="line"># chmod u+s httpd</span><br><span class="line"># su - chatweb</span><br><span class="line">$ ll httpd </span><br><span class="line">-rwsr-xr-x 1 root chatweb 1546353 2017-08-14 httpd</span><br><span class="line">$ /opt/apache/bin/apachectl start</span><br></pre></td></tr></table></figure></p>
+<h2 id="Nginx"><a href="#Nginx" class="headerlink" title="Nginx "></a>Nginx </h2><p>root用户进入<code>/.../nginx/sbin</code>目录下<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"># cd /.../nginx/sbin</span><br><span class="line"># chown root nginx</span><br><span class="line"># chmod u+s nginx</span><br><span class="line"># su - nginx</span><br><span class="line">$ ll nginx</span><br><span class="line">-rwsr-xr-x 1 root nginx 3289160 2019-05-05 nginx</span><br><span class="line">$ /.../nginx/sbin/nginx -s reload</span><br></pre></td></tr></table></figure></p>
+<h2 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h2><p>Linux系统中的文件除了user id和group id外，还有俩称之为effective的id，四个id简写为uid、gid和euid、egid。<br>内核主要是根据euid和egid来确定进程对资源的访问权限：  </p>
+<ul>
+<li>一个进程如果没有SUID或SGID位，则euid=uid egid=gid，分别是运行这个程序的用户的uid和gid；</li>
+<li>如果一个程序设置了SUID，则euid和egid变成被运行的程序的所有者的uid和gid；</li>
+<li>SUID的优先级比SGID高，当一个可执行程序设置了SUID，则SGID会自动变成相应的egid  </li>
+</ul>
+<p>set UID（SUID）的作用是让执行该命令的用户以该命令拥有者的权限去执行。假如启动命令的拥有者是root用户，普通用户执行命令时就会拥有root的权限，然后使用root权限去操作服务。<br>set UID的方式只针对二进制文件，是在执行程序（程序的可执行位被设置）时起作用，而可执行位只对普通文件和目录文件有意义。  </p>
+<p>给文件加或去掉SUID和SGID的命令如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"># chmod u+s filename 设置SUID位</span><br><span class="line"># chmod u-s filename 去掉SUID设置</span><br><span class="line"># chmod g+s filename 设置SGID位</span><br><span class="line"># chmod g-s filename 去掉SGID设置</span><br></pre></td></tr></table></figure></p>
+<p>如果一个文件被设置了SUID或SGID位，会分别表现在所有者或同组用户的权限的可执行位上。例如：<br>1、-rwsr-xr-x 表示SUID和所有者权限中可执行位被设置<br>2、-rwSr–r– 表示SUID被设置，但所有者权限中可执行位没有被设置<br>3、-rwxr-sr-x 表示SGID和同组用户权限中可执行位被设置<br>4、-rw-r-Sr– 表示SGID被设置，但同组用户权限中可执行位没有被设置</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://doublexz.github.io/doggie.github.io/doggie.github.io/2019/12/27/Environment组件的重要作用/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -916,983 +1964,11 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://doublexz.github.io/doggie.github.io/doggie.github.io/2019/12/18/SpringBootApplication注解深度解析/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Doggie">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/doggie.github.io/images/love.jpeg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="CloudXue's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/doggie.github.io/2019/12/18/SpringBootApplication注解深度解析/" itemprop="url">@SpringBootApplication注解深度解析</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-12-18T15:08:40+08:00">
-                2019-12-18
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category">
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/doggie.github.io/categories/Java-Web/" itemprop="url" rel="index">
-                    <span itemprop="name">Java Web</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-             <span id="/doggie.github.io/2019/12/18/SpringBootApplication注解深度解析/" class="leancloud_visitors" data-flag-title="@SpringBootApplication注解深度解析">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="SpringBootApplication"><a href="#SpringBootApplication" class="headerlink" title="@SpringBootApplication"></a>@SpringBootApplication</h2><p>表示声明了一个或多个@Bean方法的配置类，同时会触发自动配置(auto-configuration)和组件扫描(component scanning)。<br>是一个方便的注解，等价于@SpringBootConfiguration、@EnableAutoConfiguration和@ComponentScan注解。  </p>
-<h2 id="SpringBootConfiguration"><a href="#SpringBootConfiguration" class="headerlink" title="@SpringBootConfiguration"></a>@SpringBootConfiguration</h2><p>表示一个提供Spring Boot应用配置的类。可以作为Spring的标准@Configuration注解的替代方案，使配置可以被自动发现。<br>每个应用应该只包含一个@SpringBootConfiguration注解且常用的Spring Boot 应用将从@SpringBootApplication注解来继承它。  </p>
-<h2 id="EnableAutoConfiguration-注解"><a href="#EnableAutoConfiguration-注解" class="headerlink" title="@EnableAutoConfiguration 注解"></a>@EnableAutoConfiguration 注解</h2><p>该注解使Spring应用上下文具备自动配置功能，会试图猜测并配置你可能需要的bean。自动配置类通常基于类路径(classpath)和自定义的bean。例如，如果在classpath中包含<code>tomcat-embedded.jar</code>，那么就可能需要<code>TomcatServletWebServerFactory</code>(除非已经定义了<code>ServletWebServerFactory</code> bean)  </p>
-<p>当使用@SpringBootApplication注解时，上下文中的自动配置是自动生效，因此，再添加<code>@EnableAutoConfiguration</code>注解不会有额外的作用，即不需要该注解。  </p>
-<p>自动配置尝试尽可能智能化，并在你定义了更多的bean时退出。可以使用<code>exclude()</code>排除任何不需要的配置（如果没有这些配置的访问权限，可以使用<code>excludeName()</code>方法）。也可以用<code>spring.autoconfigure.exclude</code>属性来排除（过滤）。自动配置通常在用户自定义的bean注册后才被加载。  </p>
-<p><code>@EnableAutoConfiguration</code>注解的类所在包有具体意义且通常作为默认的包。例如，它会被用于扫描<code>@Entry</code>类。通常建议将<code>@EnableAutoConfiguration</code>（如果未使用<code>@SpringBootApplication</code>）放入最顶层的包中，那么其所有子包和类都会被扫描加载。  </p>
-<p>自动配置类是常规的Spring配置bean。他们使用<code>SpringFactoriesLoader</code>机制来加载。通常自动配置Bean是<code>@Conditional</code>的（通常使用<code>@ConditionalOnClass</code>和<code>@ConditionalOnMissingBean</code>来注解)。  </p>
-<h2 id="ComponentScan-注解"><a href="#ComponentScan-注解" class="headerlink" title="@ComponentScan 注解"></a>@ComponentScan 注解</h2><p>用于配置类的组件扫描机制。提供与Spring XML的<code>&lt;context:component-scan&gt;</code>元素相同的功能。  </p>
-<p><code>basePackageClasses</code>或者<code>basePackages</code>来指定扫描特定的包，如果未定义特定的包，那么会扫描声明了该注解的类所在的包。  </p>
-<p>注意<code>&lt;context:component-scan&gt;</code>元素有一个<code>annotation-config</code>属性；然而<code>@ComponentScan</code>注解没有。这是因为在所有使用<code>@ComponentScan</code>注解的案例中，默认注解配置处理是假设成立的。而且，当使用<code>@AnnotationConfigApplicationContext</code>注解时，注解配置处理器也会被注册，这意味着任何在<code>@ComponentScan</code>层面隐藏他们的操作都会被忽略。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://doublexz.github.io/doggie.github.io/doggie.github.io/2019/12/18/SpringBoot可运行jar启动过程分析/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Doggie">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/doggie.github.io/images/love.jpeg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="CloudXue's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/doggie.github.io/2019/12/18/SpringBoot可运行jar启动过程分析/" itemprop="url">SpringBoot可运行jar启动过程分析</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-12-18T11:07:33+08:00">
-                2019-12-18
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category">
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/doggie.github.io/categories/Java-Web/" itemprop="url" rel="index">
-                    <span itemprop="name">Java Web</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-             <span id="/doggie.github.io/2019/12/18/SpringBoot可运行jar启动过程分析/" class="leancloud_visitors" data-flag-title="SpringBoot可运行jar启动过程分析">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>通过maven或者gradle命令构建出来的可运行jar包解压后，在<code>META-INF/MANIFEST.MF</code>中<code>Main-Class</code>值为<code>org.springframework.boot.loader.JarLauncher</code><br>该类位于与<code>META-INF/</code>同目录的<code>org/springframework/boot/loader</code>目录中。经过对比发下，后者就是<code>spring-boot-loader-version.jar</code>包解压后的全部内容。  </p>
-<ul>
-<li>打包可运行jar文件时，不能再jar中嵌套jar文件；  </li>
-<li>如果jar文件中嵌套jar文件，则该jar文件称为FatJar，需要自定义加载器才能使该FatJar可运行；</li>
-<li>通过<code>java -jar spring-boot-loader-version.jar</code>命令运行SpringBoot打出的jar包时，根据jar运行机制，运行<code>MANIFEST.MF</code>中定义的<code>Main-Class</code>指定的类中的main方法，该类为<code>org.springframework.boot.loader.JarLauncher</code>  </li>
-</ul>
-<p>JarLauncher的继承结构如下<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">@startuml</span><br><span class="line">abstract class Launcher</span><br><span class="line">abstract class ExecutableArchiveLauncher</span><br><span class="line">abstract class JarLauncher</span><br><span class="line">ExecutableArchiveLauncher &lt;|-- JarLauncher</span><br><span class="line">Launcher&lt;|-- ExecutableArchiveLauncher</span><br><span class="line">@enduml</span><br></pre></td></tr></table></figure></p>
-<p>JarLauncher中的main方法:</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">public static void main(String[] args) throws Exception &#123;</span><br><span class="line">    (new JarLauncher()).launch(args);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>创建JarLauncher实例时，自己本身的无参构造方法未做任何事情，会先调用父类的无参构造方法：完成<code>Archive</code>对象的初始化，<code>Archive</code>对象就表示<code>spring-boot-loader-version.jar</code>在硬盘上的绝对物理路径。然后调用<code>Launcher</code>类中的<code>launch(String[] args)</code>方法：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">protected void launch(String[] args) throws Exception &#123;</span><br><span class="line">	JarFile.registerUrlProtocolHandler();</span><br><span class="line">	ClassLoader classLoader = createClassLoader(getClassPathArchives());</span><br><span class="line">	launch(args, getMainClass(), classLoader);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>该方法完成的主要事情就是：通过<br><code>ClassLoader classLoader = createClassLoader(getClassPathArchives());</code><br>创建自定义加载器<code>LauncherdURLClassLoader</code>,该加载器会将FatJar中<code>BOOT-INF/classes</code>和<code>BOOT-INF/lib</code>目录下的所有文件加载到系统类加载器(应用类加载器)中;  </p>
-<p>继续调用重写的<code>launch</code>方法:</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">protected void launch(String[] args, String mainClass, ClassLoader classLoader)</span><br><span class="line">			throws Exception &#123;</span><br><span class="line">    Thread.currentThread().setContextClassLoader(classLoader);</span><br><span class="line">	createMainMethodRunner(mainClass, args, classLoader).run();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>首先通过<br><code>Thread.currentThread().setContextClassLoader(classLoader);</code><br>设置当前线程的上下文类加载器为之前创建的自定义加载器<code>LaunchedURLCLassLoader</code>；<br>然后创建<code>MainMethodRunner</code>实例，指定要运行的<code>mainClassName</code>为<code>MANIFEST.MF</code>中定义的<code>Start-Class</code>属性值，即SpringBoot启动类。<br>最后运行<code>run()</code>方法，使用反射机制运行SpringBoot启动类中的<code>main</code>方法。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">public void run() throws Exception &#123;</span><br><span class="line">	Class&lt;?&gt; mainClass = Thread.currentThread().getContextClassLoader()</span><br><span class="line">				.loadClass(this.mainClassName);</span><br><span class="line">	Method mainMethod = mainClass.getDeclaredMethod(&quot;main&quot;, String[].class);</span><br><span class="line">	mainMethod.invoke(null, new Object[] &#123; this.args &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<h4 id="总结："><a href="#总结：" class="headerlink" title="总结："></a>总结：</h4><ul>
-<li>使用gradle或者maven打出来的可运行jar包为一个FatJar；</li>
-<li>FatJar中的启动类为<code>org.springframework.boot.loader.JarLauncher</code>，该类实际位于<code>spring-boot-loader-version.RELEASW.jar</code>辅助jar包中，实际打包成FatJar时，辅助jar包会被解压放到FatJar中，以便遵循jar规范，使其可运行；</li>
-<li>运行<code>org.springframework.boot.loader.JarLauncher</code>中的main方法时，会创建自定义类加载器，加载FatJar中的<code>BOOT-INF/classes/</code>和<code>BOOT-INF/lib/</code>目录下的所有文件加载到系统类加载器(应用类加载器)中;</li>
-<li>通过反射机制运行SpringBoot启动类中的<code>main</code>方法，来实现FatJar的运行。</li>
-</ul>
-<h4 id="延伸："><a href="#延伸：" class="headerlink" title="延伸："></a>延伸：</h4><ul>
-<li>通过反射机制运行SpringBoot中的main方法时，传入的第一个参数是null: <code>mainMethod.invoke(null, new Object[] { this.args });</code><br>这是因为定义的main方法是static的，类中的静态方法不归属于当前类，而是归属于当前类所对应的class对象,所以可以使用null，也可以使用任意对象。  </li>
-<li>既然使用的是反射机制来运行SpringBoot中启动类的方法，那么这个方法是否必须是main方法，答案是否定的，如果只是通过<code>java -jar</code>命令这种方式来SpringBoot应用，那么可以指定任意方法。此处默认使用main方法是为了开发时SpringBoot应用可以在IDE中运行。 </li>
-</ul>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://doublexz.github.io/doggie.github.io/doggie.github.io/2019/05/14/Item-18组合优于继承/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Doggie">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/doggie.github.io/images/love.jpeg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="CloudXue's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/doggie.github.io/2019/05/14/Item-18组合优于继承/" itemprop="url">Item-18组合优于继承</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-05-14T09:31:19+08:00">
-                2019-05-14
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category">
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/doggie.github.io/categories/Java/" itemprop="url" rel="index">
-                    <span itemprop="name">Java</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-             <span id="/doggie.github.io/2019/05/14/Item-18组合优于继承/" class="leancloud_visitors" data-flag-title="Item-18组合优于继承">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <p>继承是实现代码复用的有效方式，但对于工作来说它并不总是最好的工具。使用不当就会导致脆弱的软件系统。在同一个包中使用继承是安全的，在这里子类和父类在同一个程序员的控制下。继承特殊设计且注释了扩展的类也是安全的（Item 19）。然而，跨包继承普通的抽象类是危险的。作为一个提示，本书使用“继承”一词来表示实现继承（一个类扩展另一个类）。在本条款中讨论的问题不适合接口继承（一个类实现了一个接口或者一个接口继承了另一个）。
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/doggie.github.io/2019/05/14/Item-18组合优于继承/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </p></div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://doublexz.github.io/doggie.github.io/doggie.github.io/2019/04/28/Linux系统使用非root用户安装并管理Nginx/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Doggie">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/doggie.github.io/images/love.jpeg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="CloudXue's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/doggie.github.io/2019/04/28/Linux系统使用非root用户安装并管理Nginx/" itemprop="url">Linux系统使用非root用户安装并管理Nginx</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-04-28T17:32:30+08:00">
-                2019-04-28
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category">
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/doggie.github.io/categories/Nginx/" itemprop="url" rel="index">
-                    <span itemprop="name">Nginx</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-             <span id="/doggie.github.io/2019/04/28/Linux系统使用非root用户安装并管理Nginx/" class="leancloud_visitors" data-flag-title="Linux系统使用非root用户安装并管理Nginx">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <p>通常使用Nginx或者Apache作为Web服务器时，默认监听80端口，因此默认会使用root用户去安装，而且，使用yum命令安装时，通常会安装到默认的路径下，默认路径通常是root用户才有执行权限的。如果不需要使用Nginx监听1024以下的端口，且对权限和网络管理比较严格时，能用非root权限解决的，就用普通用户。在此使用编译Nginx源码的方式安装Nginx。 假设已拿到root用户权限，但需要使用普通用户去管理Nginx。<br>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/doggie.github.io/2019/04/28/Linux系统使用非root用户安装并管理Nginx/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </p></div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://doublexz.github.io/doggie.github.io/doggie.github.io/2019/04/23/Item-17/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Doggie">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/doggie.github.io/images/love.jpeg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="CloudXue's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/doggie.github.io/2019/04/23/Item-17/" itemprop="url">Item-17 使可变性最小化</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-04-23T18:04:46+08:00">
-                2019-04-23
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category">
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/doggie.github.io/categories/Java/" itemprop="url" rel="index">
-                    <span itemprop="name">Java</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-             <span id="/doggie.github.io/2019/04/23/Item-17/" class="leancloud_visitors" data-flag-title="Item-17 使可变性最小化">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <p>简单来说，不可变类是一种实例不能被修改的类。其每个实例包含的信息在对象的整个生命中期中是固定的，因此在这个过程中观察不到任何改变。Java平台类库包含很多不可变类，包括String、包装原生类、BigInteger和BigDecimal。这么做有许多好处：不可变类比可变类更易于设计、实现和使用。他们更少出错并且更安全。<br>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/doggie.github.io/2019/04/23/Item-17/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </p></div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://doublexz.github.io/doggie.github.io/doggie.github.io/2019/04/16/Item-16/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Doggie">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/doggie.github.io/images/love.jpeg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="CloudXue's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/doggie.github.io/2019/04/16/Item-16/" itemprop="url">Item-16 在公共类中，使用访问器方法，而不是公共字段</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-04-16T21:38:05+08:00">
-                2019-04-16
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category">
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/doggie.github.io/categories/Java/" itemprop="url" rel="index">
-                    <span itemprop="name">Java</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-             <span id="/doggie.github.io/2019/04/16/Item-16/" class="leancloud_visitors" data-flag-title="Item-16 在公共类中，使用访问器方法，而不是公共字段">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <p>有时候，你可能想要编写组合了实例字段的类没有其他任何目的：  </p>
-<pre><code>//Degenerate classes like this should not be public !
-class Point {
-    public double x;
-    public double y;
-}  
-</code></pre>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/doggie.github.io/2019/04/16/Item-16/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/doggie.github.io/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/doggie.github.io/">1</a><span class="page-number current">2</span><a class="page-number" href="/doggie.github.io/page/3/">3</a><a class="page-number" href="/doggie.github.io/page/4/">4</a><a class="extend next" rel="next" href="/doggie.github.io/page/3/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/doggie.github.io/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/doggie.github.io/">1</a><span class="page-number current">2</span><a class="page-number" href="/doggie.github.io/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/doggie.github.io/page/5/">5</a><a class="extend next" rel="next" href="/doggie.github.io/page/3/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -1940,7 +2016,7 @@ class Point {
               
                 <a href="/doggie.github.io/archives/">
               
-                  <span class="site-state-item-count">38</span>
+                  <span class="site-state-item-count">44</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -1951,7 +2027,7 @@ class Point {
               
               <div class="site-state-item site-state-categories">
                 <a href="/doggie.github.io/categories/index.html">
-                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-count">7</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>

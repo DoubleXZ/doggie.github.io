@@ -296,6 +296,1140 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://doublexz.github.io/doggie.github.io/doggie.github.io/2020/02/08/8-JVM-Launcher类源码分析与forName方法底层剖析/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Doggie">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/doggie.github.io/images/love.jpeg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="CloudXue's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/doggie.github.io/2020/02/08/8-JVM-Launcher类源码分析与forName方法底层剖析/" itemprop="url">8_JVM_Launcher类源码分析与forName方法底层剖析</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-02-08T13:28:24+08:00">
+                2020-02-08
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/doggie.github.io/categories/Java/" itemprop="url" rel="index">
+                    <span itemprop="name">Java</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/doggie.github.io/categories/Java/JVM/" itemprop="url" rel="index">
+                    <span itemprop="name">JVM</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/doggie.github.io/2020/02/08/8-JVM-Launcher类源码分析与forName方法底层剖析/" class="leancloud_visitors" data-flag-title="8_JVM_Launcher类源码分析与forName方法底层剖析">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="ClassLoader-getSystemClassLoader-方法"><a href="#ClassLoader-getSystemClassLoader-方法" class="headerlink" title="ClassLoader.getSystemClassLoader()方法"></a>ClassLoader.getSystemClassLoader()方法</h2><p>分析<code>ClassLoader.getSystemClassLoader()</code>方法的源代码可知，该方法用于返回系统类加载器，而返回值是ClassLoader类中定义的一个私有成员变量<code>private static ClassLoader scl</code>，<br>通过调用<code>initSystemClassLoader()</code>方法完成对scl的初始化：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">private static synchronized void initSystemClassLoader() &#123;</span><br><span class="line">    //scl完成初始化后，sclSet设置为true</span><br><span class="line">    if (!sclSet) &#123;</span><br><span class="line">        if (scl != null)</span><br><span class="line">            throw new IllegalStateException(&quot;recursive invocation&quot;);</span><br><span class="line">        //获取 Launcher对象</span><br><span class="line">        sun.misc.Launcher l = sun.misc.Launcher.getLauncher();</span><br><span class="line">        if (l != null) &#123;</span><br><span class="line">            Throwable oops = null;</span><br><span class="line">            //通过Launcher对象为scl赋值，即系统类加载器来源于Launcher</span><br><span class="line">            scl = l.getClassLoader();</span><br><span class="line">            try &#123;</span><br><span class="line">                //</span><br><span class="line">                scl = AccessController.doPrivileged(</span><br><span class="line">                    new SystemClassLoaderAction(scl));</span><br><span class="line">            &#125; catch (PrivilegedActionException pae) &#123;</span><br><span class="line">                oops = pae.getCause();</span><br><span class="line">                if (oops instanceof InvocationTargetException) &#123;</span><br><span class="line">                    oops = oops.getCause();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            if (oops != null) &#123;</span><br><span class="line">                if (oops instanceof Error) &#123;</span><br><span class="line">                    throw (Error) oops;</span><br><span class="line">                &#125; else &#123;</span><br><span class="line">                    // wrap the exception</span><br><span class="line">                    throw new Error(oops);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        sclSet = true;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>从代码中不难看出，系统类加载器通过<code>Launcher</code>的<code>getClassLoader()</code>方法获得。翻看Launcher的源码可知，该方法返回的是Launcher中维护的成员变量<code>private ClassLoader loader</code>。<br>该成员内变量loader在Launcher类的构造方法中完成初始化。<code>sun.misc.Launcher l = sun.misc.Launcher.getLauncher();</code>这行代码调用完毕后就会调用Launcher的构造方法，完成Launcher对象的创建。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line">public Launcher() &#123;</span><br><span class="line">    // Create the extension class loader</span><br><span class="line">    lassLoader extcl;</span><br><span class="line">    try &#123;</span><br><span class="line">        extcl = ExtClassLoader.getExtClassLoader();</span><br><span class="line">    &#125; catch (IOException e) &#123;</span><br><span class="line">        throw new InternalError(&quot;Could not create extension class loader&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">     </span><br><span class="line">   // Now create the class loader to use to launch the application</span><br><span class="line">    try &#123;</span><br><span class="line">        loader = AppClassLoader.getAppClassLoader(extcl);</span><br><span class="line">    &#125; catch (IOException e) &#123;</span><br><span class="line">        throw new InternalError(&quot;Could not create application class loader&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">  </span><br><span class="line">    // Also set the context class loader for the primordial thread.</span><br><span class="line">    Thread.currentThread().setContextClassLoader(loader);</span><br><span class="line">      </span><br><span class="line">    // Finally, install a security manager if requested</span><br><span class="line">    String s = System.getProperty(&quot;java.security.manager&quot;);</span><br><span class="line">    if (s != null) &#123;</span><br><span class="line">        SecurityManager sm = null;</span><br><span class="line">    if (&quot;&quot;.equals(s) || &quot;default&quot;.equals(s)) &#123;</span><br><span class="line">        sm = new java.lang.SecurityManager();</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">        try &#123;</span><br><span class="line">            sm = (SecurityManager)loader.loadClass(s).newInstance();</span><br><span class="line">            &#125; catch (IllegalAccessException e) &#123;</span><br><span class="line">            &#125; catch (InstantiationException e) &#123;</span><br><span class="line">            &#125; catch (ClassNotFoundException e) &#123;</span><br><span class="line">            &#125; catch (ClassCastException e) &#123;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        if (sm != null) &#123;</span><br><span class="line">            System.setSecurityManager(sm);</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            throw new InternalError(&quot;Could not create SecurityManager: &quot; + s);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>而Launcher类的构造方法会做如下事情：</p>
+<ul>
+<li>通过系统属性<code>java.ext.dirs</code>，创建扩展类构造器extc；</li>
+<li>通过系统属性<code>java.class.path</code>和扩展类构造器extc，创建系统类构造器appc，并赋值给成员变量loader，完成loader的初始化；</li>
+<li>设置当前线程的上下文类加载器是系统类加载器；</li>
+<li>创建并设置安全管理器。<br>再次回到<code>initSystemClassLoader</code>方法中，发现通过Launcher获取到scl后还需要处理一下：<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">scl = AccessController.doPrivileged(new SystemClassLoaderAction(scl));</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>下面看下SystemClassLoaderAction的源码<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">class SystemClassLoaderAction</span><br><span class="line">    implements PrivilegedExceptionAction&lt;ClassLoader&gt; &#123;</span><br><span class="line">    private ClassLoader parent;</span><br><span class="line"></span><br><span class="line">    SystemClassLoaderAction(ClassLoader parent) &#123;</span><br><span class="line">        this.parent = parent;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public ClassLoader run() throws Exception &#123;</span><br><span class="line">        String cls = System.getProperty(&quot;java.system.class.loader&quot;);</span><br><span class="line">        //未设置过系统属性，返回默认系统类加载器</span><br><span class="line">        if (cls == null) &#123;</span><br><span class="line">            return parent;</span><br><span class="line">        &#125;</span><br><span class="line">        //处理自定义系统类加载器的情况，接收一个ClassLoader.class类型的参数，</span><br><span class="line">        //这也是自定义系统类加载器必须提供一个public的】接收一个ClassLoader参数的构造方法的原因</span><br><span class="line">        Constructor&lt;?&gt; ctor = Class.forName(cls, true, parent)</span><br><span class="line">            .getDeclaredConstructor(new Class&lt;?&gt;[] &#123; ClassLoader.class &#125;);</span><br><span class="line">        ClassLoader sys = (ClassLoader) ctor.newInstance(</span><br><span class="line">            new Object[] &#123; parent &#125;);</span><br><span class="line">        //将自定义类加载器设置为当前线程的上下文加载器</span><br><span class="line">        Thread.currentThread().setContextClassLoader(sys);</span><br><span class="line">        //设置过系统属性值，返回自定义系统加载器</span><br><span class="line">        return sys;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>其实现了PrivilegedExceptionAction这一函数式接口，所以，在创建SystemClassLoaderAction实例时，必然要运行其run()方法，分析run方法逻辑可以得知：<br>先拿到<code>java.system.class.loader</code>属性值，若为空，则直接返回所传入的参数（默认系统类加载器），若不为空，则通过Class.forNane(name,true,scl)，表示加载name值对应的类的Class实例，true表示对该实例进行初始化，scl作为该自定义加载器的父类加载器用于双亲委派。最后将自定义类加载器作为当前线程的上线文加载器后返回该实例。<br>也就是说，若未设置过<code>java.system.calss.loader</code>属性，则SystemClassLoaderAction实例是默认系统类加载器，若<code>java.system.class.loader</code>属性值不为空，则表示显示指定了系统了加载器，SystemClassLoaderAction实例对应的就是自定义类加载器。</p>
+<hr>
+<p>From：圣思园年费课程：<a href="http://www.iprogramming.cn/jvm.html" target="_blank" rel="noopener">《深入理解JVM》</a> 学习笔记</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://doublexz.github.io/doggie.github.io/doggie.github.io/2020/02/07/7-JVM-平台特定的启动类加载器和自定义类系统加载器详解/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Doggie">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/doggie.github.io/images/love.jpeg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="CloudXue's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/doggie.github.io/2020/02/07/7-JVM-平台特定的启动类加载器和自定义类系统加载器详解/" itemprop="url">7_JVM_平台特定的启动类加载器和自定义类系统加载器详解</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-02-07T08:00:27+08:00">
+                2020-02-07
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/doggie.github.io/categories/Java/" itemprop="url" rel="index">
+                    <span itemprop="name">Java</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/doggie.github.io/categories/Java/JVM/" itemprop="url" rel="index">
+                    <span itemprop="name">JVM</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/doggie.github.io/2020/02/07/7-JVM-平台特定的启动类加载器和自定义类系统加载器详解/" class="leancloud_visitors" data-flag-title="7_JVM_平台特定的启动类加载器和自定义类系统加载器详解">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="特定的启动类加载器"><a href="#特定的启动类加载器" class="headerlink" title="特定的启动类加载器"></a>特定的启动类加载器</h2><p>分别使用IDE和java命令行运行MyTest23.java类，得到的结果略有不同<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">public class MyTest23 &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        //打印启动类加载器加载目录</span><br><span class="line">        System.out.println(System.getProperty(&quot;sun.boot.class.path&quot;));</span><br><span class="line">        //打印扩展类加载器加载目录</span><br><span class="line">        System.out.println(System.getProperty(&quot;java.ext.dirs&quot;));</span><br><span class="line">        //打印系统类加载器加载目录</span><br><span class="line">        System.out.println(System.getProperty(&quot;java.class.path&quot;));</span><br><span class="line">        </span><br><span class="line">        System.out.println(ClassLoader.class.getClassLoader());</span><br><span class="line"></span><br><span class="line">        System.out.println(Launcher.class.getClassLoader());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>如果在运行期，使用命令行运行MyTest23.java，并且手动修改属性<code>sun.boot.class.path</code>的值为当前目录，则在Oracle的HotSpot实现中会报错<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">➜  classes java -Dsun.boot.class.path=./ com.shengsiyuan.jvm.classloader.MyTest23</span><br><span class="line">Error occurred during initialization of VM</span><br><span class="line">java/lang/NoClassDefFoundError: java/lang/Object</span><br><span class="line">➜  classes</span><br></pre></td></tr></table></figure></p>
+<p>在运行期间，一个Java类是由该类的完全限定名（binary name，二进制名）和用于加载该类的定义类加载器（defining loader）所共同决定的。<br>如果同样名字（即相同的完全限定名）的类是由两个不同的加载器所加载，那么这些类就是不同的，即便.class文件的字节码完全一样，并且从相同的位置加载亦如此。</p>
+<p>在IDE 中运行MyTest23时，最后两行都打印出null。扩展类加载器和启动类加载器都是定义在Launcher中的内部类，而Launcher也是个Java类，它们都是由启动类加载器加载，那么启动类加载器怎么加载呢？</p>
+<p>内建于JVM中的启动类加载器会加载java.lang.ClassLoader以及其他的Java平台类，当JVM启动时，一块特殊的机器码会运行，它会加载扩展类加载器与应用类加载器，这块特殊的机器码叫做启动类加载器（Bootstrap）。  </p>
+<p>启动类加载器并不是Java类，而其他的类加载器都是Java类；<br>启动类加载器是特定于平台的机器指令（C++实现），它负责开启整个加载过程。  </p>
+<p>所有类加载器（除了启动类加载器）都被实现为Java类。不过，总归要有一个组件来加载第一个Java类加载器，从而让整个加载过程能够顺利进行下去，加载第一个纯Java类加载器就是启动类加载器的职责。  </p>
+<p>启动类加载器还会负责加载供JRE正常运行所需要的基本组件，这包括<code>java.util</code>和<code>java.lang</code>包中的类等等。</p>
+<h2 id="自定义系统类加载器"><a href="#自定义系统类加载器" class="headerlink" title="自定义系统类加载器"></a>自定义系统类加载器</h2><p><code>ClassLoader.getSystemClassLoader()</code>方法可以获得系统类加载器，阅读<code>getSystemClassLoade</code>的JavaDoc可知，JVM提供了<code>java.system.class.loader</code>属性，通过修改其值，可以显示的指定系统类加载器。该属性值是在<code>getSystemClassLoade</code>方法被首次调用时被定义，那么其属性值就是系统类加载器的名称。自定义类加载器是由默认的系统类加载器加载，且必须定义一个public的构造方法，该构造方法要接收一个ClassLoader的参数用于双亲委派。<br>下面为MyClassLoader类添加一个只有ClassLoader参数的public的构造方法，使用命令行设置<code>java.system.class.loader</code>属性值运行MyTest23<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">public class MyTest23 &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        //打印启动类加载器加载目录</span><br><span class="line">        //System.out.println(System.getProperty(&quot;sun.boot.class.path&quot;));</span><br><span class="line">        //打印扩展类加载器加载目录</span><br><span class="line">        //System.out.println(System.getProperty(&quot;java.ext.dirs&quot;));</span><br><span class="line">        //打印系统类加载器加载目录</span><br><span class="line">        //System.out.println(System.getProperty(&quot;java.class.path&quot;));</span><br><span class="line">        System.out.println(ClassLoader.class.getClassLoader());</span><br><span class="line">        //扩展类加载器与系统类加载器都是由启动类加载器加载</span><br><span class="line">        System.out.println(Launcher.class.getClassLoader());</span><br><span class="line">        System.out.println(&quot;------------------&quot;);</span><br><span class="line"></span><br><span class="line">        System.out.println(System.getProperty(&quot;java.system.class.loader&quot;));</span><br><span class="line">        System.out.println(MyTest23.class.getClassLoader());</span><br><span class="line">        System.out.println(MyClassLoader.class.getClassLoader());</span><br><span class="line">        System.out.println(ClassLoader.getSystemClassLoader());</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></p>
+<p>命令行运行<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">➜  classes java -Djava.system.class.loader=com.shengsiyuan.jvm.classloader.MyClassLoader com.shengsiyuan.jvm.classloader.MyTest23</span><br><span class="line">null</span><br><span class="line">null</span><br><span class="line">------------------</span><br><span class="line">com.shengsiyuan.jvm.classloader.MyClassLoader</span><br><span class="line">sun.misc.Launcher$AppClassLoader@18b4aac2</span><br><span class="line">sun.misc.Launcher$AppClassLoader@18b4aac2</span><br><span class="line">com.shengsiyuan.jvm.classloader.MyClassLoader@70dea4e</span><br><span class="line">➜  classes</span><br></pre></td></tr></table></figure></p>
+<p>此时的系统类加载器变成了我们指定的自定义类加载器MyClassLoader。而其父 类加载器就是默认的系统类加载器AppClassLoader。 </p>
+<hr>
+<p>From：圣思园年费课程：<a href="http://www.iprogramming.cn/jvm.html" target="_blank" rel="noopener">《深入理解JVM》</a> 学习笔记</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://doublexz.github.io/doggie.github.io/doggie.github.io/2020/02/06/6-JVM-类加载器命名空间深度解析与总结/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Doggie">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/doggie.github.io/images/love.jpeg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="CloudXue's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/doggie.github.io/2020/02/06/6-JVM-类加载器命名空间深度解析与总结/" itemprop="url">6_JVM_类加载器命名空间深度解析与总结</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-02-06T15:07:04+08:00">
+                2020-02-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/doggie.github.io/categories/Java/" itemprop="url" rel="index">
+                    <span itemprop="name">Java</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/doggie.github.io/categories/Java/JVM/" itemprop="url" rel="index">
+                    <span itemprop="name">JVM</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/doggie.github.io/2020/02/06/6-JVM-类加载器命名空间深度解析与总结/" class="leancloud_visitors" data-flag-title="6_JVM_类加载器命名空间深度解析与总结">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>首先看下面示例的运行结果<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">public class MyPerson &#123;</span><br><span class="line">    private MyPerson myPerson;</span><br><span class="line"></span><br><span class="line">    public void setMyPerson(Object object) &#123;</span><br><span class="line">        this.myPerson= (MyPerson) object;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">/**</span><br><span class="line"> * 创建两个自定义加载器分别加载MyPerson类</span><br><span class="line"> *</span><br><span class="line"> */</span><br><span class="line">public class MyTest21 &#123;</span><br><span class="line">    public static void main(String[] args) throws Exception&#123;</span><br><span class="line">        MyClassLoader loader1 = new MyClassLoader(&quot;loader1&quot;);</span><br><span class="line">        MyClassLoader loader2 = new MyClassLoader(&quot;loader2&quot;);</span><br><span class="line"></span><br><span class="line">        loader1.setPath(&quot;/Users/xuexiao/Downloads/classes/&quot;);</span><br><span class="line">        loader2.setPath(&quot;/Users/xuexiao/Downloads/classes/&quot;);</span><br><span class="line"></span><br><span class="line">        Class&lt;?&gt; clazz1 = loader1.loadClass(&quot;com.shengsiyuan.jvm.classloader.MyPerson&quot;);</span><br><span class="line">        Class&lt;?&gt; clazz2 = loader2.loadClass(&quot;com.shengsiyuan.jvm.classloader.MyPerson&quot;);</span><br><span class="line"></span><br><span class="line">        System.out.println(clazz1 == clazz2);</span><br><span class="line"></span><br><span class="line">        Object object1 = clazz1.newInstance();</span><br><span class="line">        Object object2 = clazz2.newInstance();</span><br><span class="line"></span><br><span class="line">        Method method = clazz1.getMethod(&quot;setMyPerson&quot;, Object.class);</span><br><span class="line">        method.invoke(object1,object2);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>运行结果：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">true</span><br></pre></td></tr></table></figure></p>
+<p>这是因为clazz1和clazz2都是系统类加载器加载的，为同一个对象。<br> 若删除classpath中的MyPerson.class，再次运行程序的结果是<br> <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">class Name: com.shengsiyuan.jvm.classloader.MyPerson</span><br><span class="line">class loader Name: loader1</span><br><span class="line">class Name: com.shengsiyuan.jvm.classloader.MyPerson</span><br><span class="line">class loader Name: loader2</span><br><span class="line">false</span><br><span class="line">Exception in thread &quot;main&quot; java.lang.reflect.InvocationTargetException</span><br><span class="line">	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)</span><br><span class="line">	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)</span><br><span class="line">	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)</span><br><span class="line">	at java.lang.reflect.Method.invoke(Method.java:498)</span><br><span class="line">	at com.shengsiyuan.jvm.classloader.MyTest21.main(MyTest21.java:29)</span><br><span class="line">Caused by: java.lang.ClassCastException: com.shengsiyuan.jvm.classloader.MyPerson cannot be cast to com.shengsiyuan.jvm.classloader.MyPerson</span><br><span class="line">	at com.shengsiyuan.jvm.classloader.MyPerson.setMyPerson(MyPerson.java:14)</span><br><span class="line">	... 5 more</span><br></pre></td></tr></table></figure></p>
+<p> 这是因为:<br> loader1是MyPerson的定义类加载器，其加载的Class对象位于loader1的命名空间中；<br> loader2是MyPerson的定义类加载器，其加载的Class对象位于loader2的命名空间中。<br> 同一个命名空间内的类是相互可见的。子 类加载器的命名空间包含所有父 类加载器的命名空间，因此，由子 类加载器加载的类能看见父 类加载器加载的类。例如系统类加载器加载的类能看见扩展类加载器加载的类。<br> 由父 类加载器加载的类不能看见子 类加载器加载的类。如果两个加载器之间没有直接或间接的父子关系，那么它们各自加载的类相互不可见。  </p>
+<p> 类加载器双亲委托模型的好处:  </p>
+<ul>
+<li>可以确保Java核心库的类型安全：所有Java应用都至少会引用<code>java.lang.Object</code>类，也就是说在运行期，<code>java.lang.Object</code>这个类会被加载到Java虚拟机中，如果这个加载过程是由Java应用自己的类加载器所完成的，那么很可能就会在JVM内存中存在多个版本的<code>java.lang.Object</code>类，而且这些类之间还是不兼容的，相互不可见的（正是命名空间在发挥着作用）。借助于双亲委托机制，Java核心类库中的类都是由启动类加载器统一加载的，从而确保了Java应用所使用的都是同一个版本的Java核心类库，他们之间是相互兼容的。</li>
+<li>可以确保Java核心类库所提供的类不会被自定义的类所替代</li>
+<li>不同的类加载器可以为相同名称（binary name,二进制名称）的类创建额外的命名空间。相同名称的类可以并存在Java虚拟机中，只需用不同的类加载器来加载它们即可。不同类加载器所加载的类之间是不兼容的，这相当于在Java虚拟机内部创建了一个又一个相互隔离的Java类空间，这类技术在很多框架中都得到了应用。  </li>
+</ul>
+<hr>
+<p>From：圣思园年费课程：<a href="http://www.iprogramming.cn/jvm.html" target="_blank" rel="noopener">《深入理解JVM》</a> 学习笔记</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://doublexz.github.io/doggie.github.io/doggie.github.io/2020/02/05/5-JVM-自定义加载器对复杂类的加载及类加载器命名空间实战剖析/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Doggie">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/doggie.github.io/images/love.jpeg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="CloudXue's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/doggie.github.io/2020/02/05/5-JVM-自定义加载器对复杂类的加载及类加载器命名空间实战剖析/" itemprop="url">5_JVM_自定义加载器对复杂类的加载及类加载器命名空间实战剖析</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-02-05T13:50:15+08:00">
+                2020-02-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/doggie.github.io/categories/Java/" itemprop="url" rel="index">
+                    <span itemprop="name">Java</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/doggie.github.io/categories/Java/JVM/" itemprop="url" rel="index">
+                    <span itemprop="name">JVM</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/doggie.github.io/2020/02/05/5-JVM-自定义加载器对复杂类的加载及类加载器命名空间实战剖析/" class="leancloud_visitors" data-flag-title="5_JVM_自定义加载器对复杂类的加载及类加载器命名空间实战剖析">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="自定义加载器对复杂类的加载"><a href="#自定义加载器对复杂类的加载" class="headerlink" title="自定义加载器对复杂类的加载"></a>自定义加载器对复杂类的加载</h2><p>示例1<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">/**</span><br><span class="line"> * 创建MyCat类</span><br><span class="line"> */</span><br><span class="line">public class MyCat &#123;</span><br><span class="line">    public MyCat() &#123;</span><br><span class="line">        System.out.println(&quot;MyCat is loaded by: &quot; + this.getClass().getClassLoader());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">/**</span><br><span class="line"> * 创建MySample类</span><br><span class="line"> */</span><br><span class="line">public class MySample &#123;</span><br><span class="line">    public MySample() &#123;</span><br><span class="line">        System.out.println(&quot;MySample is loaded by: &quot; + this.getClass().getClassLoader());</span><br><span class="line">        new MyCat();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">/**</span><br><span class="line"> * 创建测试类，使用之前写的自定义加载器MyClassLoader加载MySample类，</span><br><span class="line"> * 然后创建MySample类实例</span><br><span class="line"> */</span><br><span class="line">public class MyTest17 &#123;</span><br><span class="line">    public static void main(String[] args) throws Exception&#123;</span><br><span class="line">        MyClassLoader loader1 = new MyClassLoader(&quot;loader1&quot;);</span><br><span class="line">        Class&lt;?&gt; clazz =loader1.loadClass(&quot;com.shengsiyuan.jvm.classloader.MySample&quot;);</span><br><span class="line"></span><br><span class="line">        System.out.println(&quot;class: &quot; + clazz.hashCode());</span><br><span class="line">        Object object = clazz.newInstance();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>运行结果：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">class: 312714112</span><br><span class="line">MySample is loaded by: sun.misc.Launcher$AppClassLoader@330bedb4</span><br><span class="line">MyCat is loaded by: sun.misc.Launcher$AppClassLoader@330bedb4</span><br></pre></td></tr></table></figure></p>
+<p>这是因为loader1在加载MySample类时会先委托其父加载器进行加载，及系统类加载器。  </p>
+<p>调整程序，将classpath下的com/目录移到其他地方，如<code>path=/Users/xuexiao/Downloads/classes/</code>，loader1设置加载路径为path，删除classpath下的MySample类<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">/**</span><br><span class="line"> * 创建测试类，使用之前写的自定义加载器MyClassLoader加载MySample类，</span><br><span class="line"> * 然后创建MySample类实例</span><br><span class="line"> * MySample、MyCat类保持不变，loader1设置加载路径</span><br><span class="line"> * 删除classpath下的MySample.class </span><br><span class="line"> */</span><br><span class="line">public class MyTest17 &#123;</span><br><span class="line">    public static void main(String[] args) throws Exception&#123;</span><br><span class="line">        MyClassLoader loader1 = new MyClassLoader(&quot;loader1&quot;);</span><br><span class="line">        loader1.setPath(&quot;/Users/xuexiao/Downloads/classes/&quot;);</span><br><span class="line">        Class&lt;?&gt; clazz =loader1.loadClass(&quot;com.shengsiyuan.jvm.classloader.MySample&quot;);</span><br><span class="line"></span><br><span class="line">        System.out.println(&quot;class: &quot; + clazz.hashCode());</span><br><span class="line">        Object object = clazz.newInstance();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>运行结果：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">class Name: com.shengsiyuan.jvm.classloader.MySample</span><br><span class="line">class loader Name: loader1</span><br><span class="line">class: 1554874502</span><br><span class="line">MySample is loaded by: com.shengsiyuan.jvm.classloader.MyClassLoader@12a3a380</span><br><span class="line">MyCat is loaded by: sun.misc.Launcher$AppClassLoader@330bedb4</span><br></pre></td></tr></table></figure></p>
+<p>前两行打印信息说明，自定义加载器中的findClass方法运行，MySample类由自定义类加载器loader1进行加载。<br>加载成功后，通过<code>newInstance()</code>方法调用MySample的构造方法创建MySample实例，在其构造方法内<code>new MyCat()</code>会造成对MyCat类的主动使用，因此会初始化MyCat类，初始化之前要先加载MyCat类。<br>这时实际加载MyCat类的类加载器应该是加载了MySample类的类加载器loader1，根据双亲委派模型，loader1会委托其父类加载器对MyCat进行加载，其父类加载器为系统类加载器，可以加载位于classpath下的MyCat，因此，出现最后一行的打印结果。</p>
+<p>若继续删除classpath下的MyCat.class，则<br>运行结果：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">class Name: com.shengsiyuan.jvm.classloader.MySample</span><br><span class="line">class loader Name: loader1</span><br><span class="line">class: 1554874502</span><br><span class="line">MySample is loaded by: com.shengsiyuan.jvm.classloader.MyClassLoader@12a3a380</span><br><span class="line">class Name: com.shengsiyuan.jvm.classloader.MyCat</span><br><span class="line">class loader Name: loader1</span><br><span class="line">MyCat is loaded by: com.shengsiyuan.jvm.classloader.MyClassLoader@12a3a380</span><br></pre></td></tr></table></figure></p>
+<p>这是因为在加载MySample时，自定义加载器会先委托其父类加载器去加载，即由应用类加载器加载，应用类加载器继续委托其父类，直到启动类加载器都不能加载MySample.class，自定义加载器loader1再去执行加载动作。<br>在初始化MySample实例时，调用<code>new MyCat();</code>导致要对MyCat进行初始化，所以要对其加载，而加载MyCat的类加载器应该也是loader1,它先回委托父类加载器，直到启动类加载器也不能加载后，在自己去加载。  </p>
+<p>重新编译后，在classpath下只删除MyCat.class，运行结果：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">class: 312714112</span><br><span class="line">MySample is loaded by: sun.misc.Launcher$AppClassLoader@330bedb4</span><br><span class="line">Exception in thread &quot;main&quot; java.lang.NoClassDefFoundError: com/shengsiyuan/jvm/classloader/MyCat</span><br><span class="line">	at com.shengsiyuan.jvm.classloader.MySample.&lt;init&gt;(MySample.java:14)</span><br><span class="line">	at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)</span><br><span class="line">	at sun.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:62)</span><br><span class="line">	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)</span><br><span class="line">	at java.lang.reflect.Constructor.newInstance(Constructor.java:423)</span><br><span class="line">	at java.lang.Class.newInstance(Class.java:442)</span><br><span class="line">	at com.shengsiyuan.jvm.classloader.MyTest17.main(MyTest17.java:17)</span><br><span class="line">Caused by: java.lang.ClassNotFoundException: com.shengsiyuan.jvm.classloader.MyCat</span><br><span class="line">	at java.net.URLClassLoader.findClass(URLClassLoader.java:381)</span><br><span class="line">	at java.lang.ClassLoader.loadClass(ClassLoader.java:424)</span><br><span class="line">	at sun.misc.Launcher$AppClassLoader.loadClass(Launcher.java:338)</span><br><span class="line">	at java.lang.ClassLoader.loadClass(ClassLoader.java:357)</span><br><span class="line">	... 7 more</span><br></pre></td></tr></table></figure></p>
+<p>运行结果可以看出，MySample由系统类加载器加载，在实例化过程中，调用<code>new MyCat();</code>时，系统类加载器去加载MyCat，但是classpath下没有MyCat.class，导致异常。  </p>
+<p>继续变更，在MyCat类中添加MySample类的引用，这样两个类就是相互关联的关系了<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">public class MyCat &#123;</span><br><span class="line"></span><br><span class="line">    public MyCat() &#123;</span><br><span class="line">        System.out.println(&quot;MyCat is loaded by: &quot; + this.getClass().getClassLoader());</span><br><span class="line">        //添加MySample的引用</span><br><span class="line">        System.out.println(&quot;from MyCat: &quot; + MySample.class);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>重新编译后(classpath下不做删除操作)的运行结果：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">class: 312714112</span><br><span class="line">MySample is loaded by: sun.misc.Launcher$AppClassLoader@330bedb4</span><br><span class="line">MyCat is loaded by: sun.misc.Launcher$AppClassLoader@330bedb4</span><br><span class="line">from MyCat: class com.shengsiyuan.jvm.classloader.MySample</span><br></pre></td></tr></table></figure></p>
+<p>此时两个类实际都由系统类加载器正常加载。  </p>
+<p>若删除classpath下的MySample类，运行结果是:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">class Name: com.shengsiyuan.jvm.classloader.MySample</span><br><span class="line">class loader Name: loader1</span><br><span class="line">class: 1554874502</span><br><span class="line">MySample is loaded by: com.shengsiyuan.jvm.classloader.MyClassLoader@12a3a380</span><br><span class="line">MyCat is loaded by: sun.misc.Launcher$AppClassLoader@330bedb4</span><br><span class="line">Exception in thread &quot;main&quot; java.lang.NoClassDefFoundError: com/shengsiyuan/jvm/classloader/MySample</span><br><span class="line">	at com.shengsiyuan.jvm.classloader.MyCat.&lt;init&gt;(MyCat.java:15)</span><br><span class="line">	at com.shengsiyuan.jvm.classloader.MySample.&lt;init&gt;(MySample.java:14)</span><br><span class="line">	at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)</span><br><span class="line">	at sun.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:62)</span><br><span class="line">	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)</span><br><span class="line">	at java.lang.reflect.Constructor.newInstance(Constructor.java:423)</span><br><span class="line">	at java.lang.Class.newInstance(Class.java:442)</span><br><span class="line">	at com.shengsiyuan.jvm.classloader.MyTest17.main(MyTest17.java:17)</span><br><span class="line">Caused by: java.lang.ClassNotFoundException: com.shengsiyuan.jvm.classloader.MySample</span><br><span class="line">	at java.net.URLClassLoader.findClass(URLClassLoader.java:381)</span><br><span class="line">	at java.lang.ClassLoader.loadClass(ClassLoader.java:424)</span><br><span class="line">	at sun.misc.Launcher$AppClassLoader.loadClass(Launcher.java:338)</span><br><span class="line">	at java.lang.ClassLoader.loadClass(ClassLoader.java:357)</span><br><span class="line">	... 8 more</span><br></pre></td></tr></table></figure></p>
+<p>此时MySample实际由自定义加载器loader1加载，MyCat实际由系统类加载器加载，在MyCat类实例化时，要对MySample进行引用，因为类加载器的命名空间问题，父类加载器所加载的类无法访问子类加载器所加载的类，导致找不到MySample  </p>
+<p>若修改MySample类，和MyCat类，只删除classpath下的MySample.class<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">public class MySample &#123;</span><br><span class="line">    public MySample() &#123;</span><br><span class="line">        System.out.println(&quot;MySample is loaded by: &quot; + this.getClass().getClassLoader());</span><br><span class="line"></span><br><span class="line">        new MyCat();</span><br><span class="line">        //MyCat引用</span><br><span class="line">        System.out.println(&quot;from MySample: &quot; + MyCat.class);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">public class MyCat &#123;</span><br><span class="line"></span><br><span class="line">    public MyCat() &#123;</span><br><span class="line">        System.out.println(&quot;MyCat is loaded by: &quot; + this.getClass().getClassLoader());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>运行结果是：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">class Name: com.shengsiyuan.jvm.classloader.MySample</span><br><span class="line">class loader Name: loader1</span><br><span class="line">class: 1554874502</span><br><span class="line">MySample is loaded by: com.shengsiyuan.jvm.classloader.MyClassLoader@12a3a380</span><br><span class="line">MyCat is loaded by: sun.misc.Launcher$AppClassLoader@330bedb4</span><br></pre></td></tr></table></figure></p>
+<p>此时，MySample.class由自定义加载器加载，MyCat.class由父类加载器（应用加载器）加载，根据命名空间的规则，子加载器所加载的类能够访问父加载器所加载的类。  </p>
+<p>结论如下：  </p>
+<ul>
+<li>若一个类A中有对类B的引用，则B的class对象由加载A的加载器加载，并遵循双亲委派模型；</li>
+<li>父加载器所加载的类无法访问子加载器所加载的类；</li>
+<li>子加载器所加载的类能够访问父加载器所加载的类。</li>
+</ul>
+<hr>
+<p>From：圣思园年费课程：<a href="http://www.iprogramming.cn/jvm.html" target="_blank" rel="noopener">《深入理解JVM》</a> 学习笔记</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://doublexz.github.io/doggie.github.io/doggie.github.io/2020/02/02/4-JVM-ClassLoader源码分析与实例剖析/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Doggie">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/doggie.github.io/images/love.jpeg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="CloudXue's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/doggie.github.io/2020/02/02/4-JVM-ClassLoader源码分析与实例剖析/" itemprop="url">4_JVM_ClassLoader源码分析与实例剖析</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-02-02T20:57:25+08:00">
+                2020-02-02
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/doggie.github.io/categories/Java/" itemprop="url" rel="index">
+                    <span itemprop="name">Java</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/doggie.github.io/categories/Java/JVM/" itemprop="url" rel="index">
+                    <span itemprop="name">JVM</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/doggie.github.io/2020/02/02/4-JVM-ClassLoader源码分析与实例剖析/" class="leancloud_visitors" data-flag-title="4_JVM_ClassLoader源码分析与实例剖析">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="获得ClassLoader的途径"><a href="#获得ClassLoader的途径" class="headerlink" title="获得ClassLoader的途径"></a>获得ClassLoader的途径</h2><ul>
+<li>获得当前类的ClassLoader:<br><code>clazz.getClassLoader();</code></li>
+<li>获得当前线程上线文的ClassLoader :<br><code>Thread.currentThread.getContextClassLoader();</code></li>
+<li>获得系统的ClassLoader:<br><code>ClassLoader.getSystemClassLoader();</code></li>
+<li>获得调用者的ClassLoader:<br><code>DriverManager.getCallerClassLoader();</code></li>
+</ul>
+<p>类加载器是一个加载class类的对象。ClassLoader类是一个抽象类。如果给定了一个类的二进制名字，类加载器就会试图去定位或生成一些数据，这些数据构成了该类的定义。一个典型的策略是：将给定的名字转换成文件名，然后从文件系统中读取”class文件”。  </p>
+<p>每个class对象都包含一个到定义它的ClassLoader的引用。  </p>
+<p>数组的Class对象并不是由类加载器创建的，而是由Java虚拟机在运行期自动创建的（动态生成的）。<code>Class.getClassLoader()</code>方法返回的数组类的类加载器，与数组中元素类型的类加载器是一样的。如果数组中元素类型是原生类型，则数组类是没有类加载器的。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">public class MyTest15 &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        String[] strings = new String[1];</span><br><span class="line">        System.out.println(strings.getClass().getClassLoader());</span><br><span class="line">        System.out.println(&quot;-------&quot;); // null 启动类加载器</span><br><span class="line"></span><br><span class="line">        MyTest15[] myTest15s = new MyTest15[2];</span><br><span class="line">        System.out.println(myTest15s.getClass().getClassLoader());</span><br><span class="line"></span><br><span class="line">        System.out.println(&quot;--------&quot;);</span><br><span class="line"></span><br><span class="line">        int[] ints = new int[2];</span><br><span class="line">        System.out.println(ints.getClass().getClassLoader());//null 原生类型数组没有类加载器</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>运行结果：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">null</span><br><span class="line">-------</span><br><span class="line">sun.misc.Launcher$AppClassLoader@330bedb4</span><br><span class="line">--------</span><br><span class="line">null</span><br></pre></td></tr></table></figure></p>
+<p>ClassLoader的应用实现子类应该继承Java虚拟机动态加载类的方式。  </p>
+<p>类加载器通常由安全管理器用于指示安全域。  </p>
+<p>ClassLoader使用委托模型(delegation model)来寻找类和资源。其每一个实例都以一个相关的父（类）加载器。当需要寻找一个类或资源时，ClassLoader实例在自己寻找之前，会委托其父加载器进行寻找。虚拟机内建的类加载器被称为”bootstrap class loader”，它没有父加载器，但可以作为ClassLoader实例的父加载器。  </p>
+<p>支持并发加载类的类加载器被称作parallel capable类加载器，这需要在加载器类初始化时调用<code>ClassLoader.registerParallelCapable()</code>方法进行注册。注意，ClassLoader类默认具备并发加载能力。然而其他自定义子类需要显示注册并发加载能力。  </p>
+<p>delegation model环境并不是严格分层的，类加载器需要具备并发加载能力，否则在加载类时会导致死锁，因为加载器锁在类加载过程中s会被持有的。  </p>
+<p>通常Java虚拟机以平台无关的方式从本地文件系统中加载类。例如，在UNIX系统中，虚拟机从CLASSPATH环境变量定义的目录中加载类。  </p>
+<p>然而，有些类并非由文件生成，可能是由其他资源生成，如网络，也可能由应用构建而成。<code>defineClass</code>方法将二进制数组转换成Class类，该新定义类的实例可以通过<code>Class.newInstance</code>方法创建。  </p>
+<p>由类加载器创建的对象中的方法和构造方法中会引用其他类，未确定这些引用类，Java虚拟机会调用创建该类的类加载器中的<code>loadClass</code>方法。  </p>
+<p>自定义类加载器示例<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br></pre></td><td class="code"><pre><span class="line">package com.shengsiyuan.jvm.classloader;</span><br><span class="line"></span><br><span class="line">import java.io.ByteArrayOutputStream;</span><br><span class="line">import java.io.File;</span><br><span class="line">import java.io.FileInputStream;</span><br><span class="line">import java.io.InputStream;</span><br><span class="line"></span><br><span class="line">/**</span><br><span class="line"> * @Program jvm_lecture</span><br><span class="line"> * @Title: MyClassLoader</span><br><span class="line"> * @Description:</span><br><span class="line"> * @Author: XueXiao</span><br><span class="line"> * @Create: 2020-02-02 21:46:13</span><br><span class="line"> */</span><br><span class="line">public class MyClassLoader extends ClassLoader&#123;</span><br><span class="line">    private String classLoderName;</span><br><span class="line">    public String path;</span><br><span class="line">    private final String fileExtention = &quot;.class&quot;;</span><br><span class="line"></span><br><span class="line">    public MyClassLoader(String classLoderName)&#123;</span><br><span class="line">        super();//将系统类加载器当做该类加载器的父加载器</span><br><span class="line">        this.classLoderName = classLoderName;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public MyClassLoader(ClassLoader parent, String classLoderName)&#123;</span><br><span class="line">        super(parent);</span><br><span class="line">        this.classLoderName = classLoderName;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void setPath(String path) &#123;</span><br><span class="line">        this.path=path;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">     * defineClass方法，将二进制数组转换成Class类</span><br><span class="line">     * @param className</span><br><span class="line">     * @return</span><br><span class="line">     * @throws ClassNotFoundException</span><br><span class="line">     */</span><br><span class="line">    @Override</span><br><span class="line">    protected Class&lt;?&gt; findClass(String className) throws ClassNotFoundException &#123;</span><br><span class="line"></span><br><span class="line">        System.out.println(&quot;findClass methord is invoked!&quot;);</span><br><span class="line"></span><br><span class="line">        System.out.println(&quot;class Name: &quot; + className);</span><br><span class="line"></span><br><span class="line">        byte[] data = loadData(className);</span><br><span class="line"></span><br><span class="line">        return defineClass(className, data, 0, data.length);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    private byte[] loadData(String className)&#123;</span><br><span class="line">        InputStream is = null;</span><br><span class="line">        byte[] data = null;</span><br><span class="line">        ByteArrayOutputStream baos = null;</span><br><span class="line">        try &#123;</span><br><span class="line">            className = className.replace(&quot;.&quot;,&quot;/&quot;);</span><br><span class="line">            is = new FileInputStream(new File(path + className + fileExtention));</span><br><span class="line">            baos = new ByteArrayOutputStream();</span><br><span class="line"></span><br><span class="line">            int ch;</span><br><span class="line"></span><br><span class="line">            while (-1 != (ch = is.read()))&#123;</span><br><span class="line">                baos.write(ch);</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            data = baos.toByteArray();</span><br><span class="line">        &#125; catch (Exception e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125; finally &#123;</span><br><span class="line">            try &#123;</span><br><span class="line">                is.close();</span><br><span class="line">                baos.close();</span><br><span class="line">            &#125; catch (Exception ex) &#123;</span><br><span class="line">                ex.printStackTrace();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        return data;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) throws Exception&#123;</span><br><span class="line">        MyClassLoader loader = new MyClassLoader(&quot;loader1&quot;);</span><br><span class="line">        //loader.setPath(&quot;/Users/xuexiao/IdeaProjects/jvm_lecture/out/production/classes/&quot;);</span><br><span class="line">        loader.setPath(&quot;/Users/xuexiao/Downloads/classes/&quot;);</span><br><span class="line">        Class&lt;?&gt; clazz = loader.loadClass(&quot;com.shengsiyuan.jvm.classloader.MyTest1&quot;);</span><br><span class="line">        System.out.println(clazz.hashCode());</span><br><span class="line">        Object object = clazz.newInstance();</span><br><span class="line">        System.out.println(object);</span><br><span class="line"></span><br><span class="line">        System.out.println(&quot;-----------------&quot;);</span><br><span class="line"></span><br><span class="line">        MyClassLoader loader2 = new MyClassLoader(&quot;loader2&quot;);</span><br><span class="line">        loader2.setPath(&quot;/Users/xuexiao/Downloads/classes/&quot;);</span><br><span class="line">        Class&lt;?&gt; clazz2 = loader2.loadClass(&quot;com.shengsiyuan.jvm.classloader.MyTest1&quot;);</span><br><span class="line">        System.out.println(clazz2.hashCode());</span><br><span class="line">        Object object2 = clazz2.newInstance();</span><br><span class="line">        System.out.println(object2);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>运行前提，删除classpath下的MyTest1.class文件，运行结果：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">findClass methord is invoked!</span><br><span class="line">class Name: com.shengsiyuan.jvm.classloader.MyTest1</span><br><span class="line">692404036</span><br><span class="line">com.shengsiyuan.jvm.classloader.MyTest1@5cad8086</span><br><span class="line">-----------------</span><br><span class="line">findClass methord is invoked!</span><br><span class="line">class Name: com.shengsiyuan.jvm.classloader.MyTest1</span><br><span class="line">1627674070</span><br><span class="line">com.shengsiyuan.jvm.classloader.MyTest1@511d50c0</span><br></pre></td></tr></table></figure></p>
+<hr>
+<p>From：圣思园年费课程：<a href="http://www.iprogramming.cn/jvm.html" target="_blank" rel="noopener">《深入理解JVM》</a> 学习笔记</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://doublexz.github.io/doggie.github.io/doggie.github.io/2020/02/01/3-JVM-类加载器深入解析及重要特性/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Doggie">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/doggie.github.io/images/love.jpeg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="CloudXue's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/doggie.github.io/2020/02/01/3-JVM-类加载器深入解析及重要特性/" itemprop="url">3_JVM_类加载器深入解析及重要特性</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-02-01T12:10:32+08:00">
+                2020-02-01
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/doggie.github.io/categories/Java/" itemprop="url" rel="index">
+                    <span itemprop="name">Java</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/doggie.github.io/categories/Java/JVM/" itemprop="url" rel="index">
+                    <span itemprop="name">JVM</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/doggie.github.io/2020/02/01/3-JVM-类加载器深入解析及重要特性/" class="leancloud_visitors" data-flag-title="3_JVM_类加载器深入解析及重要特性">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>JVM使用class类的过程如下：</p>
+<ul>
+<li>加载： 就是把二进制形式的java类型读入java虚拟机中</li>
+<li>连接_验证</li>
+<li>连接_准备： 为类变量分配内存，设置默认值。但是在到达初始化之前，类变量都没有初始化为真正的初始值</li>
+<li>连接_解析： 解析过程就是在类型的常量池中寻找类、接口、字段和方法的符号引用，把这些符号引用替换成直接引用的过程</li>
+<li>初始化： 为类变量赋予正确的初始值。静态变量的声明语句，以及静态代码块都被看做类的初始化语句，Java虚拟机会按照初始化语句在类文件中的先后顺序来依次执行他们。</li>
+<li>类实例化：</li>
+<li>使用</li>
+<li>卸载 </li>
+<li>垃圾回收和对象终结</li>
+</ul>
+<h2 id="类的加载"><a href="#类的加载" class="headerlink" title="类的加载"></a>类的加载</h2><p>类的加载的最终产品是位于内存中的Class对象，Class对象封装了类在方法区内的数据结构，并且向Java程序员提供了访问方法区内的数据结构的接口。<br>通过两种类型的类加载器进行加载</p>
+<ul>
+<li>Java虚拟机自带的加载器<ul>
+<li>根类加载器(Bootstrap)</li>
+<li>扩展类加载器(Extention)</li>
+<li>系统(应用)类加载器(System)</li>
+</ul>
+</li>
+<li>用户自定义的类加载器<ul>
+<li>java.lang.ClassLoader的子类</li>
+<li>用户可以定制类的加载方式</li>
+</ul>
+</li>
+</ul>
+<p>类加载器并不需要等到某个类被“首次主动使用”时再加载它：<br>JVM规范允许类加载器在预料某各类将要被使用时就预先加载它，如果在预先加载的过程中遇到了.class文件缺失或文件错误，类加载器必须在程序首次主动使用该类时才报告错误（LinkageError错误）；<br>如果这个类一直没有被程序主动使用，那么类加载器就不会报告任何错误。  </p>
+<h2 id="类的验证"><a href="#类的验证" class="headerlink" title="类的验证"></a>类的验证</h2><p>类被加载后就进入到连接阶段。连接就是将已经读入到内存的类的二进制数据合并到虚拟机的运行时环境中去。<br>类的验证内容  </p>
+<ul>
+<li>类文件的结构检查</li>
+<li>语义检查</li>
+<li>字节码验证</li>
+<li>二进制兼容性的验证</li>
+</ul>
+<h2 id="类的准备"><a href="#类的准备" class="headerlink" title="类的准备"></a>类的准备</h2><p>为类的静态变量分配内存，设置默认值。但是在到达初始化之前，类变量都没有初始化为真正的初始值</p>
+<h2 id="类的初始化"><a href="#类的初始化" class="headerlink" title="类的初始化"></a>类的初始化</h2><p>初始化步骤：  </p>
+<ul>
+<li>假如这个类还没有被加载和连接，那就先进行加载和连接</li>
+<li>假如类存在直接父类，并且这个父类还没有被初始化，那就先初始化父类</li>
+<li>假如类中存在初始化语句，那就依次执行这些初始化语句</li>
+</ul>
+<p>初始化时机(类的主动使用，七种)：</p>
+<ul>
+<li>创建类的实例</li>
+<li>访问某个类或接口静态变量，或者对该静态变量赋值</li>
+<li>调用类的静态方法</li>
+<li>反射</li>
+<li>初始化一个类的子类</li>
+<li>Java虚拟机启动时被标明为启动类的类</li>
+<li>JDK 1.7新增的一种情况</li>
+</ul>
+<p>当Java虚拟机初始化一个类时，要求它的所有父类都已经被初始化，但是这条规则并不适用于接口。  </p>
+<ul>
+<li>在初始化一个类时，并不会先初始化它所实现的接口</li>
+<li>在初始化一个接口时，并不会先初始化它的父接口</li>
+</ul>
+<p>因此，一个父接口并不会因为它的子接口或者实现类的初始化而初始化，只有当程序首次使用特定接口的静态变量时，才会导致该接口的初始化。</p>
+<p>只有当程序访问的静态变量或静态方法确实在当前类或当前接口中定义时，才可以认为是对类或方法的主动使用。<br>调用ClassLoader类的loadClass方法加载一个类，并不是对类的主动使用，不会导致类的初始化。</p>
+<h2 id="类实例化"><a href="#类实例化" class="headerlink" title="类实例化"></a>类实例化</h2><p>为新的对象分配内存<br>为实例变量赋默认值<br>为实例变量赋正确的初始值<br>java编译器为它编译的每一个类都至少生成一个实例初始化方法，在java的class文件中，这个实例初始化方法被称为<code>&#39;&lt;init&gt;&#39;</code>。针对源代码中每一个类的构造方法，java编译器都产生一个’<init>‘方法  </init></p>
+<h2 id="类加载器详解"><a href="#类加载器详解" class="headerlink" title="类加载器详解"></a>类加载器详解</h2><p>类加载器用来把类加载到Java虚拟机中。从JDK 1.2版本开始，类的加载过程采用父亲委托机制，这种机制能更好的保证Java平台的安全。在此委托机制中，除了Java虚拟机自带的根类加载器之外，其余的类加载器都有且只有一个父加载器。当Java程序请求加载器loader1加载Simple类时，loader1首先委托自己的父加载器去加载Simple类，若父加载器能加载，则有父加载器完成加载任务，否则才由加载器loader1本身加载Simple类。<br>Java虚拟机自带了以下几种加载器</p>
+<ul>
+<li>根类加载器（BootStrap）：该加载器没有父加载器。它负责加载虚拟机的核心类库，如<code>java.lang.*</code>等。<code>java.lang.Object</code>类就是由根类加载器加载的。根类加载器从系统属性<code>sun.boot.class.path</code>所指定的目录中加载类库。跟类加载器的实现依赖于底层操作系统，属于虚拟机实现的一部分，它并没有继承<code>java.lang.ClassLoder</code>类。</li>
+<li>扩展类加载器（Extention）：它的父加载器为根类加载器。它从<code>java.ext.dirs</code>系统属性所指定的目录中加载类库，或者从JDK的安装目录的<code>jre/lib/ext</code>子目录（扩展目录）下加载类库，如果把用户创建的JAR文件放在这个目录下，也会自动由扩展类加载器加载。扩展类加载器是纯Java类，是<code>java.loang.ClassLoader</code>类的子类。</li>
+<li>系统类加载器（System）：也称为应用类加载器，它的父加载器为扩展类加载器。它从环境变量classpath或者系统属性<code>java.class.path</code>所指定的目录中加载类，它是用户自定义类加载器的父加载器。系统类加载器数纯Java类，是<code>java.lang.ClassLoader</code>类的子类。</li>
+<li>自定义加载器：除了以上虚拟机自带的加载器外，用户还可以定制自己的类加载器。Java提供了抽象类<code>java.lang.ClassLoader</code>，所有用户自定义的类加载器都应该继承<code>ClassLoader</code>类。  </li>
+</ul>
+<p>类加载器关系如下：<br>用户自定义类加载器 –&gt; System类加载器 –&gt; Extention类加载器 –&gt; Bootstrap类加载器  </p>
+<hr>
+<p>From：圣思园年费课程：<a href="http://www.iprogramming.cn/jvm.html" target="_blank" rel="noopener">《深入理解JVM》</a> 学习笔记</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://doublexz.github.io/doggie.github.io/doggie.github.io/2020/01/30/2-JVM-接口初始化规则与类加载器准备阶段和初始化阶段的重要意义/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -352,6 +1486,17 @@
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
                   <a href="/doggie.github.io/categories/Java/" itemprop="url" rel="index">
                     <span itemprop="name">Java</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/doggie.github.io/categories/Java/JVM/" itemprop="url" rel="index">
+                    <span itemprop="name">JVM</span>
                   </a>
                 </span>
 
@@ -415,6 +1560,8 @@
 <li>第二个例子中，调用构造方法后，counter1和cunter2分别为1和1，继续执行，counter2被初始化成0，初始化结束；</li>
 <li>第三个例子中，连接阶段counter1和counter2都是0，初始化阶段，counter1被初始化为1，然后调用构造方法后，counter1和counter2分别为2和0，初始化继续，counter2变成了0</li>
 </ul>
+<hr>
+<p>From：圣思园年费课程：<a href="http://www.iprogramming.cn/jvm.html" target="_blank" rel="noopener">《深入理解JVM》</a> 学习笔记</p>
 
           
         
@@ -519,6 +1666,17 @@
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
                   <a href="/doggie.github.io/categories/Java/" itemprop="url" rel="index">
                     <span itemprop="name">Java</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/doggie.github.io/categories/Java/JVM/" itemprop="url" rel="index">
+                    <span itemprop="name">JVM</span>
                   </a>
                 </span>
 
@@ -688,6 +1846,17 @@
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
                   <a href="/doggie.github.io/categories/Java/" itemprop="url" rel="index">
                     <span itemprop="name">Java</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/doggie.github.io/categories/Java/JVM/" itemprop="url" rel="index">
+                    <span itemprop="name">JVM</span>
                   </a>
                 </span>
 
@@ -999,1059 +2168,11 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://doublexz.github.io/doggie.github.io/doggie.github.io/2020/01/26/Kafka学习第四篇-实践篇/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Doggie">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/doggie.github.io/images/love.jpeg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="CloudXue's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/doggie.github.io/2020/01/26/Kafka学习第四篇-实践篇/" itemprop="url">Kafka学习第四篇-实践篇</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-01-26T10:11:55+08:00">
-                2020-01-26
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category">
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/doggie.github.io/categories/消息队列/" itemprop="url" rel="index">
-                    <span itemprop="name">消息队列</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-             <span id="/doggie.github.io/2020/01/26/Kafka学习第四篇-实践篇/" class="leancloud_visitors" data-flag-title="Kafka学习第四篇-实践篇">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h4 id="总体思路"><a href="#总体思路" class="headerlink" title="总体思路"></a>总体思路</h4><ul>
-<li>浏览器或POSTMAN或者curl命令行作为生产者提供消息；</li>
-<li>SpringBoot提供消费者，将从Kafka拉取的消息打印出来；</li>
-<li>命令行终端启动消费者打印出从Kafa拉取的消息  </li>
-</ul>
-<h4 id="gradle引入Kafka及相关依赖"><a href="#gradle引入Kafka及相关依赖" class="headerlink" title="gradle引入Kafka及相关依赖"></a>gradle引入Kafka及相关依赖</h4><p>在build.gradle中引入相关jar包 </p>
-<ul>
-<li>org.springframework.kafka:spring-kafka用于集成kafka</li>
-<li>com.google.code.gson:gson用于格式化消息数据<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">dependencies &#123;</span><br><span class="line">    compile(</span><br><span class="line">            &quot;org.springframework.boot:spring-boot-starter-web&quot;,</span><br><span class="line">            &quot;javax.servlet:jstl&quot;,</span><br><span class="line">            &quot;org.apache.tomcat.embed:tomcat-embed-jasper&quot;,</span><br><span class="line">            &quot;org.springframework.boot:spring-boot-starter-json&quot;,</span><br><span class="line">            &quot;org.springframework.kafka:spring-kafka&quot;,</span><br><span class="line">            &quot;com.google.code.gson:gson&quot;</span><br><span class="line">    )</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-<h4 id="application-yml添加kafka配置"><a href="#application-yml添加kafka配置" class="headerlink" title="application.yml添加kafka配置"></a>application.yml添加kafka配置</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">spring:</span><br><span class="line">    kafka:</span><br><span class="line">        producer:</span><br><span class="line">            bootstrap-servers: localhost:9092</span><br><span class="line">            key-serializer: org.apache.kafka.common.serialization.StringSerializer</span><br><span class="line">            value-serializer: org.apache.kafka.common.serialization.StringSerializer</span><br><span class="line">        consumer:</span><br><span class="line">            group-id: myGroup</span><br><span class="line">            key-deserializer: org.apache.kafka.common.serialization.StringDeserializer</span><br><span class="line">            value-deserializer: org.apache.kafka.common.serialization.StringDeserializer</span><br></pre></td></tr></table></figure>
-<h4 id="创建消息实体"><a href="#创建消息实体" class="headerlink" title="创建消息实体"></a>创建消息实体</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line">package com.shengsiyuan.boot.kafka;</span><br><span class="line"></span><br><span class="line">import java.util.Date;</span><br><span class="line"></span><br><span class="line">public class KafkaMessage &#123;</span><br><span class="line">    private long id;</span><br><span class="line">    private String username;</span><br><span class="line">    private String password;</span><br><span class="line">    private Date date;</span><br><span class="line"></span><br><span class="line">    public long getId() &#123;</span><br><span class="line">        return id;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void setId(long id) &#123;</span><br><span class="line">        this.id=id;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public String getUsername() &#123;</span><br><span class="line">        return username;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void setUsername(String username) &#123;</span><br><span class="line">        this.username=username;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public String getPassword() &#123;</span><br><span class="line">        return password;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void setPassword(String password) &#123;</span><br><span class="line">        this.password=password;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public Date getDate() &#123;</span><br><span class="line">        return date;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void setDate(Date date) &#123;</span><br><span class="line">        this.date=date;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h4 id="创建生产者"><a href="#创建生产者" class="headerlink" title="创建生产者"></a>创建生产者</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">package com.shengsiyuan.boot.kafka;</span><br><span class="line"></span><br><span class="line">import com.google.gson.Gson;</span><br><span class="line">import org.springframework.beans.factory.annotation.Autowired;</span><br><span class="line">import org.springframework.kafka.core.KafkaTemplate;</span><br><span class="line">import org.springframework.stereotype.Component;</span><br><span class="line"></span><br><span class="line">@Component</span><br><span class="line">public class KafkaProducer &#123;</span><br><span class="line"></span><br><span class="line">    @Autowired</span><br><span class="line">    private KafkaTemplate&lt;String, String&gt; kafkaTemplate;</span><br><span class="line"></span><br><span class="line">    public void sendMessage(KafkaMessage kafkaMessage)&#123;</span><br><span class="line">        System.out.println(&quot;sendMessage invoked!&quot;);</span><br><span class="line">        kafkaTemplate.send(&quot;myTopic&quot;, new Gson().toJson(kafkaMessage));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h4 id="创建消费者"><a href="#创建消费者" class="headerlink" title="创建消费者"></a>创建消费者</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">package com.shengsiyuan.boot.kafka;</span><br><span class="line"></span><br><span class="line">import org.apache.kafka.clients.consumer.ConsumerRecord;</span><br><span class="line">import org.springframework.kafka.annotation.KafkaListener;</span><br><span class="line">import org.springframework.stereotype.Component;</span><br><span class="line"></span><br><span class="line">@Component</span><br><span class="line">public class KafkaConsumer &#123;</span><br><span class="line"></span><br><span class="line">    @KafkaListener(topics=&quot;myTopic&quot;, groupId=&quot;myGroup&quot;)</span><br><span class="line">    public void obtainMessage(ConsumerRecord&lt;String, String&gt; record)&#123;</span><br><span class="line">        System.out.println(&quot;Consumer obtains message!&quot;);</span><br><span class="line">        System.out.println(&quot;record topic: &quot; + record.topic());</span><br><span class="line">        System.out.println(&quot;record partition: &quot; + record.partition());</span><br><span class="line">        System.out.println(&quot;record key :&quot; + record.key());</span><br><span class="line">        System.out.println(&quot;record value: &quot; + record.value());</span><br><span class="line">        System.out.println(&quot;record offset:&quot; + record.offset());</span><br><span class="line">        System.out.println(&quot;record timestamp&quot; + record.timestamp());</span><br><span class="line">        System.out.println(&quot;record serializedKeySize: &quot; + record.serializedKeySize());</span><br><span class="line">        System.out.println(&quot;record serializedValueSize: &quot; + record.serializedValueSize());</span><br><span class="line">        System.out.println(&quot;=========================&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h4 id="创建Controller"><a href="#创建Controller" class="headerlink" title="创建Controller"></a>创建Controller</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line">package com.shengsiyuan.boot.controller;</span><br><span class="line"></span><br><span class="line">import com.shengsiyuan.boot.kafka.KafkaMessage;</span><br><span class="line">import com.shengsiyuan.boot.kafka.KafkaProducer;</span><br><span class="line">import org.slf4j.Logger;</span><br><span class="line">import org.slf4j.LoggerFactory;</span><br><span class="line">import org.springframework.beans.factory.annotation.Autowired;</span><br><span class="line">import org.springframework.web.bind.annotation.*;</span><br><span class="line"></span><br><span class="line">import java.util.Date;</span><br><span class="line"></span><br><span class="line">/**</span><br><span class="line"> * @Program spring_lecture</span><br><span class="line"> * @Title: KafkaController</span><br><span class="line"> * @Description:</span><br><span class="line"> * @Author: XueXiao</span><br><span class="line"> * @Create: 2020-01-22 17:46:02</span><br><span class="line"> */</span><br><span class="line">@RestController</span><br><span class="line">@RequestMapping(value=&quot;/kafka&quot;)</span><br><span class="line">public class KafkaController &#123;</span><br><span class="line"></span><br><span class="line">    private static final Logger logger =LoggerFactory.getLogger(KafkaController.class);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    @Autowired</span><br><span class="line">    private KafkaProducer kafkaProducer;</span><br><span class="line"></span><br><span class="line">    @RequestMapping(value=&quot;/get-msg&quot;, method=RequestMethod.GET)</span><br><span class="line">    public KafkaMessage sendMsg(@RequestParam(name=&quot;id&quot;) long id,</span><br><span class="line">                                @RequestParam(name=&quot;username&quot;) String username,</span><br><span class="line">                                @RequestParam(name=&quot;password&quot;) String password)&#123;</span><br><span class="line">        logger.info(&quot;sendMsg method is invoked!&quot;);</span><br><span class="line">        KafkaMessage kafkaMessage = new KafkaMessage();</span><br><span class="line">        kafkaMessage.setId(id);</span><br><span class="line">        kafkaMessage.setUsername(username);</span><br><span class="line">        kafkaMessage.setPassword(password);</span><br><span class="line">        kafkaMessage.setDate(new Date());</span><br><span class="line"></span><br><span class="line">        kafkaProducer.sendMessage(kafkaMessage);</span><br><span class="line"></span><br><span class="line">        return kafkaMessage;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @RequestMapping(value=&quot;/post-msg&quot;, method=RequestMethod.POST)</span><br><span class="line">    public KafkaMessage sendMessage(@RequestBody KafkaMessage kafkaMessage)&#123;</span><br><span class="line">        logger.info(&quot;sendMessage method is invoked!&quot;);</span><br><span class="line">        kafkaMessage.setDate(new Date());</span><br><span class="line"></span><br><span class="line">        kafkaProducer.sendMessage(kafkaMessage);</span><br><span class="line"></span><br><span class="line">        return kafkaMessage;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h4 id="使用curl发送POST请求验证"><a href="#使用curl发送POST请求验证" class="headerlink" title="使用curl发送POST请求验证"></a>使用curl发送POST请求验证</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl -X POST -H &quot;Content-Type:application/json&quot; -d &apos;&#123;&quot;id&quot;:321,&quot;username&quot;:&quot;王五&quot;,&quot;password&quot;:&quot;123321&quot;&#125;&apos; http://localhost:9090/kafka/post-msg</span><br></pre></td></tr></table></figure>
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://doublexz.github.io/doggie.github.io/doggie.github.io/2020/01/22/Kafka学习第三篇-理论进阶篇/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Doggie">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/doggie.github.io/images/love.jpeg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="CloudXue's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/doggie.github.io/2020/01/22/Kafka学习第三篇-理论进阶篇/" itemprop="url">Kafka学习第三篇-理论进阶篇</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-01-22T21:08:08+08:00">
-                2020-01-22
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category">
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/doggie.github.io/categories/消息队列/" itemprop="url" rel="index">
-                    <span itemprop="name">消息队列</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-             <span id="/doggie.github.io/2020/01/22/Kafka学习第三篇-理论进阶篇/" class="leancloud_visitors" data-flag-title="Kafka学习第三篇-理论进阶篇">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="关于kafka分区"><a href="#关于kafka分区" class="headerlink" title="关于kafka分区"></a>关于kafka分区</h2><ul>
-<li>每个分区都是一个有序、不可变的消息队列，后续新来的消息会源源不断地，持续追加到分区的后面，这相当于一种结构化的提交日志。</li>
-<li>分区中的每一条消息都会被分配一个连续的id值（即offset）,该值用于唯一标识分区中的每一条消息。  </li>
-</ul>
-<h2 id="分区的作用"><a href="#分区的作用" class="headerlink" title="分区的作用"></a>分区的作用</h2><ul>
-<li>分区中的消息数据是存储在日志文件中的，而且同一分区中的消息数据是按照发送顺序严格有序的。分区在逻辑上对应一个日志，当生产者将消息写入分区中时，实际上是写到了分区所对应的日志当中。而日志可以看做是一种逻辑上的概念，它对应于磁盘上的一个目录。一个日志文件由多个Segment（段）来构成，每个Segment对应于一个索引文件与一个日志文件。</li>
-<li>借助于分区，我们可以实现Kafka Server的水平扩展。对于一台机器来说，无论是物理机还是虚拟机，其运行能力总归是有上线的。当一台机器达到其能力上限时就无法再扩展了，即垂直扩展能力总是受到硬件制约的。通过使用分区，我们可以将一个主题中的消息分散到不同的Kafka Server上（这里需要使用Kafka集群），这样当期几点能力不足时，我们只需添加机器就可以了，在新的机器上创建新的分区，这样理论上就可以实现无限的水平扩展能力。</li>
-<li>分区还可以实现并行处理能力，向一个主题所发送的消息会发送给该主题所拥有的不同的分区中，这样消息就可以实现并行发送与处理，由多个分区来接收所发送的消息。</li>
-</ul>
-<h2 id="Segment（段）"><a href="#Segment（段）" class="headerlink" title="Segment（段）"></a>Segment（段）</h2><p>一个partition是由一系列有序、不可变的消息所构成的。一个partition中的消息数量可能会非常多，因此显然不能将所有消息都保存到一个文件中。因此，类似于log4j的rolling log，当partition中的消息数量增长到一定程度后，消息文件会进行切割，新的消息会被写到一个新的文件当中，当新的文件增长到一定程度后，新的消息又会被写到另一个新的文件当中，以此类推；这一个个新的数据文件我们称之为Segment（段）。  </p>
-<p>因此，一个partition在物理上是由一个或者多个segment构成的。每个segment中则保存了真实的消息数据。  </p>
-<h2 id="partition与segment之间的关系"><a href="#partition与segment之间的关系" class="headerlink" title="partition与segment之间的关系"></a>partition与segment之间的关系</h2><ul>
-<li>每个partition都相当于一个大型文件被分配到多个大小相等的segment数据文件中，每个segment中的消息数量未必相等（这与消息大小有着紧密的关系，不同的消息所占与的磁盘空间显然是不一样的），这个特点使得老的segment文件可以很容易就被删除掉，有助于提升磁盘的利用效率。</li>
-<li>每个partition只需要支持顺序读写即可，segment文件的生命周期是由Kafka Server的配置参数决定的。比如说，server.properties文件中的参数项log.retention.hours=168表示7天后删除老的消息文件。  </li>
-</ul>
-<h2 id="关于分区目录中的4个文件的含义与作用"><a href="#关于分区目录中的4个文件的含义与作用" class="headerlink" title="关于分区目录中的4个文件的含义与作用"></a>关于分区目录中的4个文件的含义与作用</h2><ul>
-<li>.index： 它是segment文件的索引文件，它与.log日志文件是成对出现的。后缀.index表示这是个索引文件。</li>
-<li>.log： 它是segment文件的数据文件，用于存储实际的消息。该文件是二进制格式的。segment文件的命名规则是partition全局的第一个segment从0开始，后续每个segment文件名为上一个segment文件最后条消息的offset值。没有数字则用0填充。若主题消息较少，则只有一个数据文件。</li>
-<li>.timeindex： 该文件是一个基于消息日期的索引文件，主要用途是在一些根据日期或是时间来寻找消息的场景下使用，在基于时间的日志rolling或是基于基于时间的日至保留策略等情况下也会使用。实际上该文件是在Kafka较新的版本中才增加的，老版本Kafka是没有该文件的。它是对<em>.index文件的一个有益补充。</em>.index文件是基于偏移量的索引文件，而 *.timeindex则是基于时间戳的索引文件。  </li>
-<li>leader-epoch-checkpoint： 是leader的一个缓存文件。实际上，它是与Kafka的HW(High Water)和LEO(Log End Offset)相关的一个重要文件。</li>
-</ul>
-<h2 id="Kafka脚本重要命令"><a href="#Kafka脚本重要命令" class="headerlink" title="Kafka脚本重要命令"></a>Kafka脚本重要命令</h2><p>创建主题<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">bin/kafka-topics.sh --create --zookeeper localhost;2181 --replication-factor 1 --partitions --topic myTopic</span><br><span class="line">``` </span><br><span class="line">显示已有主题列表</span><br></pre></td></tr></table></figure></p>
-<p>bin/kafka-topics.sh –list –zookeeper localhost:218<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">查看某个主题详细信息</span><br></pre></td></tr></table></figure></p>
-<p>bin/kafka-topics.sh –describe –topic myTopic –zookeeper localhost 2181<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">开启生产者</span><br></pre></td></tr></table></figure></p>
-<p>bin/kafka-console-producer.sh –broker-list localhost:9092 –topic myTopic<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">开启消费者</span><br></pre></td></tr></table></figure></p>
-<p>bin/kafka-console-consumer.sh –bootstrap-server localhost:9092 –topic myTopic –from beginning<br><code>`</code></p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://doublexz.github.io/doggie.github.io/doggie.github.io/2020/01/07/Kafka学习第二篇-理论篇/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Doggie">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/doggie.github.io/images/love.jpeg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="CloudXue's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/doggie.github.io/2020/01/07/Kafka学习第二篇-理论篇/" itemprop="url">Kafka学习第二篇-理论篇</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-01-07T09:38:44+08:00">
-                2020-01-07
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category">
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/doggie.github.io/categories/消息队列/" itemprop="url" rel="index">
-                    <span itemprop="name">消息队列</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-             <span id="/doggie.github.io/2020/01/07/Kafka学习第二篇-理论篇/" class="leancloud_visitors" data-flag-title="Kafka学习第二篇-理论篇">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="Kafka简介"><a href="#Kafka简介" class="headerlink" title="Kafka简介"></a>Kafka简介</h2><p>Kafka被用于构建实时的数据管道和流式app。它具备水平扩展性、容错性、速度快，且已运行在多家公司的生产环境中。<br>Kafka是一个分布式的流式平台。分布式流式平台具备三个关键能力：  </p>
-<ul>
-<li>发布和订阅消息，类似于消息队列或企业消息传输系统</li>
-<li>以容错的持久化方式存储消息</li>
-<li>在消息发生时可以实时处理它们</li>
-</ul>
-<p>Kafka通常用于两大类应用：</p>
-<ul>
-<li>构建实时的流式数据管道，可以从系统和应用之间可靠地获取数据；</li>
-<li>构建实时的流式应用，可以传输和响应数据流。</li>
-</ul>
-<p>几个概念：</p>
-<ul>
-<li>Kafka以集群的形式运行在一个或者多个服务器上，可以跨越多个数据中心。</li>
-<li>Kafka集群以目录的形式存储消息，称之为主题。</li>
-<li>每条记录包含key、value和时间戳</li>
-</ul>
-<p>Kafka有四中核心API：</p>
-<ul>
-<li>Producer API允许应用发布消息到一个或者多个Kafka主题。</li>
-<li>Consumer API允许订阅一个或者多个主题，并处理主题对其产生的消息。</li>
-<li>Streams API允许应用作为一个流处理器，消费来自一个或多个主题的输入流，并产生输出流到一个或多个主题，有效的将输入流转换为输出流。</li>
-<li>Connector API允许构建和运行可重用的生产者或消费者，将Kafka主题连接到现有的应用程序或数据系统。例如，关系型数据库的连接器将会捕获每张表的改变。  </li>
-</ul>
-<p>在Kafka中，客户端与服务端之间的通讯是通过一个简单的、高性能的、语言无关的TCP协议完成。这个协议是版本化的，且能够向后兼容老版本。官方提供了Java客户端，但其实客户端可以使用其他语言。  </p>
-<p><img src="http://kafka.apache.org/23/images/kafka-apis.png" alt></p>
-<h2 id="Topics-and-Logs-主题与日志"><a href="#Topics-and-Logs-主题与日志" class="headerlink" title="Topics and Logs(主题与日志)"></a>Topics and Logs(主题与日志)</h2><p>首先研究下Kafka为消息提供的核心抽象概念-主题(topic)。</p>
-<p>主题是发布记录的类别或者源(feed)名称。Kafka中的主题总是多用户的；即主题可以有零个、一个或多个消费者来订阅写入其中的数据。  </p>
-<p>对每一个主题，kafka集群管理着一个如下的分区日志(partitioned log)：</p>
-<p><img src="http://kafka.apache.org/23/images/log_anatomy.png" alt><br>每个分区是一个有序的、不可变的记录序列，这个序列会持续的增加，形成一个结构化提交日志。分区中的每条记录被赋予一个称为偏移量(offset)的序列化ID值来唯一标识分区中的记录。  </p>
-<p>Kafka集群使用一个可配置的保留期来持久化所有发布的记录，无论该记录是否被消费。例如，如果保留策略被设置为两天，那么在记录发布后的两天内，他都是可以被用于消费的，两天后，将会被丢弃来释放空间。Kafka的性能是一个关于数据大小的有效常量，因此长时间存储数据不会有任何问题。  </p>
-<p><img src="http://kafka.apache.org/23/images/log_consumer.png" alt><br>实际上，每个消费者唯一持有的元数据是消费者在日志中的偏移量或位置。该偏移量由消费者控制：通常，消费者会根据读取的记录线性地增加偏移量，但实际上，鉴于消费者控制这个位置，它可能以它喜欢的任何顺序消费记录。例如，消费者可以重置老的偏移量来重新处理以前的数据，或者跳过开头到最近的数据，并以此为起始位置开始消费。  </p>
-<p>这些特点的结合意味着Kafka的消费者是非常廉价的，它们的去或留不会对集群或其他消费者产生任何影响。例如，可以使用命令行工具’tail’任何主题的内容，而不会对已有的消费者产生任何影响。  </p>
-<p>日志中分区有几个用途。首先，他们允许日志扩展到超出单个服务器的大小。每个单独的分区必须适合持有它的服务器，但是一个主题可能包含多个分区，所以它可以处理任意数量的数据。其次，他们作为平行的单元，在这一点上可以做的更多。</p>
-<h2 id="Distribution-分销"><a href="#Distribution-分销" class="headerlink" title="Distribution(分销)"></a>Distribution(分销)</h2><p>日志分区遍布Kafka集群的服务器中，每台服务器处理数据和共享分区的请求。每个分区被复制到可配置数量的服务器上用于容错。  </p>
-<p>每个分区都有一台服务器作为“leader”，零台或更多服务器作为“followrs”。leader为分区处理所有的读写请求，follower会被动的复制leader。如果leader挂了，其中的一个follower会自动成为leader。每台服务器会作为某些分区的leader和其他分区的follower，因此负载在集群中可以很好的被均衡。</p>
-<h2 id="Producers-生产者"><a href="#Producers-生产者" class="headerlink" title="Producers(生产者)"></a>Producers(生产者)</h2><p>生产者将发布数据到其选择的主题。生产者负责选择发布哪条记录到主题下的哪个分区。这可以使用round-robin算法实现简单的负载均衡，或者通过语义分区函数实现。分区时通常使用第二种。</p>
-<h2 id="Consumers-消费者"><a href="#Consumers-消费者" class="headerlink" title="Consumers(消费者)"></a>Consumers(消费者)</h2><p>消费者会在他们身上打上名为消费者组的标签，且每一条发布到主题的记录会被分发给订阅了消费者组中每一个的消费者实例。消费者实例可以运行在单独的进程中，也可以运行在单独的服务器上。  </p>
-<p>如果所有的消费者实例在相同的消费者组中，那么消息会被有效的负载均衡到每一个消费者实例上。  </p>
-<p>如果所有的消费者实例在不同的消费者组中，那么每一条记录将会被广播到所有的消费者进程中。  </p>
-<p><img src="http://kafka.apache.org/23/images/consumer-groups.png" alt="11111"><br>两个服务器的Kafka集群，拥有四个分区（P0-P4）和两个消费者组。消费者组A有两个消费者实例，消费者组B有四个消费者实例。  </p>
-<p>更常见的是，我们发现主题有少量的消费者组，每一个消费者组都有一个“逻辑订阅者”。每个消费者组由多个消费者实例组成，用于扩容和容错。这只不过是发布-订阅语义，其中订阅服务器是消费者集群，而不是单个进程。  </p>
-<p>Kafka中实现消费的方式是通过在消费者实例上划分日志中的分区，以便在任何时间点每一个实例是“公平共享”分区的专有消费者。这种维护组中成员资格的过程由Kafka协议动态处理。如果一个新的实例加入到组中，它会从组中其他成员那里分担一些分区；如果某个实例挂掉了，它的分区会被分发给其他活跃的实例。  </p>
-<p>Kafka只提供分区内记录的总顺序，而不提供主题中不同分区之间的总顺序。对于大部分应用来说，按分区排序和按键分区数据的能力已经足够了。然而，如果你需要记录总的顺序，可以通过只有一个分区的主题来实现，尽管这意味着每个消费者组只有一个消费者进程。  </p>
-<h2 id="Multi-tenancy"><a href="#Multi-tenancy" class="headerlink" title="Multi-tenancy"></a>Multi-tenancy</h2><p>可以将Kafka部署为多租户(Multi-tenancy)解决方案。Multi-tenancy可以通过配置哪个主题生产或者消费数据的方式来实现。还有对配额(quotas)的支持。管理员可以定义和强制请求上的配额来控制客户端使用的代理资源。</p>
-<h2 id="Guarantee"><a href="#Guarantee" class="headerlink" title="Guarantee"></a>Guarantee</h2><p>高性能kafka给予以下保证：  </p>
-<ul>
-<li>生产者发送消息到特定的主题分区，将会按照消息发送的顺序被追加。也就是说，如果消息M1和M2由同一个生产者发送，且M1先发送，那么M1的偏移量比M2小，且比M2更早的出现在日志中。</li>
-<li>消费者实例按照日志中存储的顺序查看消息。</li>
-<li>对于拥有N个副本的主题，最多容忍N-1个服务器故障，从而保证不会丢失任何提交到日志中的记录。 </li>
-</ul>
-<h2 id="Kafka-as-a-Messaging-System"><a href="#Kafka-as-a-Messaging-System" class="headerlink" title="Kafka as a Messaging System"></a>Kafka as a Messaging System</h2><h2 id="Kafka-as-a-Storage-System"><a href="#Kafka-as-a-Storage-System" class="headerlink" title="Kafka as a Storage System"></a>Kafka as a Storage System</h2><h2 id="Kafka-for-Stream-Processing"><a href="#Kafka-for-Stream-Processing" class="headerlink" title="Kafka for Stream Processing"></a>Kafka for Stream Processing</h2><h2 id="Putting-the-Pieces-Together-综合应用"><a href="#Putting-the-Pieces-Together-综合应用" class="headerlink" title="Putting the Pieces Together(综合应用)"></a>Putting the Pieces Together(综合应用)</h2>
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://doublexz.github.io/doggie.github.io/doggie.github.io/2020/01/06/Kafka学习第一篇-入门篇/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Doggie">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/doggie.github.io/images/love.jpeg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="CloudXue's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/doggie.github.io/2020/01/06/Kafka学习第一篇-入门篇/" itemprop="url">Kafka学习第一篇-入门篇</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-01-06T16:30:59+08:00">
-                2020-01-06
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category">
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/doggie.github.io/categories/消息队列/" itemprop="url" rel="index">
-                    <span itemprop="name">消息队列</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-             <span id="/doggie.github.io/2020/01/06/Kafka学习第一篇-入门篇/" class="leancloud_visitors" data-flag-title="Kafka学习第一篇-入门篇">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="软件安装"><a href="#软件安装" class="headerlink" title="软件安装"></a>软件安装</h2><p><a href="http://kafka.apache.org/downloads" target="_blank" rel="noopener">官网下载Kafka</a> ,选择<code>kafka_2.11-2.4.0.tgz</code>下载<br>Kafka 严重依赖ZooKeeper，通过ZooKeeper管理各种数据和元数据，所以可以使用Kafka自带的ZZooKeeper,也可以去<a href="http://zookeeper.apache.org/" target="_blank" rel="noopener">Zookeeper官网下载</a><br>示例使用Kafka自带ZooKeeper。 </p>
-<h2 id="第一个示例"><a href="#第一个示例" class="headerlink" title="第一个示例"></a>第一个示例</h2><h3 id="Step-1-下载Kafka并解压"><a href="#Step-1-下载Kafka并解压" class="headerlink" title="Step 1: 下载Kafka并解压"></a>Step 1: 下载Kafka并解压</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">tar -xvf kafka_2.11-2.4.0.tgz</span><br><span class="line">cd kafka_2.11-2.4.0</span><br></pre></td></tr></table></figure>
-<h3 id="Step-2-启动-Server"><a href="#Step-2-启动-Server" class="headerlink" title="Step 2:启动 Server"></a>Step 2:启动 Server</h3><p>启动ZooKeeper实例<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bin/zookeeper-server-start.sh config/zookeeper.properties</span><br></pre></td></tr></table></figure></p>
-<p>出现以下信息表示ZooKeeper启动成功<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[2020-01-06 17:09:05,071] INFO binding to port 0.0.0.0/0.0.0.0:2181 (org.apache.zookeeper.server.NIOServerCnxnFactory)</span><br><span class="line">[2020-01-06 17:09:05,087] INFO zookeeper.snapshotSizeFactor = 0.33 (org.apache.zookeeper.server.ZKDatabase)</span><br><span class="line">[2020-01-06 17:09:05,089] INFO Snapshotting: 0x0 to /tmp/zookeeper/version-2/snapshot.0 (org.apache.zookeeper.server.persistence.FileTxnSnapLog)</span><br><span class="line">[2020-01-06 17:09:05,092] INFO Snapshotting: 0x0 to /tmp/zookeeper/version-2/snapshot.0 (org.apache.zookeeper.server.persistence.FileTxnSnapLog)</span><br><span class="line">[2020-01-06 17:09:05,112] INFO Using checkIntervalMs=60000 maxPerMinute=10000 (org.apache.zookeeper.server.ContainerManager)</span><br></pre></td></tr></table></figure></p>
-<p>新建一个终端窗口，启动Kafka server<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bin/kafka-server-start.sh config/server.properties</span><br></pre></td></tr></table></figure></p>
-<p>出现以下信息表示Kafka server启动成功<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[2020-01-06 17:15:19,195] INFO [SocketServer brokerId=0] Started data-plane processors for 1 acceptors (kafka.network.SocketServer)</span><br><span class="line">[2020-01-06 17:15:19,198] INFO Kafka version: 2.4.0 (org.apache.kafka.common.utils.AppInfoParser)</span><br><span class="line">[2020-01-06 17:15:19,198] INFO Kafka commitId: 77a89fcf8d7fa018 (org.apache.kafka.common.utils.AppInfoParser)</span><br><span class="line">[2020-01-06 17:15:19,198] INFO Kafka startTimeMs: 1578302119196 (org.apache.kafka.common.utils.AppInfoParser)</span><br><span class="line">[2020-01-06 17:15:19,200] INFO [KafkaServer id=0] started (kafka.server.KafkaServer)</span><br></pre></td></tr></table></figure></p>
-<h3 id="Setp-3-创建主题"><a href="#Setp-3-创建主题" class="headerlink" title="Setp 3: 创建主题"></a>Setp 3: 创建主题</h3><p>新建一个终端窗口，创建一个只有一个分区和副本的名为”test”的主题（topic）<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bin/kafka-topics.sh --create --bootstrap-server localhost:9090 --replication-factor 1 --partitions 1 --topic test</span><br></pre></td></tr></table></figure></p>
-<p>查看主题列表<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">bin/kafka-topics.sh --list --bootstrap-server localhost:9092</span><br><span class="line">test</span><br></pre></td></tr></table></figure></p>
-<p>表示主题创建成功！</p>
-<h3 id="Setp-4-发送一些消息"><a href="#Setp-4-发送一些消息" class="headerlink" title="Setp 4: 发送一些消息"></a>Setp 4: 发送一些消息</h3><p>Kafka的命令行客户端将从一个文件或者标准输入获取输入信息，并将其作为消息发送给Kafka集群。默认情况下，每一行作为一个单独的消息发出。<br>新建生产者终端窗口：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">bin/kafka-console-producer.sh --broker-list localhost:9092 --topic test</span><br><span class="line">&gt;这是一个消息</span><br><span class="line">&gt;Hello World</span><br><span class="line">&gt;你好吗</span><br><span class="line">&gt;</span><br></pre></td></tr></table></figure></p>
-<h3 id="Step-5-启动消费者"><a href="#Step-5-启动消费者" class="headerlink" title="Step 5: 启动消费者"></a>Step 5: 启动消费者</h3><p>Kafka也有一个命令行客户端，可以将消息展示到标准输出。<br>新建消费者终端窗口：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test --from-beginning</span><br><span class="line">[2020-01-06 17:38:03,925] WARN [Consumer clientId=consumer-console-consumer-58504-1, groupId=console-consumer-58504] Connection to node 0 (/172.21.3.9:9092) could not be established. Broker may not be available. (org.apache.kafka.clients.NetworkClient)</span><br><span class="line">这是一个消息</span><br><span class="line">Hello World</span><br><span class="line">你好吗</span><br></pre></td></tr></table></figure></p>
-<p>启动后，生产者发送到topic的消息会被拉取并显示。此时，切换到生产者终端窗口，继续输入消息，消息会被实时发送给消费者。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://doublexz.github.io/doggie.github.io/doggie.github.io/2020/01/02/SpringBoot集成WebSocket示例/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Doggie">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/doggie.github.io/images/love.jpeg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="CloudXue's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/doggie.github.io/2020/01/02/SpringBoot集成WebSocket示例/" itemprop="url">SpringBoot集成WebSocket示例</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-01-02T15:00:30+08:00">
-                2020-01-02
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category">
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/doggie.github.io/categories/Java-Web/" itemprop="url" rel="index">
-                    <span itemprop="name">Java Web</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-             <span id="/doggie.github.io/2020/01/02/SpringBoot集成WebSocket示例/" class="leancloud_visitors" data-flag-title="SpringBoot集成WebSocket示例">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="WebSocket"><a href="#WebSocket" class="headerlink" title="WebSocket "></a>WebSocket </h2><p>WebSocket是HTML5的一种新的协议，建立在TCP协议之上，实现了客户端和服务端全双工异步通信。<br>它和HTTP最大的不同是：  </p>
-<ul>
-<li>WebSocket是一种双向通信协议，WebSocket服务器和Browser/Client Agent都能主动向对方发送或者接收数据；</li>
-<li>WebSocket需要类似TCP的客户端和服务器端通过握手连接，连接成功后才能相互通信。  </li>
-</ul>
-<p>WebSocket协议提供了一种标准的方式，在客户端与服务端之间通过使用单一的TCP连接建立一个全双工的、双向通信渠道。它是区别于HTTP的TCP协议，但设计用于HTTP，使用80和443端口，且允许复用已有的防火墙规则。  </p>
-<p>WebSocket交互始于HTTP请求，使用HTTP的<code>Upgrade</code>头来进行升级，切换到WebSocket协议：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">GET /spring-websocket-portfolio/portfolio HTTP/1.1</span><br><span class="line">Host: localhost:8080</span><br><span class="line">Upgrade: websocket</span><br><span class="line">Connection: Upgrade</span><br><span class="line">Sec-WebSocket-Key: Uc9l9TMkWGbHFD2qnFHltg==</span><br><span class="line">Sec-WebSocket-Protocol: v10.stomp, v11.stomp</span><br><span class="line">Sec-WebSocket-Version: 13</span><br><span class="line">Origin: http://localhost:8080</span><br></pre></td></tr></table></figure></p>
-<p>服务端返回101状态码，而非200状态码。  </p>
-<pre><code>HTTP/1.1 101 Switching Protocols
-Upgrade: websocket
-Connection: Upgrade
-Sec-WebSocket-Accept: 1qVdfYHU9hPOl4JYYNXF623Gzn0=
-Sec-WebSocket-Protocol: v10.stomp
-</code></pre><p>在这次成功的握手后，HTTP升级请求底层的TCP套接字仍会为客户端和服务端开启，用于发送和接收消息。  </p>
-<h2 id="HTTP-VS-WebSocket"><a href="#HTTP-VS-WebSocket" class="headerlink" title="HTTP VS WebSocket"></a>HTTP VS WebSocket</h2><p>即使WebSocket被设计成与HTTP兼容，且以HTTP请求开始，理解这两个协议的不同架构和应用程序模型是很重要的。  </p>
-<p>在HTTP和REST中，已用通过URL被分成多个模块。客户端通过访问这些URL，以请求-响应的形式来与应用交互。服务端基于HTTP的URL、方法和请求头，将请求路由的相关的处理器。  </p>
-<p>相比之下，WebSocket只有一个用于初始化连接的URL，然后所有的应用消息在相同的TCP连接上传递。这一点完全不同于异步的、事件驱动的消息传递架构。  </p>
-<p>WebSocket也是一种低级的传输协议，不像HTTP为消息内容定义语义。这意味着，除非客户端和服务端在消息语义上达成一致，否则不会路由和处理该消息。  </p>
-<p>WebSocketk客户端和服务端可以在HTTP握手请求上通过<code>Sec-WebSocket-Protocol</code>头，协商使用一种高级的消息传输协议（如，STOMP）</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://doublexz.github.io/doggie.github.io/doggie.github.io/2019/12/31/使用非root用户停止和启动Apache、Nginx的方法/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Doggie">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/doggie.github.io/images/love.jpeg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="CloudXue's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/doggie.github.io/2019/12/31/使用非root用户停止和启动Apache、Nginx的方法/" itemprop="url">使用非root用户停止和启动Apache、Nginx的方法</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-12-31T10:31:18+08:00">
-                2019-12-31
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category">
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/doggie.github.io/categories/Linux/" itemprop="url" rel="index">
-                    <span itemprop="name">Linux</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-             <span id="/doggie.github.io/2019/12/31/使用非root用户停止和启动Apache、Nginx的方法/" class="leancloud_visitors" data-flag-title="使用非root用户停止和启动Apache、Nginx的方法">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>Apache或Nginx监听80或者443端口，root权限被回收后，修改配置文件需要重启的情况下，通过给二进制文件set UID的方式实现： </p>
-<h2 id="Apache"><a href="#Apache" class="headerlink" title="Apache"></a>Apache</h2><p>root用户登录进入到<code>/opt/apache/</code>bin目录下<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"># cd /opt/apache/bin</span><br><span class="line"># chown root httpd</span><br><span class="line"># chmod u+s httpd</span><br><span class="line"># su - chatweb</span><br><span class="line">$ ll httpd </span><br><span class="line">-rwsr-xr-x 1 root chatweb 1546353 2017-08-14 httpd</span><br><span class="line">$ /opt/apache/bin/apachectl start</span><br></pre></td></tr></table></figure></p>
-<h2 id="Nginx"><a href="#Nginx" class="headerlink" title="Nginx "></a>Nginx </h2><p>root用户进入<code>/.../nginx/sbin</code>目录下<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"># cd /.../nginx/sbin</span><br><span class="line"># chown root nginx</span><br><span class="line"># chmod u+s nginx</span><br><span class="line"># su - nginx</span><br><span class="line">$ ll nginx</span><br><span class="line">-rwsr-xr-x 1 root nginx 3289160 2019-05-05 nginx</span><br><span class="line">$ /.../nginx/sbin/nginx -s reload</span><br></pre></td></tr></table></figure></p>
-<h2 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h2><p>Linux系统中的文件除了user id和group id外，还有俩称之为effective的id，四个id简写为uid、gid和euid、egid。<br>内核主要是根据euid和egid来确定进程对资源的访问权限：  </p>
-<ul>
-<li>一个进程如果没有SUID或SGID位，则euid=uid egid=gid，分别是运行这个程序的用户的uid和gid；</li>
-<li>如果一个程序设置了SUID，则euid和egid变成被运行的程序的所有者的uid和gid；</li>
-<li>SUID的优先级比SGID高，当一个可执行程序设置了SUID，则SGID会自动变成相应的egid  </li>
-</ul>
-<p>set UID（SUID）的作用是让执行该命令的用户以该命令拥有者的权限去执行。假如启动命令的拥有者是root用户，普通用户执行命令时就会拥有root的权限，然后使用root权限去操作服务。<br>set UID的方式只针对二进制文件，是在执行程序（程序的可执行位被设置）时起作用，而可执行位只对普通文件和目录文件有意义。  </p>
-<p>给文件加或去掉SUID和SGID的命令如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"># chmod u+s filename 设置SUID位</span><br><span class="line"># chmod u-s filename 去掉SUID设置</span><br><span class="line"># chmod g+s filename 设置SGID位</span><br><span class="line"># chmod g-s filename 去掉SGID设置</span><br></pre></td></tr></table></figure></p>
-<p>如果一个文件被设置了SUID或SGID位，会分别表现在所有者或同组用户的权限的可执行位上。例如：<br>1、-rwsr-xr-x 表示SUID和所有者权限中可执行位被设置<br>2、-rwSr–r– 表示SUID被设置，但所有者权限中可执行位没有被设置<br>3、-rwxr-sr-x 表示SGID和同组用户权限中可执行位被设置<br>4、-rw-r-Sr– 表示SGID被设置，但同组用户权限中可执行位没有被设置</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
   <nav class="pagination">
-    <span class="page-number current">1</span><a class="page-number" href="/doggie.github.io/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/doggie.github.io/page/4/">4</a><a class="extend next" rel="next" href="/doggie.github.io/page/2/"><i class="fa fa-angle-right"></i></a>
+    <span class="page-number current">1</span><a class="page-number" href="/doggie.github.io/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/doggie.github.io/page/5/">5</a><a class="extend next" rel="next" href="/doggie.github.io/page/2/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -2099,7 +2220,7 @@ Sec-WebSocket-Protocol: v10.stomp
               
                 <a href="/doggie.github.io/archives/">
               
-                  <span class="site-state-item-count">38</span>
+                  <span class="site-state-item-count">44</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -2110,7 +2231,7 @@ Sec-WebSocket-Protocol: v10.stomp
               
               <div class="site-state-item site-state-categories">
                 <a href="/doggie.github.io/categories/index.html">
-                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-count">7</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>

@@ -89,7 +89,7 @@
 <meta property="og:site_name" content="CloudXue&#39;s Blog">
 <meta property="og:description" content="接口初始化规则首先要明确，接口中定义的变量都为常量，public static final修饰符通常可以省略示例：1234567891011121314public class MyTest5 &amp;#123;    public static void main(String[] args) &amp;#123;        System.out.println(MyChild5.b);    &amp;#125">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2020-01-30T13:28:01.492Z">
+<meta property="og:updated_time" content="2020-02-08T05:32:10.965Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="2_JVM_接口初始化规则与类加载器准备阶段和初始化阶段的重要意义">
 <meta name="twitter:description" content="接口初始化规则首先要明确，接口中定义的变量都为常量，public static final修饰符通常可以省略示例：1234567891011121314public class MyTest5 &amp;#123;    public static void main(String[] args) &amp;#123;        System.out.println(MyChild5.b);    &amp;#125">
@@ -356,6 +356,17 @@
 
                 
                 
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/doggie.github.io/categories/Java/JVM/" itemprop="url" rel="index">
+                    <span itemprop="name">JVM</span>
+                  </a>
+                </span>
+
+                
+                
               
             </span>
           
@@ -417,6 +428,8 @@
 <li>第二个例子中，调用构造方法后，counter1和cunter2分别为1和1，继续执行，counter2被初始化成0，初始化结束；</li>
 <li>第三个例子中，连接阶段counter1和counter2都是0，初始化阶段，counter1被初始化为1，然后调用构造方法后，counter1和counter2分别为2和0，初始化继续，counter2变成了0</li>
 </ul>
+<hr>
+<p>From：圣思园年费课程：<a href="http://www.iprogramming.cn/jvm.html" target="_blank" rel="noopener">《深入理解JVM》</a> 学习笔记</p>
 
       
     </div>
@@ -456,6 +469,10 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
+            
+              <a href="/doggie.github.io/2020/02/01/3-JVM-类加载器深入解析及重要特性/" rel="prev" title="3_JVM_类加载器深入解析及重要特性">
+                3_JVM_类加载器深入解析及重要特性 <i class="fa fa-chevron-right"></i>
+              </a>
             
           </div>
         </div>
@@ -534,7 +551,7 @@
               
                 <a href="/doggie.github.io/archives/">
               
-                  <span class="site-state-item-count">38</span>
+                  <span class="site-state-item-count">44</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -545,7 +562,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/doggie.github.io/categories/index.html">
-                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-count">7</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
