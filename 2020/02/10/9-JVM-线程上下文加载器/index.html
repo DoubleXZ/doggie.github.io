@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="Nginx,">
+  <meta name="keywords" content="JVM,">
 
 
 
@@ -81,18 +81,18 @@
 
 
 
-<meta name="description" content="主要记录了root、proxy_pass、rewrite、return、error_page的用法。">
-<meta name="keywords" content="Nginx">
+<meta name="description" content="线程上线文类加载器的一般使用模式获取–&amp;gt;使用–&amp;gt;还原，伪代码如下：123456789101112//获取ClassLoader classLoader = Thread.currentThread.getContextClassLoader();try &amp;#123;    //使用    Thread.currentThread.setContextClassLoader(target">
+<meta name="keywords" content="JVM">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Nginx常用指令使用总结">
-<meta property="og:url" content="https://doublexz.github.io/doggie.github.io/2018/04/18/Nginx常用指令使用总结/index.html">
+<meta property="og:title" content="9_JVM_线程上下文加载器">
+<meta property="og:url" content="https://doublexz.github.io/doggie.github.io/2020/02/10/9-JVM-线程上下文加载器/index.html">
 <meta property="og:site_name" content="CloudXue&#39;s Blog">
-<meta property="og:description" content="主要记录了root、proxy_pass、rewrite、return、error_page的用法。">
+<meta property="og:description" content="线程上线文类加载器的一般使用模式获取–&amp;gt;使用–&amp;gt;还原，伪代码如下：123456789101112//获取ClassLoader classLoader = Thread.currentThread.getContextClassLoader();try &amp;#123;    //使用    Thread.currentThread.setContextClassLoader(target">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-04-30T08:03:29.274Z">
+<meta property="og:updated_time" content="2020-02-17T07:49:06.124Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Nginx常用指令使用总结">
-<meta name="twitter:description" content="主要记录了root、proxy_pass、rewrite、return、error_page的用法。">
+<meta name="twitter:title" content="9_JVM_线程上下文加载器">
+<meta name="twitter:description" content="线程上线文类加载器的一般使用模式获取–&amp;gt;使用–&amp;gt;还原，伪代码如下：123456789101112//获取ClassLoader classLoader = Thread.currentThread.getContextClassLoader();try &amp;#123;    //使用    Thread.currentThread.setContextClassLoader(target">
 
 
 
@@ -122,13 +122,13 @@
 
 
 
-  <link rel="canonical" href="https://doublexz.github.io/doggie.github.io/2018/04/18/Nginx常用指令使用总结/">
+  <link rel="canonical" href="https://doublexz.github.io/doggie.github.io/2020/02/10/9-JVM-线程上下文加载器/">
 
 
 
 
 
-  <title>Nginx常用指令使用总结 | CloudXue's Blog</title>
+  <title>9_JVM_线程上下文加载器 | CloudXue's Blog</title>
   
 
 
@@ -297,7 +297,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://doublexz.github.io/doggie.github.io/doggie.github.io/2018/04/18/Nginx常用指令使用总结/">
+    <link itemprop="mainEntityOfPage" href="https://doublexz.github.io/doggie.github.io/doggie.github.io/2020/02/10/9-JVM-线程上下文加载器/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Doggie">
@@ -314,7 +314,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">Nginx常用指令使用总结</h1>
+          <h1 class="post-title" itemprop="name headline">9_JVM_线程上下文加载器</h1>
         
 
         <div class="post-meta">
@@ -326,8 +326,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-18T20:41:54+08:00">
-                2018-04-18
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-02-10T17:13:05+08:00">
+                2020-02-10
               </time>
             
 
@@ -349,8 +349,19 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/doggie.github.io/categories/Nginx/" itemprop="url" rel="index">
-                    <span itemprop="name">Nginx</span>
+                  <a href="/doggie.github.io/categories/Java/" itemprop="url" rel="index">
+                    <span itemprop="name">Java</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/doggie.github.io/categories/Java/JVM/" itemprop="url" rel="index">
+                    <span itemprop="name">JVM</span>
                   </a>
                 </span>
 
@@ -366,7 +377,7 @@
 
           
           
-             <span id="/doggie.github.io/2018/04/18/Nginx常用指令使用总结/" class="leancloud_visitors" data-flag-title="Nginx常用指令使用总结">
+             <span id="/doggie.github.io/2020/02/10/9-JVM-线程上下文加载器/" class="leancloud_visitors" data-flag-title="9_JVM_线程上下文加载器">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -402,134 +413,16 @@
       
 
       
-        <p>主要记录了root、proxy_pass、rewrite、return、error_page的用法。<br><a id="more"></a></p>
-<h2 id="root-指令"><a href="#root-指令" class="headerlink" title="root 指令"></a>root 指令</h2><p>定义了静态文件的根目录，并且和URI拼接形成最终的本地文件路径。如：</p>
-<pre><code>root /etc/nginx/html；
-</code></pre><p>当请求/static/js/public.js时，则拼接后返回本地服务器文件 /etc/nginx/html/static/js/public.js </p>
-<h2 id="proxy-pass-指令"><a href="#proxy-pass-指令" class="headerlink" title="proxy_pass 指令"></a>proxy_pass 指令</h2><p>将请求传递到URL指向的代理服务器，然后将来自代理服务器的响应回传给客户端。 如：</p>
-<pre><code>location /api {
-    rewrite ^/api/(.*)$  /$1 break;
-    proxy_pass http://localhost:8081;
-}
-</code></pre><p>以上配置表示，对于/api开头的URI进行处理，首先对URI进行重写得到新的URI，然后将请求转发给<code>http://localhost:8081/新的URI</code> （默认请求参数也是会传递过去的！）</p>
-<h2 id="rewrite-指令"><a href="#rewrite-指令" class="headerlink" title="rewrite 指令"></a>rewrite 指令</h2><p>可以多次修改请求的URI。语法为：rewrite  regex replacement flag。第一个参数是URI需要匹配的正则表达式，第二个参数是将要替换的URI，第三个参数可选（lase|break|redirect|permanent）指示是否继续可以重写(last|break)或者返回重定向代码301或者302(redirect|permanent)。如：</p>
-<pre><code>location  /users {
-    rewite ^/users/(.*)$  /show?user=$1 break;
-}
-</code></pre><p>以上配置，对于/users/123 这样的URI会被重写成 /show?user=123 。<br>对于上面proxy_pass实例中rewrite指令，会将/api/app/index重写成/app/index</p>
-<p>flag说明：</p>
-<ul>
-<li>last: 在当前server或者location中停止执行rewrite指令，但是Nginx会继续搜索与新的URI匹配的location，并在匹配的location中执行任何rewrite指令(URI可能会再次改变)，若URI发生改变，则继续搜索与之匹配的location进行处理。</li>
-<li>break: <strong>停止</strong>当前server或者location中rewrite指令的处理，并取消搜索与新URI匹配的location,不会执行location中的rewrite指令。<br><strong>最好不要在server块中的rewrite指令中使用break标志</strong>。  </li>
-</ul>
-<p>在server块中的rewrite指令，使用last标记：</p>
-<pre><code>server  {
-    ...
-    rewrite ^(/file.*)/image/(/*)\..*$  $1/web1/$2.jpeg last;
-    rewrite ^(/file.*)/archive/(/*)\..*$  $1/media/$2.txt last;
-    return 403;
-    ...
-}
-</code></pre><ul>
-<li>例如<code>/file/some/image/20180411</code>被重写成 <code>/file/some/web1/20180411.jpeg</code>。由于last标志，第二个rewrite和return指令被跳过，但是Nginx继续处理更改后的URI，如匹配到某个location，则执行location中的任何指令，包括rewrite指令（这意味着URI可能再次改变）。</li>
-<li>例如<code>/file/some/archive/20180411</code>被重写成<code>/file/some/media/20180411.txt</code>，测试return指令被跳过，但是Nginx继续处理更改后的URI。</li>
-<li>例如<code>/file/some/test/fileName</code> 的URI没有匹配以上任何rewrite指令，则返回403状态码给客户端，Nginx停止处理。  </li>
-</ul>
-<p>在server块中的rewrite指令，使用break标记：</p>
-<pre><code>server  {
-    ...
-    rewrite ^(/file.*)/image/(/*)\..*$  $1/web1/$2.jpeg break;
-    rewrite ^(/file.*)/audio/(/*)\..*$  $1/archive/$2.txt break;
-    return 403;
-    ...
-}
-</code></pre><p>例如<code>/file/some/image/20180411</code>被重写成 <code>/file/some/image/20180411.jpeg</code>。由于break标志，Nginx会继续判断后面的rewrite与新得到URI是否匹配（始终在当前server块中）。</p>
-<p>在location块中的rewrite指令，使用last标记：  </p>
-<pre><code>location  /wechat  {
-    rewrite ^(/file/.*)/image/(.*)\..*$ $1/web1/$2.jpeg last;
-    rewrite ^(/file/.*)/audio/(.*)\..*$ $1/archive/$2.txt last;
-}
-</code></pre><p>例如一个URI匹配第一个rewrite指令，由于last标记，Nginx会将新的URI到所有location中再执行一遍包括rewrite指令。 </p>
-<p>在location块中的rewrite指令，使用break标记：  </p>
-<pre><code>location /wechat  {
-    rewrite ^(/file/.*)/image/(.*)\..*$ $1/web1/$2.jpeg break;
-    rewrite ^(/file/.*)/audio/(.*)\..*$ $1/archive/$2.txt break;
-}
-</code></pre><p>例如一个URI匹配第一个rewrite指令，由于break标记，Nginx会继续在当前location中执行第三行规则中的匹配处理，始终在当前location中。</p>
-<p>location指令接受两种类型的参数</p>
-<ul>
-<li>前缀字符串： 前缀字符串参数，URI必须严格以它开头。</li>
-<li>正则表达式： 正则表达式参数，以<code>~</code>开头表示大小写敏感，以<code>~*</code>开头表示大小写不敏感。正则表达式中的.要加转义字符<code>\</code>，写成<code>\.</code>  </li>
-</ul>
-<p>例如一个匹配以<code>.html</code>或者<code>.htm</code>结尾的URI的location：  </p>
-<pre><code>location  ~  \.html?  { #
-    ...
-}
-</code></pre><p>正则表达式的优先级大于前缀字符串。如果找到匹配的前缀字符串，仍继续搜索正则表达式，但是如果前缀字符串以<code>^~</code>开头，则不再检查正则表达式！<br>具体的搜索匹配流程如下：  </p>
-<ol>
-<li>将URI与所有的前缀字符串进行比较</li>
-<li>=修饰符表明URI必须与前缀字符串相等，如果找到，则停止搜索。</li>
-<li>如果找到的最长前缀匹配字符串以^~开头，则不在搜索正则表达式是否匹配。</li>
-<li>存储匹配的最长前缀字符串。</li>
-<li>测试对比URI与正则表达式。</li>
-<li>找到第一个匹配的正则表达式后停止。</li>
-<li>如果没有正则表达式匹配，则使用4存储的前缀字符串对应的location。  </li>
-</ol>
-<p><strong>=修饰符的优先级最高。如网站首页频繁访问，可以专门定义一个location  来减少搜索匹配次数，提高速度。</strong></p>
-<h2 id="return指令"><a href="#return指令" class="headerlink" title="return指令 "></a>return指令 </h2><p>第一个参数是响应代码，可选的第二个参数可以是重定向的URL或者在响应正文中返回的文本。如</p>
-<pre><code>location /permannetly/moved/url {
-    return 301 http://www.example.com/moved/here;
-}
-</code></pre><p>该指令可以包含在location和server上下文中。</p>
-<h2 id="error-page指令"><a href="#error-page指令" class="headerlink" title="error_page指令 "></a>error_page指令 </h2><p>可以配置特定错误码的错误页面，或者重定向到其他页面。如  </p>
-<pre><code>#在404错误发生时返回/404.html
-error_page 404 /404.html    
-</code></pre><p>该指令定义了如何处理错误，而不会直接返回，而return指令是立即返回。  </p>
-<pre><code>location  /old/path.html {
-    error_page 404 =  301 http://example.com/new/path.html;
-}
-</code></pre><p>当Nginx找不到页面时，它将使用代码301替换404，并将客户端重定向到 <code>http://example.com/new/path.html</code>。比如当客户端仍尝试用旧的 URI 访问页面时，301代码通知浏览器页面已永久移除，并且需要自动替换为返回的新地址。</p>
-<h2 id="try-files指令"><a href="#try-files指令" class="headerlink" title="try_files指令"></a>try_files指令</h2><h2 id="附录-常用正则"><a href="#附录-常用正则" class="headerlink" title="附录 常用正则"></a>附录 常用正则</h2><pre><code>. ： 匹配除换行符以外的任意字符
-? ： 重复0次或1次
-+ ： 重复1次或更多次
-*： 重复0次或更多次
-\d ：匹配数字
-^ ： 匹配字符串的开始
-$ ： 匹配字符串的结束
-{n} ： 重复n次
-{n,} ： 重复n次或更多次
-[c] ： 匹配单个字符c
-[a-z]： 匹配a-z小写字母的任意一个
-全局变量
-$args ： #这个变量等于请求行中的参数，同$query_string
-$content_length ： 请求头中的Content-length字段。
-$content_type ： 请求头中的Content-Type字段。
-$document_root ： 当前请求在root指令中指定的值。
-$host ： 请求主机头字段，否则为服务器名称。
-$http_user_agent ： 客户端agent信息
-$http_cookie ： 客户端cookie信息
-$limit_rate ： 这个变量可以限制连接速率。
-$request_method ： 客户端请求的动作，通常为GET或POST。
-$remote_addr ： 客户端的IP地址。
-$remote_port ： 客户端的端口。
-$remote_user ： 已经经过Auth Basic Module验证的用户名。
-$request_filename ： 当前请求的文件路径，由root或alias指令与URI请求生成。
-$scheme ： HTTP方法（如http，https）。
-$server_protocol ： 请求使用的协议，通常是HTTP/1.0或HTTP/1.1。
-$server_addr ： 服务器地址，在完成一次系统调用后可以确定这个值。
-$server_name ： 服务器名称。
-$server_port ： 请求到达服务器的端口号。
-$request_uri ： 包含请求参数的原始URI，不包含主机名，如：/foo/bar.php?arg=baz。
-$uri ： 不带请求参数的当前URI，$uri不包含主机名，如/foo/bar.html。
-$document_uri ： 与$uri相同。
-例如请求：http://localhost:88/test1/test2/test.php
-$host：localhost
-$server_port：88
-$request_uri：/test1/test2/test.php
-$document_uri：/test1/test2/test.php
-$document_root：/var/www/html
-$request_filename：/var/www/html/test1/test2/test.php
-</code></pre>
+        <h2 id="线程上线文类加载器的一般使用模式"><a href="#线程上线文类加载器的一般使用模式" class="headerlink" title="线程上线文类加载器的一般使用模式"></a>线程上线文类加载器的一般使用模式</h2><p>获取–&gt;使用–&gt;还原，伪代码如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">//获取</span><br><span class="line">ClassLoader classLoader = Thread.currentThread.getContextClassLoader();</span><br><span class="line">try &#123;</span><br><span class="line">    //使用</span><br><span class="line">    Thread.currentThread.setContextClassLoader(targetCcl);</span><br><span class="line">    myMethod();</span><br><span class="line">&#125; catch (Exception e)&#123;</span><br><span class="line">    e.printStackTrace();</span><br><span class="line">&#125; finally &#123;</span><br><span class="line">    //还原</span><br><span class="line">    Thread.currentThread.setContextClassLoader(classLoader);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>其中，<code>myMethod()</code>里面调用了<br><code>Thread.currentThread.getContextClassLoader();</code>方法来获取当前线程的上下文类加载器做某些事情。  </p>
+<p>如果一个类由类加载器A加载，那么这个类依赖的其他类也是由相同的类加载器加载的（依赖类没有被加载过）。<br>上下文类加载器的作用就是为了破坏Java的类加载委托机制。当高层提供了统一的接口让低层去实现，同时又要在高层加载或实例化低层类时，就必须通过线程上下文类加载器来帮助高层的ClassLoader找到并加载类。  </p>
+<h2 id="ServiceLoader加载策略"><a href="#ServiceLoader加载策略" class="headerlink" title="ServiceLoader加载策略"></a>ServiceLoader加载策略</h2><p>从JDK 1.6开始提供的一个简单的服务提供者加载策略。<br>服务通常被设置成接口或者抽象类。服务提供者是特定于服务的实现。提供者中的类通常实现接口或者子类化（继承）服务本身中自定义的类。服务提供者以jar文件的形式置于常用扩展目录中，作为Java平台的特定实现。服务提供者也可以添加到应用的classpath目录或者其他平台指定的目录中。基于加载的目的，一个服务由单个接口或者抽象类表示（也可以具体类，但不推荐）。给定服务的提供者，包含一个或者多个使用数据或代码扩展了指定服务提供者的服务类型的具象类。provider类通常不是整个provider本身，而是一个代理，它包含足够的信息来决定provider是否能够满足特定的请求以及能够根据需要创建实际provider的代码。该机制唯一强制要求的是提供者类必须有一个无参构造方法，以至于它可以在加载时被实例化。<br>服务提供者由位于资源目录<code>META-INF/services</code>中的提供者配置文件识别。文件的名字是服务类型的全限定二进制类名。文件包含一个列表，其每一行是具体提供类的全限定二进制名。会忽略每个名字周围的空格、制表符以及空行。注释符号为<code>#</code>;文件必须使用UTF-8编码。如果某个特定的具体提供者在多个配置文件中定义，或者在一个配置文件中定义多次，那么重复的部分会被忽略。命名某个特定提供者的配置文件不必与提供程序本身在一个jar包或者发布单元中。提供者必须对查询并定位配置文件的类加载器是可访问的；注意，这不一定是实际从中加载文件的类加载器。<br>服务提供者类可以按需定位和延迟加载。服务加载程序会维护一个到目前为止已经加载的提供者的缓存。每次调用迭代器方法都返回一个迭代器，该迭代器首先按实例化顺序生成缓存的所有元素，然后惰性地定位和实例化任何剩余的提供者，依次将每个提供者添加到缓存中。可以通过reload方法清除缓存。<br>假设我们有一个服务类型<code>com.example.CodecSet</code>，表示对某个协议的编解码服务，可以将其定义为抽象类，并定义两个抽象方法。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">public abstract Encoder getEncoder(String encodingName);</span><br><span class="line">public abstract Decoder getDecoder(String encodingName);</span><br></pre></td></tr></table></figure></p>
+<p>每个方法返回一个相关对象或者在服务提供者不支持的编码时返回null。通常情况下，提供者会支持多种编码。<br>如果<code>com.example.impl.StandardCodecs</code>是CodecSet服务的实现，那么在其jar文件中会包含一个文件，名为<br><code>META-INF/services/com.example.CodecSet</code><br>该文件包含下面一行内容<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">com.example.impl.StandardCodecs    # Standard codecs</span><br></pre></td></tr></table></figure></p>
+<p>CodecSet类在初始化时创建和保存一个唯一的服务实例<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">private static ServiceLoader&lt;CodecSet&gt; codecSetLoader</span><br><span class="line">       = ServiceLoader.load(CodecSet.class);</span><br></pre></td></tr></table></figure></p>
+<p>实现类定义一个静态工厂方法来从已知的提供者中加载给定名字的解码器，在匹配到一个合适的解码器时返回<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">public static Encoder getEncoder(String encodingName) &#123;</span><br><span class="line">    for (CodecSet cp : codecSetLoader) &#123;</span><br><span class="line">        Encoder enc = cp.getEncoder(encodingName);</span><br><span class="line">        if (enc != null)</span><br><span class="line">            return enc;</span><br><span class="line">    &#125;</span><br><span class="line">    return null;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<hr>
+<p>From：圣思园年费课程：<a href="http://www.iprogramming.cn/jvm.html" target="_blank" rel="noopener">《深入理解JVM》</a> 学习笔记</p>
+
       
     </div>
     
@@ -546,7 +439,7 @@ $request_filename：/var/www/html/test1/test2/test.php
       
         <div class="post-tags">
           
-            <a href="/doggie.github.io/tags/Nginx/" rel="tag"># Nginx</a>
+            <a href="/doggie.github.io/tags/JVM/" rel="tag"># JVM</a>
           
         </div>
       
@@ -559,15 +452,15 @@ $request_filename：/var/www/html/test1/test2/test.php
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
+              <a href="/doggie.github.io/2020/02/08/8-JVM-Launcher类源码分析与forName方法底层剖析/" rel="next" title="8_JVM_Launcher类源码分析与forName方法底层剖析">
+                <i class="fa fa-chevron-left"></i> 8_JVM_Launcher类源码分析与forName方法底层剖析
+              </a>
+            
           </div>
 
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/doggie.github.io/2018/04/29/Java中的IO体系架构与装饰模式/" rel="prev" title="Java中的IO体系架构与装饰模式">
-                Java中的IO体系架构与装饰模式 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -724,7 +617,7 @@ $request_filename：/var/www/html/test1/test2/test.php
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#root-指令"><span class="nav-number">1.</span> <span class="nav-text">root 指令</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#proxy-pass-指令"><span class="nav-number">2.</span> <span class="nav-text">proxy_pass 指令</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#rewrite-指令"><span class="nav-number">3.</span> <span class="nav-text">rewrite 指令</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#return指令"><span class="nav-number">4.</span> <span class="nav-text">return指令 </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#error-page指令"><span class="nav-number">5.</span> <span class="nav-text">error_page指令 </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#try-files指令"><span class="nav-number">6.</span> <span class="nav-text">try_files指令</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#附录-常用正则"><span class="nav-number">7.</span> <span class="nav-text">附录 常用正则</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#线程上线文类加载器的一般使用模式"><span class="nav-number">1.</span> <span class="nav-text">线程上线文类加载器的一般使用模式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ServiceLoader加载策略"><span class="nav-number">2.</span> <span class="nav-text">ServiceLoader加载策略</span></a></li></ol></div>
             
 
           </div>
