@@ -296,6 +296,963 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://doublexz.github.io/doggie.github.io/doggie.github.io/2020/01/06/Kafka学习第一篇-入门篇/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Doggie">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/doggie.github.io/images/love.jpeg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="CloudXue's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/doggie.github.io/2020/01/06/Kafka学习第一篇-入门篇/" itemprop="url">Kafka学习第一篇-入门篇</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-01-06T16:30:59+08:00">
+                2020-01-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/doggie.github.io/categories/消息队列/" itemprop="url" rel="index">
+                    <span itemprop="name">消息队列</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/doggie.github.io/2020/01/06/Kafka学习第一篇-入门篇/" class="leancloud_visitors" data-flag-title="Kafka学习第一篇-入门篇">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="软件安装"><a href="#软件安装" class="headerlink" title="软件安装"></a>软件安装</h2><p><a href="http://kafka.apache.org/downloads" target="_blank" rel="noopener">官网下载Kafka</a> ,选择<code>kafka_2.11-2.4.0.tgz</code>下载<br>Kafka 严重依赖ZooKeeper，通过ZooKeeper管理各种数据和元数据，所以可以使用Kafka自带的ZZooKeeper,也可以去<a href="http://zookeeper.apache.org/" target="_blank" rel="noopener">Zookeeper官网下载</a><br>示例使用Kafka自带ZooKeeper。 </p>
+<h2 id="第一个示例"><a href="#第一个示例" class="headerlink" title="第一个示例"></a>第一个示例</h2><h3 id="Step-1-下载Kafka并解压"><a href="#Step-1-下载Kafka并解压" class="headerlink" title="Step 1: 下载Kafka并解压"></a>Step 1: 下载Kafka并解压</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">tar -xvf kafka_2.11-2.4.0.tgz</span><br><span class="line">cd kafka_2.11-2.4.0</span><br></pre></td></tr></table></figure>
+<h3 id="Step-2-启动-Server"><a href="#Step-2-启动-Server" class="headerlink" title="Step 2:启动 Server"></a>Step 2:启动 Server</h3><p>启动ZooKeeper实例<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bin/zookeeper-server-start.sh config/zookeeper.properties</span><br></pre></td></tr></table></figure></p>
+<p>出现以下信息表示ZooKeeper启动成功<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[2020-01-06 17:09:05,071] INFO binding to port 0.0.0.0/0.0.0.0:2181 (org.apache.zookeeper.server.NIOServerCnxnFactory)</span><br><span class="line">[2020-01-06 17:09:05,087] INFO zookeeper.snapshotSizeFactor = 0.33 (org.apache.zookeeper.server.ZKDatabase)</span><br><span class="line">[2020-01-06 17:09:05,089] INFO Snapshotting: 0x0 to /tmp/zookeeper/version-2/snapshot.0 (org.apache.zookeeper.server.persistence.FileTxnSnapLog)</span><br><span class="line">[2020-01-06 17:09:05,092] INFO Snapshotting: 0x0 to /tmp/zookeeper/version-2/snapshot.0 (org.apache.zookeeper.server.persistence.FileTxnSnapLog)</span><br><span class="line">[2020-01-06 17:09:05,112] INFO Using checkIntervalMs=60000 maxPerMinute=10000 (org.apache.zookeeper.server.ContainerManager)</span><br></pre></td></tr></table></figure></p>
+<p>新建一个终端窗口，启动Kafka server<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bin/kafka-server-start.sh config/server.properties</span><br></pre></td></tr></table></figure></p>
+<p>出现以下信息表示Kafka server启动成功<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[2020-01-06 17:15:19,195] INFO [SocketServer brokerId=0] Started data-plane processors for 1 acceptors (kafka.network.SocketServer)</span><br><span class="line">[2020-01-06 17:15:19,198] INFO Kafka version: 2.4.0 (org.apache.kafka.common.utils.AppInfoParser)</span><br><span class="line">[2020-01-06 17:15:19,198] INFO Kafka commitId: 77a89fcf8d7fa018 (org.apache.kafka.common.utils.AppInfoParser)</span><br><span class="line">[2020-01-06 17:15:19,198] INFO Kafka startTimeMs: 1578302119196 (org.apache.kafka.common.utils.AppInfoParser)</span><br><span class="line">[2020-01-06 17:15:19,200] INFO [KafkaServer id=0] started (kafka.server.KafkaServer)</span><br></pre></td></tr></table></figure></p>
+<h3 id="Setp-3-创建主题"><a href="#Setp-3-创建主题" class="headerlink" title="Setp 3: 创建主题"></a>Setp 3: 创建主题</h3><p>新建一个终端窗口，创建一个只有一个分区和副本的名为”test”的主题（topic）<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bin/kafka-topics.sh --create --bootstrap-server localhost:9090 --replication-factor 1 --partitions 1 --topic test</span><br></pre></td></tr></table></figure></p>
+<p>查看主题列表<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">bin/kafka-topics.sh --list --bootstrap-server localhost:9092</span><br><span class="line">test</span><br></pre></td></tr></table></figure></p>
+<p>表示主题创建成功！</p>
+<h3 id="Setp-4-发送一些消息"><a href="#Setp-4-发送一些消息" class="headerlink" title="Setp 4: 发送一些消息"></a>Setp 4: 发送一些消息</h3><p>Kafka的命令行客户端将从一个文件或者标准输入获取输入信息，并将其作为消息发送给Kafka集群。默认情况下，每一行作为一个单独的消息发出。<br>新建生产者终端窗口：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">bin/kafka-console-producer.sh --broker-list localhost:9092 --topic test</span><br><span class="line">&gt;这是一个消息</span><br><span class="line">&gt;Hello World</span><br><span class="line">&gt;你好吗</span><br><span class="line">&gt;</span><br></pre></td></tr></table></figure></p>
+<h3 id="Step-5-启动消费者"><a href="#Step-5-启动消费者" class="headerlink" title="Step 5: 启动消费者"></a>Step 5: 启动消费者</h3><p>Kafka也有一个命令行客户端，可以将消息展示到标准输出。<br>新建消费者终端窗口：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test --from-beginning</span><br><span class="line">[2020-01-06 17:38:03,925] WARN [Consumer clientId=consumer-console-consumer-58504-1, groupId=console-consumer-58504] Connection to node 0 (/172.21.3.9:9092) could not be established. Broker may not be available. (org.apache.kafka.clients.NetworkClient)</span><br><span class="line">这是一个消息</span><br><span class="line">Hello World</span><br><span class="line">你好吗</span><br></pre></td></tr></table></figure></p>
+<p>启动后，生产者发送到topic的消息会被拉取并显示。此时，切换到生产者终端窗口，继续输入消息，消息会被实时发送给消费者。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://doublexz.github.io/doggie.github.io/doggie.github.io/2020/01/02/SpringBoot集成WebSocket示例/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Doggie">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/doggie.github.io/images/love.jpeg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="CloudXue's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/doggie.github.io/2020/01/02/SpringBoot集成WebSocket示例/" itemprop="url">SpringBoot集成WebSocket示例</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-01-02T15:00:30+08:00">
+                2020-01-02
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/doggie.github.io/categories/Java-Web/" itemprop="url" rel="index">
+                    <span itemprop="name">Java Web</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/doggie.github.io/2020/01/02/SpringBoot集成WebSocket示例/" class="leancloud_visitors" data-flag-title="SpringBoot集成WebSocket示例">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="WebSocket"><a href="#WebSocket" class="headerlink" title="WebSocket "></a>WebSocket </h2><p>WebSocket是HTML5的一种新的协议，建立在TCP协议之上，实现了客户端和服务端全双工异步通信。<br>它和HTTP最大的不同是：  </p>
+<ul>
+<li>WebSocket是一种双向通信协议，WebSocket服务器和Browser/Client Agent都能主动向对方发送或者接收数据；</li>
+<li>WebSocket需要类似TCP的客户端和服务器端通过握手连接，连接成功后才能相互通信。  </li>
+</ul>
+<p>WebSocket协议提供了一种标准的方式，在客户端与服务端之间通过使用单一的TCP连接建立一个全双工的、双向通信渠道。它是区别于HTTP的TCP协议，但设计用于HTTP，使用80和443端口，且允许复用已有的防火墙规则。  </p>
+<p>WebSocket交互始于HTTP请求，使用HTTP的<code>Upgrade</code>头来进行升级，切换到WebSocket协议：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">GET /spring-websocket-portfolio/portfolio HTTP/1.1</span><br><span class="line">Host: localhost:8080</span><br><span class="line">Upgrade: websocket</span><br><span class="line">Connection: Upgrade</span><br><span class="line">Sec-WebSocket-Key: Uc9l9TMkWGbHFD2qnFHltg==</span><br><span class="line">Sec-WebSocket-Protocol: v10.stomp, v11.stomp</span><br><span class="line">Sec-WebSocket-Version: 13</span><br><span class="line">Origin: http://localhost:8080</span><br></pre></td></tr></table></figure></p>
+<p>服务端返回101状态码，而非200状态码。  </p>
+<pre><code>HTTP/1.1 101 Switching Protocols
+Upgrade: websocket
+Connection: Upgrade
+Sec-WebSocket-Accept: 1qVdfYHU9hPOl4JYYNXF623Gzn0=
+Sec-WebSocket-Protocol: v10.stomp
+</code></pre><p>在这次成功的握手后，HTTP升级请求底层的TCP套接字仍会为客户端和服务端开启，用于发送和接收消息。  </p>
+<h2 id="HTTP-VS-WebSocket"><a href="#HTTP-VS-WebSocket" class="headerlink" title="HTTP VS WebSocket"></a>HTTP VS WebSocket</h2><p>即使WebSocket被设计成与HTTP兼容，且以HTTP请求开始，理解这两个协议的不同架构和应用程序模型是很重要的。  </p>
+<p>在HTTP和REST中，已用通过URL被分成多个模块。客户端通过访问这些URL，以请求-响应的形式来与应用交互。服务端基于HTTP的URL、方法和请求头，将请求路由的相关的处理器。  </p>
+<p>相比之下，WebSocket只有一个用于初始化连接的URL，然后所有的应用消息在相同的TCP连接上传递。这一点完全不同于异步的、事件驱动的消息传递架构。  </p>
+<p>WebSocket也是一种低级的传输协议，不像HTTP为消息内容定义语义。这意味着，除非客户端和服务端在消息语义上达成一致，否则不会路由和处理该消息。  </p>
+<p>WebSocketk客户端和服务端可以在HTTP握手请求上通过<code>Sec-WebSocket-Protocol</code>头，协商使用一种高级的消息传输协议（如，STOMP）</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://doublexz.github.io/doggie.github.io/doggie.github.io/2019/12/31/使用非root用户停止和启动Apache、Nginx的方法/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Doggie">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/doggie.github.io/images/love.jpeg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="CloudXue's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/doggie.github.io/2019/12/31/使用非root用户停止和启动Apache、Nginx的方法/" itemprop="url">使用非root用户停止和启动Apache、Nginx的方法</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-12-31T10:31:18+08:00">
+                2019-12-31
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/doggie.github.io/categories/Linux/" itemprop="url" rel="index">
+                    <span itemprop="name">Linux</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/doggie.github.io/2019/12/31/使用非root用户停止和启动Apache、Nginx的方法/" class="leancloud_visitors" data-flag-title="使用非root用户停止和启动Apache、Nginx的方法">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>Apache或Nginx监听80或者443端口，root权限被回收后，修改配置文件需要重启的情况下，通过给二进制文件set UID的方式实现： </p>
+<h2 id="Apache"><a href="#Apache" class="headerlink" title="Apache"></a>Apache</h2><p>root用户登录进入到<code>/opt/apache/</code>bin目录下<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"># cd /opt/apache/bin</span><br><span class="line"># chown root httpd</span><br><span class="line"># chmod u+s httpd</span><br><span class="line"># su - chatweb</span><br><span class="line">$ ll httpd </span><br><span class="line">-rwsr-xr-x 1 root chatweb 1546353 2017-08-14 httpd</span><br><span class="line">$ /opt/apache/bin/apachectl start</span><br></pre></td></tr></table></figure></p>
+<h2 id="Nginx"><a href="#Nginx" class="headerlink" title="Nginx "></a>Nginx </h2><p>root用户进入<code>/.../nginx/sbin</code>目录下<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"># cd /.../nginx/sbin</span><br><span class="line"># chown root nginx</span><br><span class="line"># chmod u+s nginx</span><br><span class="line"># su - nginx</span><br><span class="line">$ ll nginx</span><br><span class="line">-rwsr-xr-x 1 root nginx 3289160 2019-05-05 nginx</span><br><span class="line">$ /.../nginx/sbin/nginx -s reload</span><br></pre></td></tr></table></figure></p>
+<h2 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h2><p>Linux系统中的文件除了user id和group id外，还有俩称之为effective的id，四个id简写为uid、gid和euid、egid。<br>内核主要是根据euid和egid来确定进程对资源的访问权限：  </p>
+<ul>
+<li>一个进程如果没有SUID或SGID位，则euid=uid egid=gid，分别是运行这个程序的用户的uid和gid；</li>
+<li>如果一个程序设置了SUID，则euid和egid变成被运行的程序的所有者的uid和gid；</li>
+<li>SUID的优先级比SGID高，当一个可执行程序设置了SUID，则SGID会自动变成相应的egid  </li>
+</ul>
+<p>set UID（SUID）的作用是让执行该命令的用户以该命令拥有者的权限去执行。假如启动命令的拥有者是root用户，普通用户执行命令时就会拥有root的权限，然后使用root权限去操作服务。<br>set UID的方式只针对二进制文件，是在执行程序（程序的可执行位被设置）时起作用，而可执行位只对普通文件和目录文件有意义。  </p>
+<p>给文件加或去掉SUID和SGID的命令如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"># chmod u+s filename 设置SUID位</span><br><span class="line"># chmod u-s filename 去掉SUID设置</span><br><span class="line"># chmod g+s filename 设置SGID位</span><br><span class="line"># chmod g-s filename 去掉SGID设置</span><br></pre></td></tr></table></figure></p>
+<p>如果一个文件被设置了SUID或SGID位，会分别表现在所有者或同组用户的权限的可执行位上。例如：<br>1、-rwsr-xr-x 表示SUID和所有者权限中可执行位被设置<br>2、-rwSr–r– 表示SUID被设置，但所有者权限中可执行位没有被设置<br>3、-rwxr-sr-x 表示SGID和同组用户权限中可执行位被设置<br>4、-rw-r-Sr– 表示SGID被设置，但同组用户权限中可执行位没有被设置</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://doublexz.github.io/doggie.github.io/doggie.github.io/2019/12/27/Environment组件的重要作用/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Doggie">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/doggie.github.io/images/love.jpeg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="CloudXue's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/doggie.github.io/2019/12/27/Environment组件的重要作用/" itemprop="url">Environment组件的重要作用</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-12-27T17:21:04+08:00">
+                2019-12-27
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/doggie.github.io/2019/12/27/Environment组件的重要作用/" class="leancloud_visitors" data-flag-title="Environment组件的重要作用">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://doublexz.github.io/doggie.github.io/doggie.github.io/2019/12/25/Class类中的getName方法/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Doggie">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/doggie.github.io/images/love.jpeg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="CloudXue's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/doggie.github.io/2019/12/25/Class类中的getName方法/" itemprop="url">Class类中的getName方法</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-12-25T09:36:24+08:00">
+                2019-12-25
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/doggie.github.io/categories/Java/" itemprop="url" rel="index">
+                    <span itemprop="name">Java</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/doggie.github.io/2019/12/25/Class类中的getName方法/" class="leancloud_visitors" data-flag-title="Class类中的getName方法">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>返回Class对象代表的(类、接口、数组类、原生类型或者void)实体的名字：  </p>
+<ul>
+<li>如果class对象表示一个引用类型而非数组类型，那么返回Java语言规范指定的该类的二进制名字；</li>
+<li>如果class对象表示一个原生类型或void，那么返回的名字是与原生类型或者void相关的Java语言关键字；  </li>
+<li>如果class对象表示一个数组类，那么返回的名字的内部形式是：元素类型的名字前加数组位数个’[‘字符。  </li>
+</ul>
+<p>元素类型的名字编码如下：<br> Element Type | Encoding<br>—|—<br>boolean | Z<br>byte | B<br>char | C<br>class or interface | Lclassname;<br>double | D<br>float | F<br>int | I<br>long | J<br>short | S</p>
+<p>类或接口的<code>classname</code>是class对象的二进制名字，例如：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">String.class.getName()</span><br><span class="line">    returns &quot;java.lang.String&quot;</span><br><span class="line">byte.class.getName()</span><br><span class="line">    returns &quot;byte&quot;</span><br><span class="line">(new Object[3]).getClass().getName()</span><br><span class="line">    returns &quot;[Ljava.lang.Object;&quot;</span><br><span class="line">(new int[3][4][5][6][7][8][9]).getClass().getName()</span><br><span class="line">    returns &quot;[[[[[[[I&quot;</span><br></pre></td></tr></table></figure></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://doublexz.github.io/doggie.github.io/doggie.github.io/2019/12/21/SpringBoot应用启动流程源码分析/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Doggie">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/doggie.github.io/images/love.jpeg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="CloudXue's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/doggie.github.io/2019/12/21/SpringBoot应用启动流程源码分析/" itemprop="url">SpringBoot应用启动流程源码分析</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-12-21T08:56:54+08:00">
+                2019-12-21
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/doggie.github.io/categories/Java-Web/" itemprop="url" rel="index">
+                    <span itemprop="name">Java Web</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/doggie.github.io/2019/12/21/SpringBoot应用启动流程源码分析/" class="leancloud_visitors" data-flag-title="SpringBoot应用启动流程源码分析">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>在main方法中调用<code>SpringApplication.run(SpringLectureApplication.class, args)</code>，传入我们自己编写的启动类的class对象<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">//run方法的具化形式</span><br><span class="line">public static ConfigurableApplicationContext run(Class&lt;?&gt; primarySource,</span><br><span class="line">        String... args) &#123;</span><br><span class="line">    return run(new Class&lt;?&gt;[] &#123; primarySource &#125;, args);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">//run方法的泛化形式</span><br><span class="line">public static ConfigurableApplicationContext run(Class&lt;?&gt;[] primarySources,</span><br><span class="line">        String[] args) &#123;</span><br><span class="line">    return new SpringApplication(primarySources).run(args);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<hr>
+<p>在run方法中，通过构造方法创建<code>SpringApplication</code>实例，然后调用实例run方法进行启动。创建<code>SpringApplication</code>实例时，应用上下文将会从特定的源中加载beans，且该实例可以在调用之前被定制。<br>分析<code>SpringApplication</code>的构造方法：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">//SpringApplication构造方法的具化形式</span><br><span class="line">public SpringApplication(Class&lt;?&gt;... primarySources) &#123;</span><br><span class="line">    this(null, primarySources);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">//SpringApplication构造方法的泛化形式</span><br><span class="line">public SpringApplication(ResourceLoader resourceLoader, Class&lt;?&gt;... primarySources) &#123;</span><br><span class="line">    this.resourceLoader = resourceLoader;</span><br><span class="line">    Assert.notNull(primarySources, &quot;PrimarySources must not be null&quot;);</span><br><span class="line">    this.primarySources = new LinkedHashSet&lt;&gt;(Arrays.asList(primarySources));</span><br><span class="line">    //根据类路径中的jar包名字推断应用类型： NONE、SERVLET、REACTIVE</span><br><span class="line">    this.webApplicationType = WebApplicationType.deduceFromClasspath();</span><br><span class="line">    //先获取初始化器实例集合，再设置初始化器</span><br><span class="line">    setInitializers((Collection) getSpringFactoriesInstances(</span><br><span class="line">            ApplicationContextInitializer.class));</span><br><span class="line">    //设置监听器</span><br><span class="line">    setListeners((Collection) getSpringFactoriesInstances(ApplicationListener.class));</span><br><span class="line">    //主类名赋值</span><br><span class="line">    this.mainApplicationClass = deduceMainApplicationClass();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<hr>
+<p>重点分析<code>SpringApplication</code>中的<code>(Collection) getSpringFactoriesInstances(
+            ApplicationContextInitializer.class)</code>方法，获取初始化器集合：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">//getSpringFactoriesInstances方法的具化形式</span><br><span class="line">private &lt;T&gt; Collection&lt;T&gt; getSpringFactoriesInstances(Class&lt;T&gt; type) &#123;</span><br><span class="line">    return getSpringFactoriesInstances(type, new Class&lt;?&gt;[] &#123;&#125;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">//getSpringFactoriesInstances方法的泛化形式 获取Spring工厂名字</span><br><span class="line">private &lt;T&gt; Collection&lt;T&gt; getSpringFactoriesInstances(Class&lt;T&gt; type,</span><br><span class="line">        Class&lt;?&gt;[] parameterTypes, Object... args) &#123;</span><br><span class="line">    ClassLoader classLoader = getClassLoader();</span><br><span class="line">    // Use names and ensure unique to protect against duplicates</span><br><span class="line">    //获得Spring中实现了type接口类的全限定类名集合</span><br><span class="line">    Set&lt;String&gt; names = new LinkedHashSet&lt;&gt;(</span><br><span class="line">            SpringFactoriesLoader.loadFactoryNames(type, classLoader));</span><br><span class="line">    //根据全限定类名，通过反射创建Spring工厂实例集合</span><br><span class="line">    List&lt;T&gt; instances = createSpringFactoriesInstances(type, parameterTypes,</span><br><span class="line">            classLoader, args, names);</span><br><span class="line">    AnnotationAwareOrderComparator.sort(instances);</span><br><span class="line">    return instances;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<hr>
+<p>首先获取实现了<code>ApplicationContextInitializer</code>接口类的全限定类名集合：<br>在获取过程中，会将读取到的所有内容加载到缓存中，方便后续使用，该缓存为<code>org.springframework.core.io.support.SpringFactoriesLoader.java</code>类中定义的成员变量：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">private static final Map&lt;ClassLoader, MultiValueMap&lt;String, String&gt;&gt; cache = new ConcurrentReferenceHashMap&lt;&gt;();</span><br></pre></td></tr></table></figure></p>
+<p>加载过程：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">private static Map&lt;String, List&lt;String&gt;&gt; loadSpringFactories(@Nullable ClassLoader classLoader) &#123;</span><br><span class="line">    //原数据结构</span><br><span class="line">    //MultiValueMap&lt;String, String&gt; result = cache.get(classLoader);</span><br><span class="line">    //个人认为这种定义方式更好理解</span><br><span class="line">    MultiValueMap&lt;String, List&lt;String&gt;&gt; result = cache.get(classLoader);</span><br><span class="line">    if (result != null) &#123;</span><br><span class="line">        return result;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    try &#123;</span><br><span class="line">        //根据给定的名字,(从类路径中)找到所有的资源</span><br><span class="line">        Enumeration&lt;URL&gt; urls = (classLoader != null ?</span><br><span class="line">                classLoader.getResources(FACTORIES_RESOURCE_LOCATION) :</span><br><span class="line">                ClassLoader.getSystemResources(FACTORIES_RESOURCE_LOCATION));</span><br><span class="line">        result = new LinkedMultiValueMap&lt;&gt;();</span><br><span class="line">        while (urls.hasMoreElements()) &#123;</span><br><span class="line">            URL url = urls.nextElement();</span><br><span class="line">            UrlResource resource = new UrlResource(url);</span><br><span class="line">            Properties properties = PropertiesLoaderUtils.loadProperties(resource);</span><br><span class="line">            for (Map.Entry&lt;?, ?&gt; entry : properties.entrySet()) &#123;</span><br><span class="line">                String factoryClassName = ((String) entry.getKey()).trim();</span><br><span class="line">                for (String factoryName : StringUtils.commaDelimitedListToStringArray((String) entry.getValue())) &#123;</span><br><span class="line">                    result.add(factoryClassName, factoryName.trim());</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        //将才spring.factories中读取的内容放入缓存中</span><br><span class="line">        cache.put(classLoader, result);</span><br><span class="line">        return result;</span><br><span class="line">    &#125;</span><br><span class="line">    catch (IOException ex) &#123;</span><br><span class="line">        throw new IllegalArgumentException(&quot;Unable to load factories from location [&quot; +</span><br><span class="line">                FACTORIES_RESOURCE_LOCATION + &quot;]&quot;, ex);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>从哪些里获取这些资源呢？答案是从约定的文件中获取：<br>通过Debug发现，这些资源从<code>META-INF/spring.factories</code>文件中加载，加载的路径包括：<br><code>spring-boot-autoconfiguration-version.jar/META-INF/spring.factories</code><br><code>spring-boot-version.jar/META-INF/spring.factories</code><br><code>spring-beans-version.jar/META-INF/spring.factories</code>  </p>
+<p>分析<code>spring.factories</code>文件的内容得出：<br>其格式遵从properties文件规范，以key和value对的形式配置，多个value值中间使用逗号分隔。主要配置了Initializers、Application Listeners、Auto Configuration Import Listeners、Auto Configuration Import Filters、Auto Configure、Failure analyzers、Template availability providers等相关的实现类，这些类用于完成Spring Boot的一系列功能。<br>通过文件流的形式依次读取，将读取到的内容放入<code>LinkedMultiValueMap</code>中，key为<code>spring.factories</code>中读取到的key，value为key对应value值的一个并集，即把多个文件中相同key值对应的value进行去重后合并。  </p>
+<p>最后将<code>LinkedMultiValueMap&lt;String,List&lt;String&gt;()</code>作为value,类加载器作为key放入缓存<code>MultiValueMap&lt;String, List&lt;String&gt;&gt;</code>  </p>
+<hr>
+<p>拿到全限定类名后，使用反射创建实例<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">private &lt;T&gt; List&lt;T&gt; createSpringFactoriesInstances(Class&lt;T&gt; type,</span><br><span class="line">        Class&lt;?&gt;[] parameterTypes, ClassLoader classLoader, Object[] args,</span><br><span class="line">        Set&lt;String&gt; names) &#123;</span><br><span class="line">    //创建一个已知大小的集合用于存储实例对象        </span><br><span class="line">    List&lt;T&gt; instances = new ArrayList&lt;&gt;(names.size());</span><br><span class="line">    //循环全限定类名集合</span><br><span class="line">    for (String name : names) &#123;</span><br><span class="line">        try &#123;</span><br><span class="line">            //获取Class对象</span><br><span class="line">            Class&lt;?&gt; instanceClass = ClassUtils.forName(name, classLoader);</span><br><span class="line">            Assert.isAssignable(type, instanceClass);</span><br><span class="line">            //获取Constructor对象</span><br><span class="line">            Constructor&lt;?&gt; constructor = instanceClass</span><br><span class="line">                    .getDeclaredConstructor(parameterTypes);</span><br><span class="line">            //反射创建实例</span><br><span class="line">            T instance = (T) BeanUtils.instantiateClass(constructor, args);</span><br><span class="line">            instances.add(instance);</span><br><span class="line">        &#125;</span><br><span class="line">        catch (Throwable ex) &#123;</span><br><span class="line">            throw new IllegalArgumentException(</span><br><span class="line">                    &quot;Cannot instantiate &quot; + type + &quot; : &quot; + name, ex);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    return instances;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>以上为创建初始化器实例并设置的过程，该过程完毕后，会设置监听器：从缓存中拿到实现了<code>ApplicationListener</code>接口的类名集合，通过反射创建实例集合，最后完成赋值。  </p>
+<p>最后会推断主类名，比较讨巧的是，通过运行期异常的堆栈信息来获取。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">private Class&lt;?&gt; deduceMainApplicationClass() &#123;</span><br><span class="line">    try &#123;</span><br><span class="line">        StackTraceElement[] stackTrace = new RuntimeException().getStackTrace();</span><br><span class="line">        //循环遍历堆栈元素</span><br><span class="line">        for (StackTraceElement stackTraceElement : stackTrace) &#123;</span><br><span class="line">            if (&quot;main&quot;.equals(stackTraceElement.getMethodName())) &#123;</span><br><span class="line">                return Class.forName(stackTraceElement.getClassName());</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    catch (ClassNotFoundException ex) &#123;</span><br><span class="line">        // Swallow and continue</span><br><span class="line">    &#125;</span><br><span class="line">    return null;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://doublexz.github.io/doggie.github.io/doggie.github.io/2019/12/19/Configuration注解深入详解/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -953,964 +1910,11 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://doublexz.github.io/doggie.github.io/doggie.github.io/2019/04/28/Linux系统使用非root用户安装并管理Nginx/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Doggie">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/doggie.github.io/images/love.jpeg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="CloudXue's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/doggie.github.io/2019/04/28/Linux系统使用非root用户安装并管理Nginx/" itemprop="url">Linux系统使用非root用户安装并管理Nginx</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-04-28T17:32:30+08:00">
-                2019-04-28
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category">
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/doggie.github.io/categories/Nginx/" itemprop="url" rel="index">
-                    <span itemprop="name">Nginx</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-             <span id="/doggie.github.io/2019/04/28/Linux系统使用非root用户安装并管理Nginx/" class="leancloud_visitors" data-flag-title="Linux系统使用非root用户安装并管理Nginx">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <p>通常使用Nginx或者Apache作为Web服务器时，默认监听80端口，因此默认会使用root用户去安装，而且，使用yum命令安装时，通常会安装到默认的路径下，默认路径通常是root用户才有执行权限的。如果不需要使用Nginx监听1024以下的端口，且对权限和网络管理比较严格时，能用非root权限解决的，就用普通用户。在此使用编译Nginx源码的方式安装Nginx。 假设已拿到root用户权限，但需要使用普通用户去管理Nginx。<br>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/doggie.github.io/2019/04/28/Linux系统使用非root用户安装并管理Nginx/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </p></div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://doublexz.github.io/doggie.github.io/doggie.github.io/2019/04/23/Item-17/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Doggie">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/doggie.github.io/images/love.jpeg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="CloudXue's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/doggie.github.io/2019/04/23/Item-17/" itemprop="url">Item-17 使可变性最小化</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-04-23T18:04:46+08:00">
-                2019-04-23
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category">
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/doggie.github.io/categories/Java/" itemprop="url" rel="index">
-                    <span itemprop="name">Java</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-             <span id="/doggie.github.io/2019/04/23/Item-17/" class="leancloud_visitors" data-flag-title="Item-17 使可变性最小化">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <p>简单来说，不可变类是一种实例不能被修改的类。其每个实例包含的信息在对象的整个生命中期中是固定的，因此在这个过程中观察不到任何改变。Java平台类库包含很多不可变类，包括String、包装原生类、BigInteger和BigDecimal。这么做有许多好处：不可变类比可变类更易于设计、实现和使用。他们更少出错并且更安全。<br>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/doggie.github.io/2019/04/23/Item-17/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </p></div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://doublexz.github.io/doggie.github.io/doggie.github.io/2019/04/16/Item-16/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Doggie">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/doggie.github.io/images/love.jpeg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="CloudXue's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/doggie.github.io/2019/04/16/Item-16/" itemprop="url">Item-16 在公共类中，使用访问器方法，而不是公共字段</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-04-16T21:38:05+08:00">
-                2019-04-16
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category">
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/doggie.github.io/categories/Java/" itemprop="url" rel="index">
-                    <span itemprop="name">Java</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-             <span id="/doggie.github.io/2019/04/16/Item-16/" class="leancloud_visitors" data-flag-title="Item-16 在公共类中，使用访问器方法，而不是公共字段">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <p>有时候，你可能想要编写组合了实例字段的类没有其他任何目的：  </p>
-<pre><code>//Degenerate classes like this should not be public !
-class Point {
-    public double x;
-    public double y;
-}  
-</code></pre>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/doggie.github.io/2019/04/16/Item-16/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://doublexz.github.io/doggie.github.io/doggie.github.io/2019/04/13/volatile关键字/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Doggie">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/doggie.github.io/images/love.jpeg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="CloudXue's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/doggie.github.io/2019/04/13/volatile关键字/" itemprop="url">volatile关键字</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-04-13T21:24:06+08:00">
-                2019-04-13
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category">
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/doggie.github.io/categories/Java/" itemprop="url" rel="index">
-                    <span itemprop="name">Java</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-             <span id="/doggie.github.io/2019/04/13/volatile关键字/" class="leancloud_visitors" data-flag-title="volatile关键字">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <h3 id="对volatile关键字的理解"><a href="#对volatile关键字的理解" class="headerlink" title="对volatile关键字的理解"></a>对volatile关键字的理解</h3><ol>
-<li>volatile只能修饰变量，不能修饰方法和代码块，是一个变量修饰符。</li>
-<li>volatile修饰变量后可以保证多个线程对该变量操作的内存可见性。即一个线程修改变量的值后，其他线程可以立即得到修改值。</li>
-<li>禁止处理器对指令重排序，保证程序执行的有序性，即保证程序按照代码的先后顺序执行。</li>
-<li>volatile不保证程序执行的原子性。</li>
-</ol>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/doggie.github.io/2019/04/13/volatile关键字/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://doublexz.github.io/doggie.github.io/doggie.github.io/2019/04/10/Item-15/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Doggie">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/doggie.github.io/images/love.jpeg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="CloudXue's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/doggie.github.io/2019/04/10/Item-15/" itemprop="url">Item-15 最大限度地减少类和成员的可访问性</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-04-10T08:56:15+08:00">
-                2019-04-10
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category">
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/doggie.github.io/categories/Java/" itemprop="url" rel="index">
-                    <span itemprop="name">Java</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-             <span id="/doggie.github.io/2019/04/10/Item-15/" class="leancloud_visitors" data-flag-title="Item-15 最大限度地减少类和成员的可访问性">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <p>区分设计良好和设计糟糕组件的唯一重要因素是组件隐藏其内部数据的程度以及其他组件的其他实现详情。设计良好的组件会隐藏所有其实现细节，从其实现中清晰划分API。组件之间只通过API交互，并且明显在各组件内部起作用。这个称作信息隐藏或者封装的概念是软件设计中的一个重要信条【Parnas72】。<br>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/doggie.github.io/2019/04/10/Item-15/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </p></div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://doublexz.github.io/doggie.github.io/doggie.github.io/2019/04/04/Item-14/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Doggie">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/doggie.github.io/images/love.jpeg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="CloudXue's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/doggie.github.io/2019/04/04/Item-14/" itemprop="url">Item-14 考虑实现Comparable接口</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-04-04T11:14:08+08:00">
-                2019-04-04
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category">
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/doggie.github.io/categories/Java/" itemprop="url" rel="index">
-                    <span itemprop="name">Java</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-             <span id="/doggie.github.io/2019/04/04/Item-14/" class="leancloud_visitors" data-flag-title="Item-14 考虑实现Comparable接口">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <p>不像在本章节中讨论的其他方法，compareTo方法未在Object中声明，而是Comparable接口中的唯一方法。它的特征与Object的equals方法类似，除了允许简单的相等性比较还允许顺序比较，且它是通用的。为了实现Comparable接口，类应该声明其实例有一个自然顺序。为实现了Comparable接口的对象数组排序就像下面这样简单：  </p>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/doggie.github.io/2019/04/04/Item-14/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/doggie.github.io/page/2/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/doggie.github.io/">1</a><a class="page-number" href="/doggie.github.io/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/doggie.github.io/page/4/">4</a><a class="page-number" href="/doggie.github.io/page/5/">5</a><a class="extend next" rel="next" href="/doggie.github.io/page/4/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/doggie.github.io/page/2/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/doggie.github.io/">1</a><a class="page-number" href="/doggie.github.io/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/doggie.github.io/page/4/">4</a><span class="space">&hellip;</span><a class="page-number" href="/doggie.github.io/page/6/">6</a><a class="extend next" rel="next" href="/doggie.github.io/page/4/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -1958,7 +1962,7 @@ class Point {
               
                 <a href="/doggie.github.io/archives/">
               
-                  <span class="site-state-item-count">45</span>
+                  <span class="site-state-item-count">52</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>

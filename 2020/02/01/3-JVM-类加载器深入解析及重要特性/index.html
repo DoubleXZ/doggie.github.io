@@ -84,14 +84,14 @@
 <meta name="description" content="JVM使用class类的过程如下：  加载： 就是把二进制形式的java类型读入java虚拟机中 连接_验证 连接_准备： 为类变量分配内存，设置默认值。但是在到达初始化之前，类变量都没有初始化为真正的初始值 连接_解析： 解析过程就是在类型的常量池中寻找类、接口、字段和方法的符号引用，把这些符号引用替换成直接引用的过程 初始化： 为类变量赋予正确的初始值。静态变量的声明语句，以及静态代码块都被看">
 <meta name="keywords" content="JVM">
 <meta property="og:type" content="article">
-<meta property="og:title" content="3_JVM_类加载器深入解析及重要特性">
+<meta property="og:title" content="3_JVM_类加载器_类加载器深入解析及重要特性">
 <meta property="og:url" content="https://doublexz.github.io/doggie.github.io/2020/02/01/3-JVM-类加载器深入解析及重要特性/index.html">
 <meta property="og:site_name" content="CloudXue&#39;s Blog">
 <meta property="og:description" content="JVM使用class类的过程如下：  加载： 就是把二进制形式的java类型读入java虚拟机中 连接_验证 连接_准备： 为类变量分配内存，设置默认值。但是在到达初始化之前，类变量都没有初始化为真正的初始值 连接_解析： 解析过程就是在类型的常量池中寻找类、接口、字段和方法的符号引用，把这些符号引用替换成直接引用的过程 初始化： 为类变量赋予正确的初始值。静态变量的声明语句，以及静态代码块都被看">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2020-02-10T14:18:39.669Z">
+<meta property="og:updated_time" content="2020-02-19T07:56:06.507Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="3_JVM_类加载器深入解析及重要特性">
+<meta name="twitter:title" content="3_JVM_类加载器_类加载器深入解析及重要特性">
 <meta name="twitter:description" content="JVM使用class类的过程如下：  加载： 就是把二进制形式的java类型读入java虚拟机中 连接_验证 连接_准备： 为类变量分配内存，设置默认值。但是在到达初始化之前，类变量都没有初始化为真正的初始值 连接_解析： 解析过程就是在类型的常量池中寻找类、接口、字段和方法的符号引用，把这些符号引用替换成直接引用的过程 初始化： 为类变量赋予正确的初始值。静态变量的声明语句，以及静态代码块都被看">
 
 
@@ -128,7 +128,7 @@
 
 
 
-  <title>3_JVM_类加载器深入解析及重要特性 | CloudXue's Blog</title>
+  <title>3_JVM_类加载器_类加载器深入解析及重要特性 | CloudXue's Blog</title>
   
 
 
@@ -314,7 +314,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">3_JVM_类加载器深入解析及重要特性</h1>
+          <h1 class="post-title" itemprop="name headline">3_JVM_类加载器_类加载器深入解析及重要特性</h1>
         
 
         <div class="post-meta">
@@ -377,7 +377,7 @@
 
           
           
-             <span id="/doggie.github.io/2020/02/01/3-JVM-类加载器深入解析及重要特性/" class="leancloud_visitors" data-flag-title="3_JVM_类加载器深入解析及重要特性">
+             <span id="/doggie.github.io/2020/02/01/3-JVM-类加载器深入解析及重要特性/" class="leancloud_visitors" data-flag-title="3_JVM_类加载器_类加载器深入解析及重要特性">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -512,8 +512,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/doggie.github.io/2020/01/30/2-JVM-接口初始化规则与类加载器准备阶段和初始化阶段的重要意义/" rel="next" title="2_JVM_接口初始化规则与类加载器准备阶段和初始化阶段的重要意义">
-                <i class="fa fa-chevron-left"></i> 2_JVM_接口初始化规则与类加载器准备阶段和初始化阶段的重要意义
+              <a href="/doggie.github.io/2020/01/30/2-JVM-接口初始化规则与类加载器准备阶段和初始化阶段的重要意义/" rel="next" title="2_JVM_类加载器_接口初始化规则与类加载器准备阶段和初始化阶段的重要意义">
+                <i class="fa fa-chevron-left"></i> 2_JVM_类加载器_接口初始化规则与类加载器准备阶段和初始化阶段的重要意义
               </a>
             
           </div>
@@ -522,8 +522,8 @@
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/doggie.github.io/2020/02/02/4-JVM-ClassLoader源码分析与实例剖析/" rel="prev" title="4_JVM_ClassLoader源码分析与实例剖析">
-                4_JVM_ClassLoader源码分析与实例剖析 <i class="fa fa-chevron-right"></i>
+              <a href="/doggie.github.io/2020/02/02/4-JVM-ClassLoader源码分析与实例剖析/" rel="prev" title="4_JVM_类加载器_ClassLoader源码分析与实例剖析">
+                4_JVM_类加载器_ClassLoader源码分析与实例剖析 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -603,7 +603,7 @@
               
                 <a href="/doggie.github.io/archives/">
               
-                  <span class="site-state-item-count">45</span>
+                  <span class="site-state-item-count">52</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>

@@ -84,14 +84,14 @@
 <meta name="description" content="Java程序运行的过程在Java代码中，类型的加载、连接与初始化过程都是在程序运行期间完成的，这样就提供了更大的灵活性，增加了更多的可能性。    加载： 指的是查找并加载类的二进制数据，将类的.class文件中的二进制数据读入到内存中，将其放在运行时数据区的方法区内，然后在内存中创建一个java.lang.Class对象（规范并未说明Class对象位于哪里，HotSpot虚拟机将其放在了方法区中">
 <meta name="keywords" content="JVM">
 <meta property="og:type" content="article">
-<meta property="og:title" content="0_JVM_类加载、连接与初始化">
+<meta property="og:title" content="0_JVM_类加载器_类加载、连接与初始化">
 <meta property="og:url" content="https://doublexz.github.io/doggie.github.io/2020/01/29/0-JVM-类加载、连接与初始化/index.html">
 <meta property="og:site_name" content="CloudXue&#39;s Blog">
 <meta property="og:description" content="Java程序运行的过程在Java代码中，类型的加载、连接与初始化过程都是在程序运行期间完成的，这样就提供了更大的灵活性，增加了更多的可能性。    加载： 指的是查找并加载类的二进制数据，将类的.class文件中的二进制数据读入到内存中，将其放在运行时数据区的方法区内，然后在内存中创建一个java.lang.Class对象（规范并未说明Class对象位于哪里，HotSpot虚拟机将其放在了方法区中">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2020-02-10T09:50:44.476Z">
+<meta property="og:updated_time" content="2020-02-19T07:56:24.296Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="0_JVM_类加载、连接与初始化">
+<meta name="twitter:title" content="0_JVM_类加载器_类加载、连接与初始化">
 <meta name="twitter:description" content="Java程序运行的过程在Java代码中，类型的加载、连接与初始化过程都是在程序运行期间完成的，这样就提供了更大的灵活性，增加了更多的可能性。    加载： 指的是查找并加载类的二进制数据，将类的.class文件中的二进制数据读入到内存中，将其放在运行时数据区的方法区内，然后在内存中创建一个java.lang.Class对象（规范并未说明Class对象位于哪里，HotSpot虚拟机将其放在了方法区中">
 
 
@@ -128,7 +128,7 @@
 
 
 
-  <title>0_JVM_类加载、连接与初始化 | CloudXue's Blog</title>
+  <title>0_JVM_类加载器_类加载、连接与初始化 | CloudXue's Blog</title>
   
 
 
@@ -314,7 +314,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">0_JVM_类加载、连接与初始化</h1>
+          <h1 class="post-title" itemprop="name headline">0_JVM_类加载器_类加载、连接与初始化</h1>
         
 
         <div class="post-meta">
@@ -377,7 +377,7 @@
 
           
           
-             <span id="/doggie.github.io/2020/01/29/0-JVM-类加载、连接与初始化/" class="leancloud_visitors" data-flag-title="0_JVM_类加载、连接与初始化">
+             <span id="/doggie.github.io/2020/01/29/0-JVM-类加载、连接与初始化/" class="leancloud_visitors" data-flag-title="0_JVM_类加载器_类加载、连接与初始化">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -518,8 +518,8 @@
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/doggie.github.io/2020/01/30/1-JVM-编译期常量与运行期常量及数组创建的本质/" rel="prev" title="1_JVM_编译期常量与运行期常量及数组创建的本质">
-                1_JVM_编译期常量与运行期常量及数组创建的本质 <i class="fa fa-chevron-right"></i>
+              <a href="/doggie.github.io/2020/01/30/1-JVM-编译期常量与运行期常量及数组创建的本质/" rel="prev" title="1_JVM_类加载器_编译期常量与运行期常量及数组创建的本质">
+                1_JVM_类加载器_编译期常量与运行期常量及数组创建的本质 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -599,7 +599,7 @@
               
                 <a href="/doggie.github.io/archives/">
               
-                  <span class="site-state-item-count">45</span>
+                  <span class="site-state-item-count">52</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>

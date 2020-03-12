@@ -1,0 +1,1340 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/doggie.github.io/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/doggie.github.io/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/doggie.github.io/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/doggie.github.io/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/doggie.github.io/images/fat_run_32px.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/doggie.github.io/images/fat_run_16px.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/doggie.github.io/images/love.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="JVM,">
+
+
+
+
+
+  <link rel="alternate" href="/doggie.github.io/atom.xml" title="CloudXue's Blog" type="application/atom+xml">
+
+
+
+
+
+
+<meta name="description" content="对照下面类的源代码及class文件逐个字节分析源代码123456789101112131415161718192021222324252627package com.shengsiyuan.jvm.bytecode;/** * @Program jvm_lecture * @Title: MyTest2 * @Description: * @Author: XueXiao * @Create:">
+<meta name="keywords" content="JVM">
+<meta property="og:type" content="article">
+<meta property="og:title" content="12_JVM_字节码_字节码分析实战">
+<meta property="og:url" content="https://doublexz.github.io/doggie.github.io/2020/02/22/12-JVM-字节码-字节码分析实战/index.html">
+<meta property="og:site_name" content="CloudXue&#39;s Blog">
+<meta property="og:description" content="对照下面类的源代码及class文件逐个字节分析源代码123456789101112131415161718192021222324252627package com.shengsiyuan.jvm.bytecode;/** * @Program jvm_lecture * @Title: MyTest2 * @Description: * @Author: XueXiao * @Create:">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2020-02-28T01:55:57.862Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="12_JVM_字节码_字节码分析实战">
+<meta name="twitter:description" content="对照下面类的源代码及class文件逐个字节分析源代码123456789101112131415161718192021222324252627package com.shengsiyuan.jvm.bytecode;/** * @Program jvm_lecture * @Title: MyTest2 * @Description: * @Author: XueXiao * @Create:">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/doggie.github.io/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":true,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://doublexz.github.io/doggie.github.io/2020/02/22/12-JVM-字节码-字节码分析实战/">
+
+
+
+
+
+  <title>12_JVM_字节码_字节码分析实战 | CloudXue's Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/doggie.github.io/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">CloudXue's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/doggie.github.io/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/doggie.github.io/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/doggie.github.io/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/doggie.github.io/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/doggie.github.io/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://doublexz.github.io/doggie.github.io/doggie.github.io/2020/02/22/12-JVM-字节码-字节码分析实战/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Doggie">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/doggie.github.io/images/love.jpeg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="CloudXue's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">12_JVM_字节码_字节码分析实战</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-02-22T08:39:52+08:00">
+                2020-02-22
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/doggie.github.io/categories/Java/" itemprop="url" rel="index">
+                    <span itemprop="name">Java</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/doggie.github.io/categories/Java/JVM/" itemprop="url" rel="index">
+                    <span itemprop="name">JVM</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/doggie.github.io/2020/02/22/12-JVM-字节码-字节码分析实战/" class="leancloud_visitors" data-flag-title="12_JVM_字节码_字节码分析实战">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o">本文总阅读量</i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>次
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>对照下面类的源代码及class文件逐个字节分析<br>源代码<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">package com.shengsiyuan.jvm.bytecode;</span><br><span class="line"></span><br><span class="line">/**</span><br><span class="line"> * @Program jvm_lecture</span><br><span class="line"> * @Title: MyTest2</span><br><span class="line"> * @Description:</span><br><span class="line"> * @Author: XueXiao</span><br><span class="line"> * @Create: 2020-02-21 16:25:10</span><br><span class="line"> */</span><br><span class="line">public class MyTest2 &#123;</span><br><span class="line"></span><br><span class="line">    String str = &quot;Welcome&quot;;</span><br><span class="line"></span><br><span class="line">    private int x = 5;</span><br><span class="line"></span><br><span class="line">    public static Integer in = 10;</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        MyTest2 myTest2 = new MyTest2();</span><br><span class="line">        myTest2.setX(8);</span><br><span class="line">        in = 20;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void setX(int x) &#123;</span><br><span class="line">        this.x=x;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>字节码文件<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">CA FE BA BE 00 00 00 34 00 2F 0A 00 0A 00 22 08 00 23 09 00 05 00 24 09 00 05 00 25 07 00 26 0A 00 05 00 22 0A 00 05 </span><br><span class="line">00 27 0A 00 28 00 29 09 00 05 00 2A 07 00 2B 01 00 03 73 74 72 01 00 12 4C 6A 61 76 61 2F 6C 61 6E 67 2F 53 74 72 69 </span><br><span class="line">6E 67 3B 01 00 01 78 01 00 01 49 01 00 02 69 6E 01 00 13 4C 6A 61 76 61 2F 6C 61 6E 67 2F 49 6E 74 65 67 65 72 3B 01 </span><br><span class="line">00 06 3C 69 6E 69 74 3E 01 00 03 28 29 56 01 00 04 43 6F 64 65 01 00 0F 4C 69 6E 65 4E 75 6D 62 65 72 54 61 62 6C 65 </span><br><span class="line">01 00 12 4C 6F 63 61 6C 56 61 72 69 61 62 6C 65 54 61 62 6C 65 01 00 04 74 68 69 73 01 00 26 4C 63 6F 6D 2F 73 68 65 </span><br><span class="line">6E 67 73 69 79 75 61 6E 2F 6A 76 6D 2F 62 79 74 65 63 6F 64 65 2F 4D 79 54 65 73 74 32 3B 01 00 04 6D 61 69 6E 01 00 </span><br><span class="line">16 28 5B 4C 6A 61 76 61 2F 6C 61 6E 67 2F 53 74 72 69 6E 67 3B 29 56 01 00 04 61 72 67 73 01 00 13 5B 4C 6A 61 76 61 </span><br><span class="line">2F 6C 61 6E 67 2F 53 74 72 69 6E 67 3B 01 00 07 6D 79 54 65 73 74 32 01 00 04 73 65 74 58 01 00 04 28 49 29 56 01 00 </span><br><span class="line">08 3C 63 6C 69 6E 69 74 3E 01 00 0A 53 6F 75 72 63 65 46 69 6C 65 01 00 0C 4D 79 54 65 73 74 32 2E 6A 61 76 61 0C 00 </span><br><span class="line">11 00 12 01 00 07 57 65 6C 63 6F 6D 65 0C 00 0B 00 0C 0C 00 0D 00 0E 01 00 24 63 6F 6D 2F 73 68 65 6E 67 73 69 79 75 </span><br><span class="line">61 6E 2F 6A 76 6D 2F 62 79 74 65 63 6F 64 65 2F 4D 79 54 65 73 74 32 0C 00 1D 00 1E 07 00 2C 0C 00 2D 00 2E 0C 00 0F </span><br><span class="line">00 10 01 00 10 6A 61 76 61 2F 6C 61 6E 67 2F 4F 62 6A 65 63 74 01 00 11 6A 61 76 61 2F 6C 61 6E 67 2F 49 6E 74 65 67 </span><br><span class="line">65 72 01 00 07 76 61 6C 75 65 4F 66 01 00 16 28 49 29 4C 6A 61 76 61 2F 6C 61 6E 67 2F 49 6E 74 65 67 65 72 3B 00 21 </span><br><span class="line">00 05 00 0A 00 00 00 03 00 00 00 0B 00 0C 00 00 00 02 00 0D 00 0E 00 00 00 09 00 0F 00 10 00 00 00 04 00 01 00 11 00 </span><br><span class="line">12 00 01 00 13 00 00 00 42 00 02 00 01 00 00 00 10 2A B7 00 01 2A 12 02 B5 00 03 2A 08 B5 00 04 B1 00 00 00 02 00 14 </span><br><span class="line">00 00 00 0E 00 03 00 00 00 0A 00 04 00 0C 00 0A 00 0E 00 15 00 00 00 0C 00 01 00 00 00 10 00 16 00 17 00 00 00 09 00 </span><br><span class="line">18 00 19 00 01 00 13 00 00 00 57 00 02 00 02 00 00 00 17 BB 00 05 59 B7 00 06 4C 2B 10 08 B6 00 07 10 14 B8 00 08 B3 </span><br><span class="line">00 09 B1 00 00 00 02 00 14 00 00 00 12 00 04 00 00 00 13 00 08 00 14 00 0E 00 15 00 16 00 16 00 15 00 00 00 16 00 02 </span><br><span class="line">00 00 00 17 00 1A 00 1B 00 00 00 08 00 0F 00 1C 00 17 00 01 00 01 00 1D 00 1E 00 01 00 13 00 00 00 3E 00 02 00 02 00 </span><br><span class="line">00 00 06 2A 1B B5 00 04 B1 00 00 00 02 00 14 00 00 00 0A 00 02 00 00 00 19 00 05 00 1A 00 15 00 00 00 16 00 02 00 00 </span><br><span class="line">00 06 00 16 00 17 00 00 00 00 00 06 00 0D 00 0E 00 01 00 08 00 1F 00 12 00 01 00 13 00 00 00 21 00 01 00 00 00 00 00 </span><br><span class="line">09 10 0A B8 00 08 B3 00 09 B1 00 00 00 01 00 14 00 00 00 06 00 01 00 00 00 10 00 01 00 20 00 00 00 02 00 21</span><br></pre></td></tr></table></figure></p>
+<p>魔数：CA CF BA BE — 0xCACFBABE<br>次版本号： 00 00 — 0x0000<br>主版本号： 00 34 — 0x0034<br>常量池数量： 00 2F — 0x002F 47 即有46个元素<br>常量池数组：<br>第1个元素：u1为0A，转换成十进制是10，表示方法引用常量Methodref，紧随其后的两个字节是00 0A，指向声明方法的类描述符Class的索引项，即#10；再往后两个字节是00 22，指向名称及类型描述符NameAndType的索引项，即#34。所以第一个元素表示为<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">#1 = Methodref	#10.#34		// java/lang/Object.&quot;&lt;init&gt;&quot;:()V</span><br></pre></td></tr></table></figure></p>
+<p>第2个元素：u1为08，转换成十进制是8，表示字符串字面量String，紧随其后的两个字节是00 23，指向字符串字面量索引项，即#35。所以第二个元素表示为<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">#2 = String  #35	// Welcome</span><br></pre></td></tr></table></figure></p>
+<p>第3个元素：u1为09，转换成十进制是9，表示字段引用常量Fieldref，紧随其后的两个字节是00 05，指向声明字段的类或接口描述符Class的索引项，即#5；再往后两个字节是00 24，指向名称及类型描述符NameAndType的索引项，即#36。所以第三个元素表示为<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">#3 = Fieldref	#5.#36		// com/shengsiyuan/jvm/bytecode/MyTest2.str:Ljava/lang/String;</span><br></pre></td></tr></table></figure></p>
+<p>第4个元素：u1为09，转换成十进制是9，表示字段引用常量Fieldref，根据其后四个字节，表示为<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">#4 = Fieldref	#5.#37		//com/shengsiyuan/jvm/bytecode/MyTest2.x:I</span><br></pre></td></tr></table></figure></p>
+<p>第5个元素：u1为07，转换成十进制是7，表示全限定名常量Class，紧随其后的两个字节是00 26，指向全限定名常量项的索引，即#38。所以第五个元素表示为<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">#5 = Class	#38		// com/shengsiyuan/jvm/bytecode/MyTest2</span><br></pre></td></tr></table></figure></p>
+<p>第6个元素：u1为0A，转换成十进制是10，表示方法引用常量Methodref，根据其后四个字节00 05 00 22，表示为<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">#6 = Methodref	#5.#34		//com/shengsiyuan/jvm/bytecode/MyTest2.&quot;&lt;init&gt;&quot;:()V</span><br></pre></td></tr></table></figure></p>
+<p>第7个元素：u1为0A，转换成十进制是10，表示方法引用常量Methodref，根据其后四个字节00 05 00 27，表示为<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">#7 = Methodref	#5.#39		// com/shengsiyuan/jvm/bytecode/MyTest2.setX:(I)V</span><br></pre></td></tr></table></figure></p>
+<p>第8个元素：u1为0A，转换成十进制是10，表示方法引用常量Methodref，根据其后四个字节00 28 00 29，表示为<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">#8 = Methodref	#40.#41		// java/lang/Integer.valueOf:(I)Ljava/lang/Integer;</span><br></pre></td></tr></table></figure></p>
+<p>第9个元素：u1为09，转换成十进制是9，表示字段引用常量Fieldref，根据其后四个字节00 05 00 2A，表示为<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">#9 = Fieldref	#5.#42		// com/shengsiyuan/jvm/bytecode/MyTest2.in:Ljava/lang/Integer;</span><br></pre></td></tr></table></figure></p>
+<p>第10个元素：u1为07，转换成十进制是7，表示全限定名常量Class，根据其后两个字节00 2B，表示为<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">#10 = Class		#43		// java/lang/Object</span><br></pre></td></tr></table></figure></p>
+<p>第11个元素：u1位01，表示UTF-8编码的字符串常量Utf8,紧随其后两个字节00 03，表示字符串的长度length，即长度为3的Utf8编码的字符串，后面length个字节表示字符串的内容，此处长度是3，后面的三个字节是73 74 72，表示str。表示为<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">#11 = Utf8	str</span><br></pre></td></tr></table></figure></p>
+<p>第12个元素：u1位01，表示UTF-8编码的字符串常量Utf8，表示为<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">#12 = Utf8	Ljava/lang/String;</span><br></pre></td></tr></table></figure></p>
+<p>以此类推，直到第33个元素<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">#13 = Utf8               x</span><br><span class="line">#14 = Utf8               I</span><br><span class="line">#15 = Utf8               in</span><br><span class="line">#16 = Utf8               Ljava/lang/Integer;</span><br><span class="line">#17 = Utf8               &lt;init&gt;</span><br><span class="line">#18 = Utf8               ()V</span><br><span class="line">#19 = Utf8               Code</span><br><span class="line">#20 = Utf8               LineNumberTable</span><br><span class="line">#21 = Utf8               LocalVariableTable</span><br><span class="line">#22 = Utf8               this</span><br><span class="line">#23 = Utf8               Lcom/shengsiyuan/jvm/bytecode/MyTest2;</span><br><span class="line">#24 = Utf8               main</span><br><span class="line">#25 = Utf8               ([Ljava/lang/String;)V</span><br><span class="line">#26 = Utf8               args</span><br><span class="line">#27 = Utf8               [Ljava/lang/String;</span><br><span class="line">#28 = Utf8               myTest2</span><br><span class="line">#29 = Utf8               setX</span><br><span class="line">#30 = Utf8               (I)V</span><br><span class="line">#31 = Utf8               &lt;clinit&gt;</span><br><span class="line">#32 = Utf8               SourceFile</span><br><span class="line">#33 = Utf8               MyTest2.java</span><br></pre></td></tr></table></figure></p>
+<p>第34个元素，u1为0C，转换成十进制是12，表示字段或方法名称常量项NameAndType，紧随其后两个字节00 11，指向该字段或者方法名称常量项索引，再往后两个字节00 12，指向字段或方法描述符索引。表示为<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">#34 = NameAndType        #17:#18        // &quot;&lt;init&gt;&quot;:()V</span><br></pre></td></tr></table></figure></p>
+<p>第35个元素，u1为01，表示为<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">#35 = Utf8               Welcome</span><br></pre></td></tr></table></figure></p>
+<p>直到最后一个常量如下<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">#36 = NameAndType        #11:#12        // str:Ljava/lang/String;</span><br><span class="line">#37 = NameAndType        #13:#14        // x:I</span><br><span class="line">#38 = Utf8               com/shengsiyuan/jvm/bytecode/MyTest2</span><br><span class="line">#39 = NameAndType        #29:#30        // setX:(I)V</span><br><span class="line">#40 = Class              #44            // java/lang/Integer</span><br><span class="line">#41 = NameAndType        #45:#46        // valueOf:(I)Ljava/lang/Integer;</span><br><span class="line">#42 = NameAndType        #15:#16        // in:Ljava/lang/Integer;</span><br><span class="line">#43 = Utf8               java/lang/Object</span><br><span class="line">#44 = Utf8               java/lang/Integer</span><br><span class="line">#45 = Utf8               valueOf</span><br><span class="line">#46 = Utf8               (I)Ljava/lang/Integer;</span><br></pre></td></tr></table></figure></p>
+<p>以上常量池分析完毕！</p>
+<p>常量池表(cp_info)后面,紧接着的两个字节（00 21）是该类的访问标志access_flag。这个标志用于识别一些类或者接口层次的访问信息，包括：这个Class是类还是接口；是否定义为public类型；是否定义为abstract类型；如果是类的话，是否本声明为final等。根据JVM规范预定义的访问标志，可以看成是0x0001|0x0020=0x0021，即ACC_PUBLIC和ACC_SUPER。</p>
+<p>访问标志(access_flag)后面，紧接着的两个字节（00 05）是类索引（this_class），指向常量池中第5个常量（#5），而常量池中第5个常量又指向第38个常量（#38），最终确定类的全限定名是：<br><code>com/shengsiyuan/jvm/bytecode/MyTest2</code></p>
+<p>类索引之后紧接着的两个字节（00 0A）是父类索引(super_class)，指向常量池中第10个常量（#10），而常量池中第10个常量又指向第43个常量（#43），最终确定父类的全限定名是：<br><code>java/lang/Object</code></p>
+<p>父类索引之后紧接着的两个字节（00 00）是接口索引集合的长度（interfaces_count），该类没有实现任何接口，所以接口索引集合的长度为0，后面的接口索引表不再占用任何字节。</p>
+<p>再往后就是字段表（field_info）,用于描述接口或者类中声明的变量。先看的两个字节（00 03）表示字段表的长度（fileds_count），表示字段的数量，也就是说所分析的类中有3个字段。</p>
+<p>fields_count以后的字节就是字段表（field_info）信息了，逐个分析：</p>
+<ul>
+<li><p>第一个字段：<br>前两个字节（00 00），表示字段的访问标志（access_flags），根据源代码，第一个字段<code>String str = &quot;Welcome&quot;;</code>是没有访问修饰符的。<br>访问标志（access_flags）后面的两个字节（00 0B），表示该字段名字的索引（name_index），即指向常量池中第11个常量（#11），为<code>str</code><br>名字索引（name_index）后面的两个字节（00 0C），表示该字段描述符的索引（descriptor_index），即指向常量池中第12个常量（#12），为<code>Ljava/lang/String</code>;<br>描述符索引后面紧挨着的两个字节：00 00，表示该字段的属性数量（attributes_count），此处为0，表示没有属性，本字段的字节内容结束。</p>
+</li>
+<li><p>第二个字段：<br>前两个字节：00 02，表示该字段的访问标志为ACC_PRIVATE，根据源代码，第二个字段<code>private int x = 5;</code>可以印证。<br>后面紧挨着的两个字节：00 0D，表示该字段名字的索引，指向常量池中第13个常量（#13），为<code>x</code><br>后面紧挨着的两个字节：00 0E，表示该字段描述符的索引，指向常量池中第14个常量（#14），为<code>I</code><br>后面紧挨着的两个字节：00 00，表示该字段的属性数量，此处为0，表示没有属性，本字段的字节内容结束。</p>
+</li>
+<li><p>第三个字段：<br>前两个字节：00 09，表示该字段的访问标志为ACC_PUBLIC、ACC_STATIC，根据源代码，第二个字段<code>private int x = 5;</code>可以印证<br>后面紧挨着的两个字节：00 0F，表示该字段名字的索引，指向常量池中第15个常量（#15），为<code>in</code><br>后面紧挨着的两个字节：00 10，表示该字段描述符的索引，指向常量池中第16个常量（#16），为<code>Ijava/lang/Integer</code>;<br>后面紧挨着的两个字节：00 00，表示字该段的属性数量，此处为0，表示没有属性，本字段的字节内容结束。</p>
+</li>
+</ul>
+<p>以上字段表分析完毕。</p>
+<p>后面紧挨着字段表的是方法表（method_info）相关的信息，同字段表一样，先看下方法表的长度：</p>
+<p>先看两个字节：00 04，表示methods_count，是方法的数量，也就是说所分析类中有4个方法，后面紧挨着的字节就是method_info方法表信息了，逐个分析：</p>
+<ul>
+<li>第一个方法：<br>先看两个字节：00 01，表示该方法的访问修饰符为ACC_PUBLIC<br>后面紧挨着的两个字节：00 11，表示该方法名字的索引，即常量池#17，为<init><br>后面紧挨着的两个字节：00 12，表示该方法描述符的索引，即常量池#18，为()V<br>可以确认第一个方法是编译器创建的无参构造方法。<br>后面紧挨着的两个字节：00 01，表示该方法包含的属性数量是1<br>下面方法的属性表信息：<br>  后面紧挨着的两个字节：00 13，表示该方法属性名索引，即常量池#19，为Code<br>  后面紧挨着的四个字节：00 00 00 42，表示方法表属性所包含的字节数为16x4+2=66<br>  后面紧挨着的字节即为Code Attribute：<br>  后面紧挨着的两个字节：00 02，是max_stacks，表示该方法运行的任何时刻所能达到的操作栈的最大深度<br>  后面紧挨着的两个字节：00 01，是max_locals，表示该方法运行期间创建的局部变量的数目<br>  后面四个字节：00 00 00 10，是code_length，表示该方法所包含字节码的字节数为16<br>  后面的16个字节就是该方法执行的指令，根据Java虚拟机规范：<br>  2A = aload_0，从局部变量加载引用<br>  B7 = invokespecial，调用实例化方法，用于父类方法、私有方法和实例初始化方法调用的特殊处理，根据其后的两个字节00 01，指向了#1，及调用父类的无参构造方法<br>  2A = aload_0，从局部变量加载引用<br>  12 = ldc，此处表示将String类型的常量从常量池推至栈顶，所推送的常量为：02，指向#2，即将<welcome>字符串从常量池推到栈顶<br>  B5 = putfield，设置对象中字段的值，根据其后两个字节：00 03，指向#3，即为字段：&lt;com/shengsiyuan/jvm/bytecode/MyTest2.str&gt;设置值为当前栈顶的值<welcome><br>  2A = aload_0，从局部变量加载引用<br>  08 = iconst_5，将int类型5推送至栈顶<br>  B5 = putfield，设置对象中字段都值，根据其后两个字节：00 04，指向#4，即为字段引：&lt;com/shengsiyuan/jvm/bytecode/MyTest2.x&gt;设置值为当前栈顶的值5<br>  B1 = return，从方法中返回void。return后，该方法指令码执行完毕。<br>  后面的两个字节是00 00，表示exception_table_length值为0，不做分析<br>  后面紧挨着的两个字节是00 02，表示方法的附加属性长度，即两个附加属性<ul>
+<li>第一个附加属性：<br>后面两个字节：00 14，表示附加属性的名字索引：#20，为LineNumberTable<br>后面四个字节：00 00 00 0E，表示该附加属性的长度为14<br>后面两个字节：00 03，表示line_number_table_length为3，即LineNumberTable中有三组对应关系，12个字节：00 00 00 0A 00 04 00 0C 00 0A 00 0E：<br>00 00 — 00 0A code数组中第0个指令对应Java源代码的第10行<br>00 04 — 00 0C    code数组中第4个指令对应Java源代码的第12行<br>00 0A — 00 0E code数组中第10个指令对应Java源代码的第14行</li>
+<li>第二个附加属性：<br>后面两个字节：00 15，表示附加属性的名字索引：#21，为LocalVariableTable<br>后面四个字节：00 00 00 0C，表示该附加属性的长度为12<br>后面两个字节：00 01，表示该附加属性表中元素的个数为1，即只有一个局部变量<br>后面两个字节：00 00，start_pc为0<br>后面两个字节：00 10，length为16<br>后面两个字节：00 16，表述局部变量名称，#22，为this<br>后面两个字节：00 17，表示局部变量描述符，#23，为Lcom/shengsiyuan/jvm/bytecode/MyTest2;<br>以上无参构造方法执行完毕，完成了对成员变量str和x的赋值</li>
+</ul>
+</welcome></welcome></init></li>
+</ul>
+<p>后面紧跟两个字节是00 00，表示Stack Map Table，此处不赘述。</p>
+<ul>
+<li><p>第二个方法：<br>先看两个字节：00 09，表示该方法的访问修饰符为ACC_PRIVATE、ACC_STATIC<br>后面紧挨着的两个字节：00 18，表示该方法名字的索引：#24，为main<br>后面紧挨着的两个字节：00 19，表示该方法描述符的索引，即常量池#25，为([Ljava/lang/String;)V<br>可以确认第二个方法是main方法。<br>后面紧挨着的两个字节：00 01，表示该方法包含的属性数量是1<br>下面方法的属性表信息：<br>  后面紧挨着的两个字节：00 13，表示该方法属性名索引，即常量池#19，为Code<br>  后面紧挨着的四个字节：00 00 00 57，表示方法表属性所包含的字节数为16x5+7=87<br>  后面紧挨着的字节即为Code Attribute：<br>  后面紧挨着的两个字节：00 02，是max_stacks，表示该方法运行的任何时刻所能达到的操作栈的最大深度<br>  后面紧挨着的两个字节：00 02，是max_locals，表示该方法运行期间创建的局部变量的数目<br>  后面四个字节：00 00 00 17，是code_length，表示该方法所包含字节码的字节数为23<br>  BB = new，表示创建一个对象，后面两个字节00 05，即创建一个#5所表示的对象<br>  59 = dup，复制顶部操作栈的值<br>  B7 = invokespecial，00 06为#6，即调用该类的无参构造方法<br>  4C = astore_1，<br>  2B = aload_1，<br>  10 = bipush，将十六进制08，即十进制8推送到栈顶<br>  B6 = invokevirtual，调用实例方法，索引为00 07，即#7表示的 &lt;com/shengsiyuan/jvm/bytecode/MyTest2.setX&gt;<br>  10 = bipush，将十六进制14，即十进制20推送到栈顶<br>  B8 = invokestatic，调用静态方法，索引为00 08，即#8表示的&lt;java/lang/Integer.valueOf&gt;，类型转换，自动装箱<br>  B3 = putstatic，设置静态字段的值，索引为00 09，即#9表示为静态字段in赋值<br>  B1 = return 从方法中返回void。return后，该方法指令码执行完毕。<br>  后面的两个字节是00 00，表示exception_table_length值为0，不做分析<br>  后面紧挨着的两个字节是00 02，表示方法的附加属性长度，即两个附加属性</p>
+<ul>
+<li>第一个附加属性：<br>后面两个字节：00 14，表示附加属性的名字索引：#20，为LineNumberTable<br>后面四个字节：00 00 00 12，表示该附加属性的长度为18<br>后面两个字节：00 04，表示line_number_table_length为4，即LineNumberTable中有4组对应关系，16个字节：00 00 00 13 00 08 00 14 00 0E 00 15 00 16 00 16：<br>00 00 — 00 13 code数组中第0个指令对应Java源代码的第19行<br>00 08 — 00 14    code数组中第8个指令对应Java源代码的第20行<br>00 0E — 00 15 code数组中第14个指令对应Java源代码的第21行<br>00 16 — 00 16 code数组中第22个指令对应Java源代码的第22行</li>
+<li><p>第二个附加属性：<br>后面两个字节：00 15，表示附加属性的名字索引：#21，为LocalVariableTable<br>后面四个字节：00 00 00 16，表示该附加属性的长度为22<br>后面两个字节：00 02，表示该附加属性表中元素的个数为2，即两个局部变量</p>
+<ul>
+<li><p>第一个局部变量：<br>后面两个字节：00 00，start_pc为0<br>后面两个字节：00 17，length为23<br>后面两个字节：00 1A，表示局部变量名称，#26，为args<br>后面两个字节：00 1B，表示局部变量描述符，#27，为[Ljava/lang/String;</p>
+<p>两个局部变量之间的 00 00 表示什么？？？？？？？</p>
+</li>
+<li><p>第二个局部变量：<br>后面两个字节：00 08，start_pc为8<br>后面两个字节：00 0F，length为15<br>后面两个字节：00 1C，表示局部变量名称，#28，为myTest2<br>后面两个字节：00 17，表示局部变量描述符，#23，为Lcom/shengsiyuan/jvm/bytecode/MyTest2;</p>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>以上main方法执行完毕。</p>
+<p>第二个方法结束之后和第三个方法开始之前有 00 01两个字节码???</p>
+<ul>
+<li><p>第三个方法：<br>先看两个字节：00 01，表示该方法的访问修饰符为ACC_PUBLIC<br>后面紧挨着的两个字节：00 1D，表示该方法名字的索引：#1，为setX<br>后面紧挨着的两个字节：00 1E，表示该方法描述符的索引，即常量池#30，为(I)V<br>可以确认第三个方法是set方法。<br>后面紧挨着的两个字节：00 01，表示该方法包含的属性数量是1<br>下面方法的属性表信息：<br>  后面紧挨着的两个字节：00 13，表示该方法属性名索引，即常量池#19，为Code<br>  后面紧挨着的四个字节：00 00 00 3E，表示方法表属性所包含的字节数为16x3+14=62<br>  后面紧挨着的字节即为Code Attribute：<br>  后面紧挨着的两个字节：00 02，是max_stacks，表示该方法运行的任何时刻所能达到的操作栈的最大深度<br>  后面紧挨着的两个字节：00 02，是max_locals，表示该方法运行期间创建的局部变量的数目<br>  后面四个字节：00 00 00 06，是code_length，表示该方法所包含字节码的字节数为6<br>  2A = aload_0，从局部变量加载索引为0的值<br>  1B = iload_1，从局部变量中加载整型1<br>  B5 = putfield，设置对象中的字段值， 00 04，为#4表示的com/shengsiyuan/jvm/bytecode/MyTest2.x设置值<br>  B1 = return，从方法中返回void。return后，该方法指令码执行完毕。<br>  后面的两个字节是00 00，表示exception_table_length值为0，不做分析<br>  后面紧挨着的两个字节是00 02，表示方法的附加属性长度，即两个附加属性</p>
+<ul>
+<li>第一个附加属性：<br>后面两个字节：00 14，表示附加属性的名字索引：#20，为LineNumberTable<br>后面四个字节：00 00 00 0A，表示该附加属性的长度为10<br>后面两个字节：00 02，表示line_number_table_length为2，即LineNumberTable中有2组对应关系，8个字节：00 00 00 19 00 05 00 1A：<br>00 00 — 00 19 code数组中第0个指令对应Java源代码的第25行<br>00 05 — 00 1A    code数组中第5个指令对应Java源代码的第26行</li>
+<li><p>第二个附加属性：<br>后面两个字节：00 15，表示附加属性的名字索引：#21，为LocalVariableTable<br>后面四个字节：00 00 00 16，表示该附加属性的长度为22<br>后面两个字节：00 02，表示该附加属性表中元素的个数为2，即两个局部变量</p>
+<ul>
+<li><p>第一个局部变量：<br>后面两个字节：00 00，start_pc为0<br>后面两个字节：00 06，length为6<br>后面两个字节：00 16，表示局部变量名称，#22，为this<br>后面两个字节：00 17，表示局部变量描述符，#23，为Lcom/shengsiyuan/jvm/bytecode/MyTest2;</p>
+<p>两个局部变量之间的 00 00 表示什么？？？？？？？</p>
+</li>
+<li><p>第二个局部变量：<br>后面两个字节：00 00，start_pc为0<br>后面两个字节：00 06，length为6<br>后面两个字节：00 0D，表示局部变量名称，#13，为x<br>后面两个字节：00 0E，表示局部变量描述符，#14，为I<br>setX方法中有两个局部变量，分别是this和x</p>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>以上setX方法执行完毕。</p>
+<p>第三个方法结束之后和第四个方法开始之前有 00 01两个字节码???</p>
+<ul>
+<li>第四个方法：<br>先看两个字节：00 08，表示该方法的访问修饰符为ACC_STATIC<br>后面紧挨着的两个字节：00 1F，表示该方法名字的索引：#31，为  <clinit><br>后面紧挨着的两个字节：00 12，表示该方法描述符的索引，即常量池#18，为()V<br>后面紧挨着的两个字节：00 01，表示该方法包含的属性数量是1<br>下面方法的属性表信息：<br>后面紧挨着的两个字节：00 13，表示该方法属性名索引，即常量池#19，为Code<br>后面紧挨着的四个字节：00 00 00 21，表示方法表属性所包含的字节数为16x2+1=33<br>后面紧挨着的字节即为Code Attribute：<br>后面紧挨着的两个字节：00 01，是max_stacks，表示该方法运行的任何时刻所能达到的操作栈的最大深度<br>后面紧挨着的两个字节：00 00，是max_locals，表示该方法运行期间创建的局部变量的数目<br>后面四个字节：00 00 00 09，是code_length，表示该方法所包含字节码的字节数为9<br>10 = bipush，将后面紧跟的字节0A，转换成十进制是10推至栈顶<br>B8 = invokestatic，调用字节00 08(#8)表示的静态方法&lt;java/lang/Integer.valueOf&gt;，相当于自动装箱<br>B3 = putstatic，为字节00 09(#9)表示的字段引用赋值&lt;com/shengsiyuan/jvm/bytecode/MyTest2.in&gt;<br>B1 = return，从方法中返回void。return后，该方法指令码执行完毕。<br>后面的两个字节是00 00，表示exception_table_length值为0，不做分析<br>后面紧挨着的两个字节是00 01，表示方法的附加属性长度，即1个附加属性<ul>
+<li>第一个附加属性：<br>后面两个字节：00 14，表示附加属性的名字索引：#20，为LineNumberTable<br>后面四个字节：00 00 00 06，表示该附加属性的长度为6<br>后面两个字节：00 01，表示line_number_table_length为1，即LineNumberTable中有1组对应关系，4个字节：00 00 00 10：<br>00 00 — 00 10 code数组中第0个指令对应Java源代码的第16行</li>
+</ul>
+</clinit></li>
+</ul>
+<p>以上第四个<clinit>方法分析完毕！！</clinit></p>
+<p>方法后面是类的附加属性<br>后面两个字节：00 01，表示附加属性的个数是1<br>后面两个字节：00 20，表示附加属性名称索引，#32为SourceFile<br>后面四个字节：00 00 00 02，表示该附加属性的长度为2<br>最后两个字节：00 21，表示附加属性描述符索引#33位MyTest2.java，即源文件名称</p>
+<hr>
+<p>From：圣思园年费课程：<a href="http://www.iprogramming.cn/jvm.html" target="_blank" rel="noopener">《深入理解JVM》</a><br>《深入理解Java虚拟机 第2版》</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/doggie.github.io/tags/JVM/" rel="tag"># JVM</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/doggie.github.io/2020/02/20/11-JVM-字节码-Java字节码的字段表、方法表和属性表/" rel="next" title="11_JVM_字节码_Java字节码的字段表、方法表和属性表">
+                <i class="fa fa-chevron-left"></i> 11_JVM_字节码_Java字节码的字段表、方法表和属性表
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/doggie.github.io/2020/02/25/13-JVM-字节码-synchronized关键字、构造方法和静态代码块字节码分析/" rel="prev" title="13_JVM_字节码_synchronized关键字、构造方法和静态代码块字节码分析">
+                13_JVM_字节码_synchronized关键字、构造方法和静态代码块字节码分析 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/doggie.github.io/images/love.jpeg" alt="Doggie">
+            
+              <p class="site-author-name" itemprop="name">Doggie</p>
+              <p class="site-description motion-element" itemprop="description">CloudXue</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/doggie.github.io/archives/">
+              
+                  <span class="site-state-item-count">52</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/doggie.github.io/categories/index.html">
+                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/doggie.github.io/tags/index.html">
+                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/doggie.github.io/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/DoubleXZ" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:xx734513550@gmail.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<div class="copyright">&copy; 2018 &mdash; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Doggie</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user">本站访客数</i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      人次
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye">本站总访问量</i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      次
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/doggie.github.io/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/doggie.github.io/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/doggie.github.io/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/doggie.github.io/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/doggie.github.io/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/doggie.github.io/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/doggie.github.io/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/doggie.github.io/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/doggie.github.io/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/doggie.github.io/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/doggie.github.io/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/doggie.github.io/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/doggie.github.io/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/doggie.github.io/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("hgbYTEumt6gl5PJEJMAI8AVi-gzGzoHsz", "rsk2kpWME20oPPAyPS4g6alC");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
